@@ -3,20 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thrive Bot Dashboard</title>
+<title>Thrive Agent Command Centre</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --black: #0a0a0a;
-    --dark: #111111;
-    --card: #161616;
-    --border: #222222;
+    --dark: #0e0e0e;
+    --card: #141414;
+    --card2: #181818;
+    --border: #1e1e1e;
+    --border2: #2a2a2a;
     --gold: #c9a84c;
     --gold-light: #e8c97a;
-    --gold-dim: rgba(201, 168, 76, 0.15);
+    --gold-dim: rgba(201, 168, 76, 0.12);
+    --gold-glow: rgba(201, 168, 76, 0.25);
     --white: #f5f0e8;
-    --muted: #666666;
-    --green: #4caf7d;
+    --muted: #555;
+    --muted2: #888;
+    --green: #3ecf8e;
+    --green-dim: rgba(62, 207, 142, 0.1);
     --red: #e05252;
     --blue: #5b8dee;
   }
@@ -31,26 +36,26 @@
     overflow-x: hidden;
   }
 
-  /* Noise texture overlay */
+  /* Subtle noise */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
   }
 
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 1; }
 
-  /* Header */
+  /* ── HEADER ── */
   header {
     border-bottom: 1px solid var(--border);
-    padding: 20px 0;
+    padding: 18px 0;
     position: sticky;
     top: 0;
-    background: rgba(10,10,10,0.95);
-    backdrop-filter: blur(12px);
+    background: rgba(10,10,10,0.97);
+    backdrop-filter: blur(16px);
     z-index: 100;
   }
 
@@ -62,42 +67,58 @@
 
   .logo {
     font-family: 'DM Serif Display', serif;
-    font-size: 22px;
+    font-size: 20px;
     color: var(--gold);
     letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  .logo span {
-    color: var(--white);
-    font-style: italic;
-  }
+  .logo-crown { font-size: 16px; }
+  .logo span { color: var(--white); font-style: italic; }
+
+  .header-right { display: flex; align-items: center; gap: 16px; }
 
   .header-badge {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--green);
-    background: rgba(76, 175, 125, 0.1);
-    border: 1px solid rgba(76, 175, 125, 0.3);
-    padding: 4px 10px;
+    background: var(--green-dim);
+    border: 1px solid rgba(62, 207, 142, 0.25);
+    padding: 5px 12px;
     border-radius: 20px;
     letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
-  /* Nav */
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* ── NAV ── */
   nav {
     display: flex;
-    gap: 2px;
-    padding: 24px 0 0;
+    gap: 0;
+    padding: 20px 0 0;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 32px;
+    margin-bottom: 0;
   }
 
   .nav-tab {
     font-family: 'DM Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.5px;
-    padding: 10px 20px;
+    letter-spacing: 0.8px;
+    padding: 10px 22px;
     border: none;
     background: none;
     color: var(--muted);
@@ -108,46 +129,39 @@
     transition: all 0.2s;
   }
 
-  .nav-tab:hover { color: var(--white); }
+  .nav-tab:hover { color: var(--muted2); }
   .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
 
-  /* Panels */
-  .panel { display: none; }
-  .panel.active { display: block; animation: fadeIn 0.3s ease; }
+  /* ── PANELS ── */
+  .panel { display: none; padding-top: 36px; padding-bottom: 80px; }
+  .panel.active { display: block; animation: fadeUp 0.3s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* Section header */
+  /* ── SECTION HEADER ── */
   .section-header {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 
   .section-title {
     font-family: 'DM Serif Display', serif;
-    font-size: 32px;
+    font-size: 30px;
     line-height: 1;
     color: var(--white);
   }
 
   .section-title span { color: var(--gold); font-style: italic; }
+  .section-subtitle { font-size: 13px; color: var(--muted2); margin-top: 6px; font-weight: 300; }
 
-  .section-subtitle {
-    font-size: 13px;
-    color: var(--muted);
-    margin-top: 6px;
-    font-weight: 300;
-  }
-
-  /* Buttons */
+  /* ── BUTTONS ── */
   .btn {
     font-family: 'DM Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.5px;
-    padding: 10px 20px;
+    padding: 9px 18px;
     border-radius: 6px;
     cursor: pointer;
     border: none;
@@ -155,142 +169,278 @@
     text-transform: uppercase;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
   }
 
-  .btn-primary {
-    background: var(--gold);
-    color: var(--black);
-  }
+  .btn-primary { background: var(--gold); color: #000; }
   .btn-primary:hover { background: var(--gold-light); }
-
-  .btn-outline {
-    background: transparent;
-    color: var(--white);
-    border: 1px solid var(--border);
-  }
+  .btn-outline { background: transparent; color: var(--white); border: 1px solid var(--border2); }
   .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-danger { background: transparent; color: var(--red); border: 1px solid rgba(224,82,82,0.25); }
+  .btn-danger:hover { background: rgba(224,82,82,0.08); }
+  .btn-sm { padding: 5px 11px; font-size: 10px; }
 
-  .btn-danger {
-    background: transparent;
-    color: var(--red);
-    border: 1px solid rgba(224, 82, 82, 0.3);
-  }
-  .btn-danger:hover { background: rgba(224, 82, 82, 0.1); }
+  /* ══════════════════════════════════════
+     ORG CHART / AGENT DIRECTORY
+  ══════════════════════════════════════ */
 
-  .btn-sm { padding: 6px 12px; font-size: 11px; }
+  .org-chart { width: 100%; }
 
-  /* Cards */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    transition: border-color 0.2s;
+  /* CEO row */
+  .org-ceo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
   }
 
-  .card:hover { border-color: #333; }
-
-  /* Bot grid */
-  .bots-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
+  /* Connector lines */
+  .org-connector-v {
+    width: 2px;
+    background: var(--border2);
+    margin: 0 auto;
   }
 
-  .bot-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    cursor: pointer;
-    transition: all 0.2s;
+  .org-connector-h-wrap {
+    display: flex;
+    justify-content: center;
     position: relative;
-    overflow: hidden;
+    margin-bottom: 0;
   }
 
-  .bot-card::before {
+  .org-connector-h {
+    border-top: 2px solid var(--border2);
+    position: absolute;
+    top: 0;
+  }
+
+  /* Agent card */
+  .agent-card {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    transition: all 0.25s;
+    cursor: default;
+    width: 200px;
+    flex-shrink: 0;
+  }
+
+  .agent-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
     background: linear-gradient(90deg, var(--gold), transparent);
+    border-radius: 14px 14px 0 0;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.25s;
   }
 
-  .bot-card:hover { border-color: var(--gold); transform: translateY(-2px); }
-  .bot-card:hover::before { opacity: 1; }
+  .agent-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(201,168,76,0.08); }
+  .agent-card:hover::before { opacity: 1; }
 
-  .bot-card.add-new {
-    border-style: dashed;
+  .agent-card.ceo {
+    width: 240px;
+    border-color: rgba(201,168,76,0.35);
+    background: linear-gradient(135deg, #181408, var(--card));
+  }
+
+  .agent-card.coo {
+    width: 220px;
+    border-color: var(--border2);
+  }
+
+  .agent-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--card2);
+    border: 2px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin: 0 auto 12px;
+    transition: border-color 0.25s;
+  }
+
+  .agent-card:hover .agent-avatar { border-color: var(--gold); }
+  .agent-card.ceo .agent-avatar { border-color: rgba(201,168,76,0.5); background: rgba(201,168,76,0.08); }
+
+  .agent-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    text-align: center;
+    margin-bottom: 3px;
+  }
+
+  .agent-role {
+    font-size: 11px;
+    color: var(--muted2);
+    text-align: center;
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+
+  .agent-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+
+  .agent-status.offline { color: var(--muted2); }
+  .agent-status.offline .live-dot { background: var(--muted); box-shadow: none; }
+
+  .agent-port {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.3px;
+  }
+
+  /* Org layout tiers */
+  .org-tier {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    position: relative;
+  }
+
+  .org-tier-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  /* Vertical stem from each child up */
+  .stem-up {
+    width: 2px;
+    height: 24px;
+    background: var(--border2);
+    flex-shrink: 0;
+  }
+
+  /* Horizontal bar across children */
+  .crossbar-wrap {
+    display: flex;
     justify-content: center;
-    min-height: 160px;
-    color: var(--muted);
+    width: 100%;
+    position: relative;
+    height: 24px;
   }
 
-  .bot-card.add-new:hover { color: var(--gold); border-color: var(--gold); }
-
-  .bot-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    margin-bottom: 6px;
+  /* ══════════════════════════════════════
+     STAT CARDS (below org chart)
+  ══════════════════════════════════════ */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
   }
 
-  .bot-desc {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 16px;
-    line-height: 1.5;
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 18px 20px;
   }
 
-  .bot-stats {
-    display: flex;
-    gap: 16px;
-  }
-
-  .bot-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .bot-stat-value {
+  .stat-label {
     font-family: 'DM Mono', monospace;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--gold);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 8px;
   }
 
-  .bot-stat-label {
+  .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-sub { font-size: 12px; color: var(--muted2); }
+
+  /* ══════════════════════════════════════
+     PRIORITY LIST
+  ══════════════════════════════════════ */
+  .priority-section {
+    margin-top: 32px;
+  }
+
+  .priority-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted2);
+    margin-bottom: 14px;
+  }
+
+  .priority-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .priority-item {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .priority-left { display: flex; align-items: center; gap: 12px; }
+  .priority-num {
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    width: 20px;
   }
 
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    display: inline-block;
-    margin-right: 6px;
-    box-shadow: 0 0 6px var(--green);
-    animation: pulse 2s infinite;
+  .priority-text { font-size: 13px; }
+  .priority-agent { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); }
+
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+  .badge-active { background: var(--green-dim); color: var(--green); }
+  .badge-pending { background: rgba(201,168,76,0.1); color: var(--gold); }
+  .badge-new { background: rgba(91,141,238,0.1); color: var(--blue); }
+
+  /* ══════════════════════════════════════
+     OTHER PANELS (PDF, KB, Test, Log)
+  ══════════════════════════════════════ */
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 24px;
   }
 
-  /* PDF Manager */
+  /* PDF */
   .drop-zone {
-    border: 2px dashed var(--border);
+    border: 2px dashed var(--border2);
     border-radius: 12px;
     padding: 48px;
     text-align: center;
@@ -300,33 +450,12 @@
     position: relative;
   }
 
-  .drop-zone:hover, .drop-zone.dragover {
-    border-color: var(--gold);
-    background: var(--gold-dim);
-  }
-
-  .drop-zone input[type="file"] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-  }
-
-  .drop-zone-icon {
-    font-size: 40px;
-    margin-bottom: 12px;
-  }
-
-  .drop-zone-text {
-    font-size: 15px;
-    color: var(--muted);
-  }
-
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--gold); background: var(--gold-dim); }
+  .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .drop-zone-icon { font-size: 36px; margin-bottom: 10px; }
+  .drop-zone-text { font-size: 14px; color: var(--muted2); }
   .drop-zone-text strong { color: var(--white); }
 
-  /* PDF list */
   .pdf-list { display: flex; flex-direction: column; gap: 8px; }
 
   .pdf-item {
@@ -335,30 +464,18 @@
     justify-content: space-between;
     padding: 12px 16px;
     background: var(--dark);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 8px;
     transition: border-color 0.2s;
   }
 
   .pdf-item:hover { border-color: #333; }
-
   .pdf-info { display: flex; align-items: center; gap: 12px; }
+  .pdf-icon { font-size: 18px; }
+  .pdf-name { font-size: 13px; font-weight: 500; }
+  .pdf-size { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted2); margin-top: 2px; }
 
-  .pdf-icon { font-size: 20px; }
-
-  .pdf-name {
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .pdf-size {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  /* KB Status */
+  /* KB */
   .kb-status {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -368,37 +485,22 @@
 
   .kb-stat {
     background: var(--card);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 10px;
     padding: 20px;
     text-align: center;
   }
 
-  .kb-stat-value {
-    font-family: 'DM Serif Display', serif;
-    font-size: 36px;
-    color: var(--gold);
-  }
+  .kb-stat-value { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--gold); }
+  .kb-stat-label { font-size: 11px; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
 
-  .kb-stat-label {
-    font-size: 12px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 4px;
-  }
-
-  /* Test panel */
-  .test-input-row {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
+  /* Test */
+  .test-input-row { display: flex; gap: 12px; margin-bottom: 24px; }
 
   .input-field {
     flex: 1;
     background: var(--card);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 8px;
     padding: 12px 16px;
     color: var(--white);
@@ -413,52 +515,36 @@
 
   .test-answer {
     background: var(--card);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 10px;
     padding: 24px;
     margin-bottom: 16px;
-    line-height: 1.7;
+    line-height: 1.8;
     font-size: 14px;
     white-space: pre-wrap;
     display: none;
   }
 
-  .test-chunks {
-    display: none;
-  }
+  .test-chunks { display: none; }
 
   .chunk-item {
     background: var(--dark);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 8px;
     font-size: 12px;
     font-family: 'DM Mono', monospace;
-    color: var(--muted);
+    color: var(--muted2);
   }
 
-  .chunk-source {
-    color: var(--gold);
-    font-weight: 500;
-    margin-bottom: 6px;
-    font-size: 11px;
-  }
+  .chunk-source { color: var(--gold); font-weight: 500; margin-bottom: 6px; font-size: 11px; }
+  .chunk-score { float: right; background: var(--gold-dim); color: var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 10px; }
 
-  .chunk-score {
-    float: right;
-    background: var(--gold-dim);
-    color: var(--gold);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 10px;
-  }
-
-  /* Loading spinner */
+  /* Spinner */
   .spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border);
+    width: 18px; height: 18px;
+    border: 2px solid var(--border2);
     border-top-color: var(--gold);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -467,53 +553,50 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* Questions */
+  .questions-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .question-item {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+
+  .question-q { font-size: 14px; margin-bottom: 6px; }
+  .question-a { font-size: 13px; color: var(--muted2); line-height: 1.6; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .question-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+
   /* Modal */
   .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000; display: none;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
   }
 
   .modal-overlay.open { display: flex; }
 
   .modal {
     background: var(--card);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 16px;
     padding: 32px;
     width: 100%;
-    max-width: 480px;
+    max-width: 460px;
   }
 
-  .modal-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 24px;
-    margin-bottom: 24px;
-  }
-
-  .form-group { margin-bottom: 16px; }
-
-  .form-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    display: block;
-  }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 24px; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted2); margin-bottom: 6px; display: block; }
 
   .form-input {
     width: 100%;
     background: var(--dark);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 8px;
-    padding: 12px 16px;
+    padding: 11px 14px;
     color: var(--white);
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
@@ -522,18 +605,16 @@
   }
 
   .form-input:focus { border-color: var(--gold); }
-
   .modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
 
   /* Toast */
   .toast {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
+    bottom: 24px; right: 24px;
     background: var(--card);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border2);
     border-radius: 8px;
-    padding: 12px 20px;
+    padding: 11px 18px;
     font-size: 13px;
     z-index: 2000;
     transform: translateY(100px);
@@ -544,52 +625,29 @@
   }
 
   .toast.show { transform: translateY(0); }
-  .toast.success { border-color: rgba(76,175,125,0.4); color: var(--green); }
-  .toast.error { border-color: rgba(224,82,82,0.4); color: var(--red); }
+  .toast.success { border-color: rgba(62,207,142,0.3); color: var(--green); }
+  .toast.error { border-color: rgba(224,82,82,0.3); color: var(--red); }
 
   /* Rebuild bar */
-  .rebuild-progress {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    margin-top: 12px;
-    overflow: hidden;
-    display: none;
-  }
+  .rebuild-progress { height: 3px; background: var(--border2); border-radius: 2px; margin-top: 12px; overflow: hidden; display: none; }
+  .rebuild-bar { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); width: 0%; transition: width 0.5s; border-radius: 2px; }
 
-  .rebuild-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold), var(--gold-light));
-    width: 0%;
-    transition: width 0.5s;
-    border-radius: 2px;
-  }
-
-  /* Questions log */
-  .questions-list { display: flex; flex-direction: column; gap: 8px; }
-
-  .question-item {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-  }
-
-  .question-text { font-size: 14px; margin-bottom: 4px; }
-  .question-meta {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 60px 0;
-    color: var(--muted);
-  }
-
-  .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+  /* Empty state */
+  .empty-state { text-align: center; padding: 60px 0; color: var(--muted2); }
+  .empty-state-icon { font-size: 44px; margin-bottom: 12px; }
   .empty-state-text { font-size: 14px; }
+
+  /* Section divider label */
+  .divider-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
 </style>
 </head>
 <body>
@@ -597,36 +655,81 @@
 <header>
   <div class="container">
     <div class="header-inner">
-      <div class="logo">Thrive <span>Bot</span> Dashboard</div>
-      <div class="header-badge">● SYSTEM ONLINE</div>
+      <div class="logo">
+        <span class="logo-crown">👑</span>
+        Thrive <span>Agent</span> Command Centre
+      </div>
+      <div class="header-right">
+        <div id="agents-online-count" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);"></div>
+        <div class="header-badge">
+          <div class="live-dot"></div>
+          SYSTEM ONLINE
+        </div>
+      </div>
     </div>
     <nav>
-      <button class="nav-tab active" onclick="showPanel('directory')">Directory</button>
-      <button class="nav-tab" onclick="showPanel('pdfs')">PDF Manager</button>
-      <button class="nav-tab" onclick="showPanel('knowledge')">Knowledge Base</button>
-      <button class="nav-tab" onclick="showPanel('test')">Test Bot</button>
-      <button class="nav-tab" onclick="showPanel('questions')">Questions Log</button>
+      <button class="nav-tab active" onclick="showPanel('directory', this)">Agent Directory</button>
+      <button class="nav-tab" onclick="showPanel('pdfs', this)">PDF Manager</button>
+      <button class="nav-tab" onclick="showPanel('knowledge', this)">Knowledge Base</button>
+      <button class="nav-tab" onclick="showPanel('test', this)">Test Bot</button>
+      <button class="nav-tab" onclick="showPanel('questions', this)">Questions Log</button>
     </nav>
   </div>
 </header>
 
-<div class="container" style="padding-top: 8px; padding-bottom: 60px;">
+<div class="container">
 
-  <!-- DIRECTORY PANEL -->
+  <!-- ══ AGENT DIRECTORY PANEL ══ -->
   <div class="panel active" id="panel-directory">
+
     <div class="section-header">
       <div>
-        <div class="section-title">Bot <span>Directory</span></div>
-        <div class="section-subtitle">Manage all your Thrive bots in one place</div>
+        <div class="section-title">Agent <span>Directory</span></div>
+        <div class="section-subtitle">Your AI workforce — live deployment overview</div>
       </div>
-      <button class="btn btn-primary" onclick="openNewBotModal()">+ New Bot</button>
+      <button class="btn btn-primary" onclick="openNewBotModal()">+ Deploy Agent</button>
     </div>
-    <div class="bots-grid" id="bots-grid">
-      <div style="color: var(--muted); font-size: 14px;">Loading bots...</div>
+
+    <!-- Org Chart -->
+    <div class="org-chart" id="org-chart">
+      <!-- rendered by JS -->
     </div>
+
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Agents Live</div>
+        <div class="stat-value" id="stat-live">—</div>
+        <div class="stat-sub">of <span id="stat-total">—</span> deployed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Knowledge Chunks</div>
+        <div class="stat-value" id="stat-chunks">—</div>
+        <div class="stat-sub">across all bots</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Questions Answered</div>
+        <div class="stat-value" id="stat-questions">—</div>
+        <div class="stat-sub">total logged</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Documents Indexed</div>
+        <div class="stat-value" id="stat-docs">—</div>
+        <div class="stat-sub">PDFs & spreadsheets</div>
+      </div>
+    </div>
+
+    <!-- Priority list -->
+    <div class="priority-section">
+      <div class="priority-label">Active Priority & Status</div>
+      <div class="priority-list" id="priority-list">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
   </div>
 
-  <!-- PDF MANAGER PANEL -->
+  <!-- ══ PDF MANAGER PANEL ══ -->
   <div class="panel" id="panel-pdfs">
     <div class="section-header">
       <div>
@@ -643,13 +746,13 @@
 
     <div id="pdf-list-container">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;" id="pdf-count">Loading...</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;" id="pdf-count">Loading...</div>
       </div>
       <div class="pdf-list" id="pdf-list"></div>
     </div>
   </div>
 
-  <!-- KNOWLEDGE BASE PANEL -->
+  <!-- ══ KNOWLEDGE BASE PANEL ══ -->
   <div class="panel" id="panel-knowledge">
     <div class="section-header">
       <div>
@@ -675,11 +778,11 @@
 
     <div class="card">
       <div style="font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:8px;">Rebuild Knowledge Base</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">This processes all PDFs and spreadsheets in your library and creates a searchable knowledge base. Run this whenever you add or remove documents.</div>
+      <div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6;">Processes all PDFs and spreadsheets in your library and creates a searchable knowledge base. Run this whenever you add or remove documents.</div>
       <div style="display:flex;align-items:center;gap:16px;">
         <button class="btn btn-primary" onclick="rebuildKB()">🔄 Rebuild Now</button>
         <div class="spinner" id="rebuild-spinner"></div>
-        <div id="rebuild-status" style="font-size:13px;color:var(--muted);"></div>
+        <div id="rebuild-status" style="font-size:13px;color:var(--muted2);"></div>
       </div>
       <div class="rebuild-progress" id="rebuild-progress">
         <div class="rebuild-bar" id="rebuild-bar"></div>
@@ -687,7 +790,7 @@
     </div>
   </div>
 
-  <!-- TEST PANEL -->
+  <!-- ══ TEST BOT PANEL ══ -->
   <div class="panel" id="panel-test">
     <div class="section-header">
       <div>
@@ -705,12 +808,12 @@
     <div class="test-answer" id="test-answer"></div>
 
     <div class="test-chunks" id="test-chunks">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:12px;">Source Chunks Used</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted2);margin-bottom:12px;">Source Chunks Used</div>
       <div id="chunks-list"></div>
     </div>
   </div>
 
-  <!-- QUESTIONS LOG PANEL -->
+  <!-- ══ QUESTIONS LOG PANEL ══ -->
   <div class="panel" id="panel-questions">
     <div class="section-header">
       <div>
@@ -722,7 +825,7 @@
     <div id="questions-container">
       <div class="empty-state">
         <div class="empty-state-icon">💬</div>
-        <div class="empty-state-text">No questions logged yet. Questions will appear here once clients start using the bot.</div>
+        <div class="empty-state-text">No questions logged yet.</div>
       </div>
     </div>
   </div>
@@ -732,35 +835,57 @@
 <!-- New Bot Modal -->
 <div class="modal-overlay" id="new-bot-modal">
   <div class="modal">
-    <div class="modal-title">New Bot</div>
+    <div class="modal-title">Deploy New Agent</div>
     <div class="form-group">
-      <label class="form-label">Bot Name</label>
-      <input class="form-input" id="new-bot-name" placeholder="e.g. Sales Mastery Bot">
+      <label class="form-label">Agent Name</label>
+      <input class="form-input" id="new-bot-name" placeholder="e.g. Sales Closer Bot">
     </div>
     <div class="form-group">
-      <label class="form-label">Description</label>
-      <input class="form-input" id="new-bot-desc" placeholder="What is this bot trained on?">
+      <label class="form-label">Role / Description</label>
+      <input class="form-input" id="new-bot-desc" placeholder="What is this agent responsible for?">
     </div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="createBot()">Create Bot</button>
+      <button class="btn btn-primary" onclick="createBot()">Deploy Agent</button>
     </div>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
 const BOT_ID = 'thrive-bot';
 
+// Agent metadata — visual config (role, avatar, tier)
+// Extend this as you add more agents
+const AGENT_META = {
+  'thrive-bot': {
+    name: 'Thrive Bot',
+    shortName: 'Thrive',
+    role: 'Client Success Agent',
+    avatar: '🤖',
+    tier: 'worker',
+    platform: 'Discord / Railway',
+  }
+};
+
+// Static "future vision" agents (shown as coming soon if not in DB)
+const FUTURE_AGENTS = [
+  { id: 'rex',    name: 'Rex',    role: 'COO / Strategic Orchestrator', avatar: '🧠', tier: 'coo',    status: 'planned' },
+  { id: 'dash',   name: 'Dash',   role: 'Data & Dashboard Manager',      avatar: '📊', tier: 'worker', status: 'planned' },
+  { id: 'closer', name: 'Closer', role: 'Sales Manager',                  avatar: '🎯', tier: 'worker', status: 'planned' },
+  { id: 'vault',  name: 'Vault',  role: 'CFO Agent',                      avatar: '💰', tier: 'worker', status: 'planned' },
+  { id: 'mailer', name: 'Mailer', role: 'Email Marketing Manager',         avatar: '✉️',  tier: 'worker', status: 'planned' },
+  { id: 'hunter', name: 'Hunter', role: 'HR / Recruiting Agent',           avatar: '🔍', tier: 'worker', status: 'planned' },
+];
+
 // Panel switching
-function showPanel(name) {
+function showPanel(name, tabEl) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
-  event.target.classList.add('active');
-  if (name === 'directory') loadBots();
+  if (tabEl) tabEl.classList.add('active');
+  if (name === 'directory') renderDirectory();
   if (name === 'pdfs') loadPDFs();
   if (name === 'knowledge') loadKBStatus();
   if (name === 'questions') loadQuestions();
@@ -771,86 +896,201 @@ function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
   t.textContent = (type === 'success' ? '✓ ' : '✗ ') + msg;
   t.className = 'toast ' + type + ' show';
-  setTimeout(() => t.className = 'toast', 3000);
+  setTimeout(() => t.className = 'toast', 3500);
 }
 
-// --- DIRECTORY ---
-async function loadBots() {
-  const res = await fetch('/api/bots');
-  const bots = await res.json();
-  const grid = document.getElementById('bots-grid');
-  grid.innerHTML = bots.map(bot => `
-    <div class="bot-card" onclick="selectBot('${bot.id}')">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">${bot.id}</span>
-        <span><span class="status-dot"></span><span style="font-size:11px;color:var(--green);">Active</span></span>
+// ── DIRECTORY ────────────────────────────────────────────
+let botsData = [];
+
+async function renderDirectory() {
+  try {
+    const res = await fetch('/api/bots');
+    botsData = await res.json();
+  } catch(e) {
+    botsData = [];
+  }
+
+  // Merge DB bots with agent meta
+  const liveAgents = botsData.map(b => ({
+    ...b,
+    ...(AGENT_META[b.id] || { role: b.description || 'AI Agent', avatar: '🤖', tier: 'worker', platform: 'Railway' }),
+    status: 'live'
+  }));
+
+  // Also load questions count
+  let qCount = 0;
+  try {
+    const qr = await fetch('/api/bots/' + BOT_ID + '/questions');
+    const qs = await qr.json();
+    qCount = Array.isArray(qs) ? qs.length : 0;
+  } catch(e) {}
+
+  // Stats
+  const totalChunks = botsData.reduce((s, b) => s + (b.chunkCount || 0), 0);
+  const totalDocs = botsData.reduce((s, b) => s + (b.pdfCount || 0), 0);
+  document.getElementById('stat-live').textContent = liveAgents.length;
+  document.getElementById('stat-total').textContent = liveAgents.length + FUTURE_AGENTS.length + 1; // +1 CEO
+  document.getElementById('stat-chunks').textContent = totalChunks.toLocaleString();
+  document.getElementById('stat-questions').textContent = qCount;
+  document.getElementById('stat-docs').textContent = totalDocs;
+  document.getElementById('agents-online-count').textContent = liveAgents.length + ' agent' + (liveAgents.length !== 1 ? 's' : '') + ' online';
+
+  renderOrgChart(liveAgents);
+  renderPriorityList(liveAgents);
+}
+
+function agentCardHTML(agent) {
+  const isLive = agent.status === 'live';
+  const isPlanned = agent.status === 'planned';
+  const extraClass = agent.tier === 'ceo' ? ' ceo' : agent.tier === 'coo' ? ' coo' : '';
+
+  return `
+    <div class="agent-card${extraClass}" style="${isPlanned ? 'opacity:0.45;' : ''}">
+      <div class="agent-avatar">${agent.avatar}</div>
+      <div class="agent-name">${agent.name}</div>
+      <div class="agent-role">${agent.role}</div>
+      <div class="agent-status${isLive ? '' : ' offline'}">
+        <div class="live-dot"></div>
+        ${isLive ? 'LIVE' : isPlanned ? 'PLANNED' : 'OFFLINE'}
       </div>
-      <div class="bot-name">${bot.name}</div>
-      <div class="bot-desc">${bot.description || 'No description'}</div>
-      <div class="bot-stats">
-        <div class="bot-stat">
-          <div class="bot-stat-value">${bot.pdfCount}</div>
-          <div class="bot-stat-label">PDFs</div>
-        </div>
-        <div class="bot-stat">
-          <div class="bot-stat-value">${bot.chunkCount}</div>
-          <div class="bot-stat-label">Chunks</div>
-        </div>
-      </div>
-    </div>
-  `).join('') + `
-    <div class="bot-card add-new" onclick="openNewBotModal()">
-      <div style="font-size:32px;margin-bottom:8px;">+</div>
-      <div style="font-size:13px;font-weight:500;">Create New Bot</div>
+      ${isLive && agent.platform ? `<div class="agent-port">${agent.platform}</div>` : ''}
+      ${isPlanned ? `<div class="agent-port">Coming soon</div>` : ''}
     </div>
   `;
 }
 
-function selectBot(id) {
-  showToast('Managing ' + id, 'success');
-  document.querySelector('[onclick="showPanel(\'pdfs\')"]').click();
+function renderOrgChart(liveAgents) {
+  const chart = document.getElementById('org-chart');
+
+  // CEO (static — always Cameron/you)
+  const ceoCard = {
+    id: 'cameron', name: 'Cameron', role: 'CEO / Vision & Strategy',
+    avatar: '👑', tier: 'ceo', status: 'live', platform: ''
+  };
+
+  // COO (Rex — future)
+  const cooCard = FUTURE_AGENTS.find(a => a.id === 'rex') || null;
+
+  // Workers: live agents first, then planned
+  const workerAgents = [
+    ...liveAgents,
+    ...FUTURE_AGENTS.filter(a => a.tier === 'worker')
+  ];
+
+  chart.innerHTML = `
+    <!-- CEO -->
+    <div class="org-ceo">${agentCardHTML(ceoCard)}</div>
+
+    <!-- V stem to COO -->
+    <div style="display:flex;justify-content:center;">
+      <div class="org-connector-v" style="height:28px;"></div>
+    </div>
+
+    <!-- COO -->
+    ${cooCard ? `<div class="org-ceo">${agentCardHTML(cooCard)}</div>` : ''}
+
+    <!-- V stem to crossbar -->
+    <div style="display:flex;justify-content:center;">
+      <div class="org-connector-v" style="height:28px;"></div>
+    </div>
+
+    <!-- Horizontal crossbar + workers -->
+    <div style="position:relative;">
+      <!-- Workers row -->
+      <div class="org-tier" id="workers-tier">
+        ${workerAgents.map(a => `
+          <div class="org-tier-item">
+            <div class="stem-up"></div>
+            ${agentCardHTML(a)}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Draw horizontal crossbar dynamically after render
+  requestAnimationFrame(() => {
+    const tierEl = document.getElementById('workers-tier');
+    if (!tierEl) return;
+    const items = tierEl.querySelectorAll('.org-tier-item');
+    if (items.length < 2) return;
+    const tierRect = tierEl.getBoundingClientRect();
+    const first = items[0].getBoundingClientRect();
+    const last = items[items.length - 1].getBoundingClientRect();
+    const left = first.left + first.width / 2 - tierRect.left;
+    const right = tierRect.right - (last.right - last.width / 2);
+    // inject an absolute line
+    const line = document.createElement('div');
+    line.style.cssText = `position:absolute;top:0;left:${left}px;right:${right}px;height:2px;background:var(--border2);`;
+    tierEl.style.position = 'relative';
+    tierEl.insertBefore(line, tierEl.firstChild);
+  });
 }
 
-function openNewBotModal() {
-  document.getElementById('new-bot-modal').classList.add('open');
-}
+function renderPriorityList(liveAgents) {
+  const items = [
+    ...liveAgents.map((a, i) => ({
+      num: i + 1,
+      text: a.name + ' — ' + (a.role || a.description || 'Active'),
+      agent: a.id,
+      badge: 'active',
+      label: 'LIVE'
+    })),
+    ...FUTURE_AGENTS.map((a, i) => ({
+      num: liveAgents.length + i + 1,
+      text: a.name + ' — ' + a.role,
+      agent: a.id,
+      badge: 'pending',
+      label: 'PLANNED'
+    }))
+  ];
 
-function closeModal() {
-  document.getElementById('new-bot-modal').classList.remove('open');
-}
-
-async function createBot() {
-  const name = document.getElementById('new-bot-name').value;
-  const description = document.getElementById('new-bot-desc').value;
-  if (!name) return showToast('Please enter a bot name', 'error');
-  await fetch('/api/bots', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, description }) });
-  closeModal();
-  loadBots();
-  showToast('Bot created successfully!');
-}
-
-// --- PDF MANAGER ---
-async function loadPDFs() {
-  const res = await fetch('/api/bots/' + BOT_ID + '/pdfs');
-  const files = await res.json();
-  document.getElementById('pdf-count').textContent = files.length + ' documents loaded';
-  const list = document.getElementById('pdf-list');
-  if (files.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><div class="empty-state-text">No documents yet. Drop files above to get started.</div></div>';
+  const list = document.getElementById('priority-list');
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🤖</div><div class="empty-state-text">No agents deployed yet.</div></div>';
     return;
   }
-  list.innerHTML = files.map(f => `
-    <div class="pdf-item">
-      <div class="pdf-info">
-        <div class="pdf-icon">${f.name.endsWith('.pdf') ? '📄' : f.name.endsWith('.xlsx') ? '📊' : '📋'}</div>
+
+  list.innerHTML = items.map(item => `
+    <div class="priority-item">
+      <div class="priority-left">
+        <div class="priority-num">${String(item.num).padStart(2, '0')}</div>
         <div>
-          <div class="pdf-name">${f.name}</div>
-          <div class="pdf-size">${(f.size / 1024).toFixed(1)} KB</div>
+          <div class="priority-text">${item.text}</div>
+          <div class="priority-agent">${item.agent}</div>
         </div>
       </div>
-      <button class="btn btn-danger btn-sm" onclick="deletePDF('${f.name}')">Remove</button>
+      <span class="badge badge-${item.badge}">${item.label}</span>
     </div>
   `).join('');
+}
+
+// ── PDF MANAGER ───────────────────────────────────────────
+async function loadPDFs() {
+  try {
+    const res = await fetch('/api/bots/' + BOT_ID + '/pdfs');
+    const files = await res.json();
+    document.getElementById('pdf-count').textContent = files.length + ' documents loaded';
+    const list = document.getElementById('pdf-list');
+    if (!files.length) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><div class="empty-state-text">No documents yet. Drop files above to get started.</div></div>';
+      return;
+    }
+    list.innerHTML = files.map(f => `
+      <div class="pdf-item">
+        <div class="pdf-info">
+          <div class="pdf-icon">${f.name.endsWith('.pdf') ? '📄' : f.name.endsWith('.xlsx') ? '📊' : '📋'}</div>
+          <div>
+            <div class="pdf-name">${f.name}</div>
+            <div class="pdf-size">${(f.size / 1024).toFixed(1)} KB</div>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="deletePDF('${f.name}')">Remove</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('pdf-count').textContent = 'PDF management available on local server only';
+  }
 }
 
 async function handleFileUpload(files) {
@@ -870,27 +1110,28 @@ async function deletePDF(filename) {
   loadPDFs();
 }
 
-// Drag and drop
 const dropZone = document.getElementById('drop-zone');
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
-  handleFileUpload(e.dataTransfer.files);
-});
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFileUpload(e.dataTransfer.files); });
 
-// --- KNOWLEDGE BASE ---
+// ── KNOWLEDGE BASE ────────────────────────────────────────
 async function loadKBStatus() {
-  const [statusRes, pdfsRes] = await Promise.all([
-    fetch('/api/bots/' + BOT_ID + '/status'),
-    fetch('/api/bots/' + BOT_ID + '/pdfs')
-  ]);
-  const status = await statusRes.json();
-  const pdfs = await pdfsRes.json();
-  document.getElementById('kb-chunks').textContent = status.chunks;
-  document.getElementById('kb-pdfs').textContent = pdfs.length;
-  document.getElementById('kb-built').textContent = status.lastBuilt ? new Date(status.lastBuilt).toLocaleDateString() : 'Never';
+  try {
+    const [statusRes, pdfsRes] = await Promise.all([
+      fetch('/api/bots/' + BOT_ID + '/status'),
+      fetch('/api/bots/' + BOT_ID + '/pdfs')
+    ]);
+    const status = await statusRes.json();
+    const pdfs = await pdfsRes.json();
+    document.getElementById('kb-chunks').textContent = status.chunks || 0;
+    document.getElementById('kb-pdfs').textContent = Array.isArray(pdfs) ? pdfs.length : 0;
+    document.getElementById('kb-built').textContent = status.lastBuilt ? new Date(status.lastBuilt).toLocaleDateString() : 'Never';
+  } catch(e) {
+    document.getElementById('kb-chunks').textContent = '—';
+    document.getElementById('kb-pdfs').textContent = '—';
+    document.getElementById('kb-built').textContent = '—';
+  }
 }
 
 async function rebuildKB() {
@@ -899,21 +1140,14 @@ async function rebuildKB() {
   const statusEl = document.getElementById('rebuild-status');
   const progress = document.getElementById('rebuild-progress');
   const bar = document.getElementById('rebuild-bar');
-
   btn.disabled = true;
   spinner.style.display = 'block';
   progress.style.display = 'block';
   statusEl.textContent = 'Rebuilding...';
   bar.style.width = '30%';
-
   await fetch('/api/bots/' + BOT_ID + '/rebuild', { method: 'POST' });
-
   let pct = 30;
-  const interval = setInterval(() => {
-    pct = Math.min(pct + 10, 90);
-    bar.style.width = pct + '%';
-  }, 1000);
-
+  const interval = setInterval(() => { pct = Math.min(pct + 10, 90); bar.style.width = pct + '%'; }, 1000);
   setTimeout(async () => {
     clearInterval(interval);
     bar.style.width = '100%';
@@ -921,12 +1155,12 @@ async function rebuildKB() {
     btn.disabled = false;
     await loadKBStatus();
     statusEl.textContent = 'Done!';
-    showToast('Knowledge base rebuilt successfully!');
+    showToast('Knowledge base rebuilt!');
     setTimeout(() => { statusEl.textContent = ''; progress.style.display = 'none'; bar.style.width = '0%'; }, 3000);
   }, 8000);
 }
 
-// --- TEST BOT ---
+// ── TEST BOT ──────────────────────────────────────────────
 async function testBot() {
   const question = document.getElementById('test-question').value;
   if (!question) return;
@@ -936,7 +1170,6 @@ async function testBot() {
   spinner.style.display = 'block';
   answerEl.style.display = 'none';
   chunksEl.style.display = 'none';
-
   const res = await fetch('/api/bots/' + BOT_ID + '/test', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
@@ -944,16 +1177,9 @@ async function testBot() {
   });
   const data = await res.json();
   spinner.style.display = 'none';
-
-  if (data.error) {
-    answerEl.style.display = 'block';
-    answerEl.textContent = '⚠️ ' + data.error;
-    return;
-  }
-
   answerEl.style.display = 'block';
+  if (data.error) { answerEl.textContent = '⚠️ ' + data.error; return; }
   answerEl.textContent = data.answer;
-
   if (data.chunks && data.chunks.length > 0) {
     chunksEl.style.display = 'block';
     document.getElementById('chunks-list').innerHTML = data.chunks.map(c => `
@@ -965,25 +1191,44 @@ async function testBot() {
   }
 }
 
-// --- QUESTIONS ---
+// ── QUESTIONS LOG ─────────────────────────────────────────
 async function loadQuestions() {
-  const res = await fetch('/api/bots/' + BOT_ID + '/questions');
-  const questions = await res.json();
-  const container = document.getElementById('questions-container');
-  if (!questions.length) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div><div class="empty-state-text">No questions logged yet.</div></div>';
-    return;
+  try {
+    const res = await fetch('/api/bots/' + BOT_ID + '/questions');
+    const questions = await res.json();
+    const container = document.getElementById('questions-container');
+    if (!Array.isArray(questions) || !questions.length) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div><div class="empty-state-text">No questions logged yet. Questions appear here once clients start using the bot.</div></div>';
+      return;
+    }
+    container.innerHTML = '<div class="questions-list">' + questions.map(q => `
+      <div class="question-item">
+        <div class="question-q">❓ ${q.question}</div>
+        ${q.answer ? `<div class="question-a">${q.answer}</div>` : ''}
+        <div class="question-meta">${q.username || 'unknown'} · ${new Date(q.created_at).toLocaleString()}</div>
+      </div>
+    `).join('') + '</div>';
+  } catch(e) {
+    document.getElementById('questions-container').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Could not load questions.</div></div>';
   }
-  container.innerHTML = '<div class="questions-list">' + questions.map(q => `
-    <div class="question-item">
-      <div class="question-text">${q.question}</div>
-      <div class="question-meta">${q.user} · ${new Date(q.timestamp).toLocaleString()}</div>
-    </div>
-  `).join('') + '</div>';
+}
+
+// ── MODALS ────────────────────────────────────────────────
+function openNewBotModal() { document.getElementById('new-bot-modal').classList.add('open'); }
+function closeModal() { document.getElementById('new-bot-modal').classList.remove('open'); }
+
+async function createBot() {
+  const name = document.getElementById('new-bot-name').value;
+  const description = document.getElementById('new-bot-desc').value;
+  if (!name) return showToast('Please enter a name', 'error');
+  await fetch('/api/bots', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, description }) });
+  closeModal();
+  renderDirectory();
+  showToast('Agent deployed!');
 }
 
 // Init
-loadBots();
+renderDirectory();
 </script>
 </body>
 </html>
