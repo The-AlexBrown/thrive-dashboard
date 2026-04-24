@@ -1470,6 +1470,441 @@ function initOffice() {
   const ctx = canvas.getContext('2d');
   ctx.scale(DPR, DPR);
 
+  // ── ROOMS (top-down flat layout, fills full canvas) ──
+  const ROOM_DEFS = [
+    { id:'ceo',   label:'CEO OFFICE',        color:'#d4a843', x:0,     y:0,     w:W*0.38, h:H*0.45 },
+    { id:'suite', label:'C-SUITE',            color:'#7c3aed', x:W*0.62,y:0,     w:W*0.38, h:H*0.45 },
+    { id:'sales', label:'SALES & MARKETING',  color:'#f59e0b', x:0,     y:H*0.55,w:W*0.48, h:H*0.45 },
+    { id:'ops',   label:'OPERATIONS',         color:'#3b82f6', x:W*0.52,y:H*0.55,w:W*0.48, h:H*0.45 },
+  ];
+
+  // Gap between rooms
+  const GAP = 6;
+
+  // Agent positions (fraction of their room)
+  const AGENTS_POS = {
+    'alex':       { room:'ceo',   rx:0.45, ry:0.45 },
+    'rex':        { room:'suite', rx:0.35, ry:0.45 },
+    'ledger':     { room:'suite', rx:0.68, ry:0.45 },
+    'thrive-bot': { room:'ops',   rx:0.22, ry:0.5  },
+    'closer':     { room:'sales', rx:0.30, ry:0.5  },
+    'mailer':     { room:'sales', rx:0.70, ry:0.5  },
+    'dash':       { room:'ops',   rx:0.55, ry:0.5  },
+    'hunter':     { room:'ops',   rx:0.82, ry:0.5  },
+  };
+
+  // Desk positions per agent (slightly offset from agent)
+  function getAgentScreenPos(agId) {
+    const ap = AGENTS_POS[agId];
+    if (!ap) return { x: W/2, y: H/2 };
+    const room = ROOM_DEFS.find(r => r.id === ap.room);
+    return {
+      x: room.x + GAP + ap.rx * (room.w - GAP*2),
+      y: room.y + GAP + ap.ry * (room.h - GAP*2),
+    };
+  }
+
+  // Pre-compute agent screen positions
+  OFFICE_AGENTS.forEach(ag => {
+    const p = getAgentScreenPos(ag.id);
+    ag._x = p.x; ag._y = p.y;
+    ag._walkX = p.x; ag._walkTimer = Math.random() * 300;
+  });
+
+  // Particles between live agents
+  const particles = [];
+  const notifications = [];
+  let notifTimer = 120;
+  const NOTIF_MSGS = ['✓ Question answered','📩 Task complete','⚡ Processing...','🔄 Syncing data','✨ Response sent','💬 Client helped','📊 Metrics updated','🎯 Lead captured'];
+
+  // Seed particles
+  const liveAgs = OFFICE_AGENTS.filter(a => a.status === 'live');
+  if (liveAgs.length >= 2) {
+    for (let i = 0; i < liveAgs.length; i++) {
+      for (let j = i+1; j < liveAgs.length; j++) {
+        for (let k = 0; k < 3; k++) {
+          particles.push({ from: liveAgs[i], to: liveAgs[j], prog: k/3, speed: 0.003 + Math.random()*0.002, trail:[] });
+        }
+      }
+    }
+  }
+  // Also seed from CEO to live workers
+  const alexAg = OFFICE_AGENTS.find(a => a.id === 'alex');
+  if (alexAg) {
+    liveAgs.filter(a => a.id !== 'alex').forEach(ag => {
+      for (let k = 0; k < 2; k++) {
+        particles.push({ from: alexAg, to: ag, prog: k/2, speed: 0.004, trail:[] });
+      }
+    });
+  }
+
+  let mouseX = -999, mouseY = -999, hoveredAgent = null;
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = (e.clientX - r.left);
+    mouseY = (e.clientY - r.top);
+  });
+  canvas.addEventListener('click', e => {
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let best = null, bestD = 40;
+    OFFICE_AGENTS.forEach(ag => {
+      const d = Math.hypot(mx - ag._x, my - ag._y);
+      if (d < bestD) { bestD = d; best = ag; }
+    });
+    if (best) { selectedAgent = best; selectAgent(best); }
+  });
+
+  // Ticker
+  const TICKER = '  ●  THRIVE ONLINE  ·  Knowledge base active  ·  Discord connected  ·  Awaiting Rex deployment  ·  Next: Closer agent  ·  Ledger CFO coming soon  ·  Hunter HR in pipeline  ·  ';
+  let tickerX = W;
+
+  let t = 0;
+
+  function drawRoom(room) {
+    const x = room.x + GAP/2, y = room.y + GAP/2;
+    const w = room.w - GAP, h = room.h - GAP;
+
+    // Background fill
+    const bg = ctx.createLinearGradient(x, y, x+w, y+h);
+    bg.addColorStop(0, room.color + '18');
+    bg.addColorStop(1, room.color + '08');
+    ctx.fillStyle = bg;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 12);
+    ctx.fill();
+
+    // Border
+    ctx.strokeStyle = room.color + '55';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 12);
+    ctx.stroke();
+
+    // Corner glow dots
+    ctx.fillStyle = room.color + '99';
+    [[x+12,y+12],[x+w-12,y+12],[x+12,y+h-12],[x+w-12,y+h-12]].forEach(([cx2,cy2]) => {
+      ctx.beginPath(); ctx.arc(cx2, cy2, 3, 0, Math.PI*2); ctx.fill();
+    });
+
+    // Room label
+    ctx.font = '700 11px "Space Mono", monospace';
+    ctx.fillStyle = room.color;
+    ctx.globalAlpha = 0.9;
+    ctx.shadowColor = room.color;
+    ctx.shadowBlur = 8;
+    ctx.fillText(room.label, x + 16, y + 22);
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+
+    // Floor grid lines
+    ctx.strokeStyle = room.color + '15';
+    ctx.lineWidth = 1;
+    const gridSize = 40;
+    for (let gx = x + gridSize; gx < x + w; gx += gridSize) {
+      ctx.beginPath(); ctx.moveTo(gx, y+GAP); ctx.lineTo(gx, y+h-GAP); ctx.stroke();
+    }
+    for (let gy = y + gridSize; gy < y + h; gy += gridSize) {
+      ctx.beginPath(); ctx.moveTo(x+GAP, gy); ctx.lineTo(x+w-GAP, gy); ctx.stroke();
+    }
+  }
+
+  function drawDesk(ax, ay, color) {
+    // Desk surface
+    const dw = 72, dh = 44;
+    ctx.fillStyle = color + '33';
+    ctx.strokeStyle = color + '88';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(ax - dw/2, ay + 10, dw, dh, 6);
+    ctx.fill(); ctx.stroke();
+
+    // Monitor
+    const mw = 28, mh = 20;
+    ctx.fillStyle = '#0a0e1a';
+    ctx.strokeStyle = color + 'cc';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(ax - mw/2, ay + 14, mw, mh, 3);
+    ctx.fill(); ctx.stroke();
+
+    // Screen glow content
+    const pulse = 0.5 + 0.5 * Math.sin(t * 0.04 + ax * 0.1);
+    const sg = ctx.createLinearGradient(ax - mw/2, ay+14, ax + mw/2, ay+14+mh);
+    sg.addColorStop(0, color + 'cc');
+    sg.addColorStop(1, color + '33');
+    ctx.fillStyle = sg;
+    ctx.globalAlpha = 0.7 * pulse;
+    ctx.beginPath();
+    ctx.roundRect(ax - mw/2 + 2, ay + 16, mw - 4, mh - 4, 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Monitor stand
+    ctx.fillStyle = '#1a2236';
+    ctx.fillRect(ax - 3, ay + 34, 6, 6);
+    ctx.fillRect(ax - 8, ay + 39, 16, 3);
+
+    // Keyboard
+    ctx.fillStyle = color + '44';
+    ctx.strokeStyle = color + '66';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(ax - 20, ay + 44, 40, 8, 2);
+    ctx.fill(); ctx.stroke();
+  }
+
+  function drawAgent(ag, t) {
+    const isLive = ag.status === 'live';
+    const isSel = selectedAgent && selectedAgent.id === ag.id;
+    const isHov = hoveredAgent && hoveredAgent.id === ag.id;
+    const alpha = isLive ? 1.0 : 0.45;
+    const bob = isLive ? Math.sin(t * 0.05 + ag._x * 0.03) * 4 : 0;
+    const ax = ag._x, ay = ag._y + bob;
+    const S = isLive ? 1.0 : 0.85; // scale
+
+    ctx.globalAlpha = alpha;
+
+    // Draw desk first (behind character)
+    drawDesk(ax, ay, ag.color);
+
+    // Selection / hover ring
+    if (isSel) {
+      ctx.beginPath();
+      ctx.arc(ax, ay, 34 * S, 0, Math.PI*2);
+      ctx.strokeStyle = ag.color;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = ag.color;
+      ctx.shadowBlur = 20;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else if (isHov) {
+      ctx.beginPath();
+      ctx.arc(ax, ay, 32 * S, 0, Math.PI*2);
+      ctx.strokeStyle = '#ffffff88';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Ambient floor glow for live agents
+    if (isLive) {
+      const glow = ctx.createRadialGradient(ax, ay+5, 0, ax, ay+5, 55);
+      glow.addColorStop(0, ag.color + '30');
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.ellipse(ax, ay+5, 55, 28, 0, 0, Math.PI*2); ctx.fill();
+    }
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(ax, ay + 4, 16*S, 6*S, 0, 0, Math.PI*2); ctx.fill();
+
+    // Legs
+    const legSwing = isLive ? Math.sin(t * 0.03 + ag._x) * 3 : 0;
+    ctx.fillStyle = '#1e293b';
+    ctx.beginPath(); ctx.roundRect(ax-9*S, ay-16*S + legSwing, 8*S, 18*S, 3); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(ax+1*S, ay-16*S - legSwing, 8*S, 18*S, 3); ctx.fill();
+
+    // Shoes
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath(); ctx.roundRect(ax-11*S, ay+1*S, 10*S, 5*S, 2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(ax+1*S, ay+1*S, 10*S, 5*S, 2); ctx.fill();
+
+    // Body
+    const bodyGrad = ctx.createLinearGradient(ax-12*S, ay-38*S, ax+12*S, ay-18*S);
+    bodyGrad.addColorStop(0, ag.color + 'ff');
+    bodyGrad.addColorStop(1, ag.color + 'aa');
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath(); ctx.roundRect(ax-12*S, ay-38*S, 24*S, 22*S, 4); ctx.fill();
+
+    // Collar / shirt detail
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.beginPath(); ctx.roundRect(ax-4*S, ay-38*S, 8*S, 10*S, 2); ctx.fill();
+
+    // Arms
+    const armSwing = isLive ? Math.sin(t * 0.07 + ag._x) * 5 : 0;
+    ctx.fillStyle = ag.color + 'dd';
+    ctx.beginPath(); ctx.roundRect(ax-20*S, ay-37*S + armSwing, 8*S, 18*S, 3); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(ax+12*S, ay-37*S - armSwing, 8*S, 18*S, 3); ctx.fill();
+
+    // Hands
+    ctx.fillStyle = '#d4956a';
+    ctx.beginPath(); ctx.arc(ax-16*S, ay-20*S + armSwing, 5*S, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ax+16*S, ay-20*S - armSwing, 5*S, 0, Math.PI*2); ctx.fill();
+
+    // Neck
+    ctx.fillStyle = '#d4956a';
+    ctx.beginPath(); ctx.roundRect(ax-5*S, ay-44*S, 10*S, 8*S, 2); ctx.fill();
+
+    // Head
+    const headGrad = ctx.createRadialGradient(ax-3*S, ay-52*S, 0, ax, ay-50*S, 16*S);
+    headGrad.addColorStop(0, '#e8b090');
+    headGrad.addColorStop(1, '#c47840');
+    ctx.fillStyle = headGrad;
+    ctx.beginPath(); ctx.ellipse(ax, ay-52*S, 14*S, 16*S, 0, 0, Math.PI*2); ctx.fill();
+
+    // Hair
+    ctx.fillStyle = isLive ? ag.color + 'cc' : '#334155';
+    ctx.beginPath(); ctx.ellipse(ax, ay-62*S, 14*S, 8*S, 0, Math.PI, 0); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ax-10*S, ay-56*S, 5*S, 8*S, -0.3, Math.PI*0.5, Math.PI*1.5); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(ax+10*S, ay-56*S, 5*S, 8*S, 0.3, Math.PI*1.5, Math.PI*0.5); ctx.fill();
+
+    // Eyes
+    const blink = Math.sin(t*0.01 + ag._x*5) > 0.96;
+    ctx.fillStyle = '#1e1b4b';
+    if (!blink) {
+      ctx.beginPath(); ctx.ellipse(ax-5*S, ay-53*S, 3*S, 3.5*S, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(ax+5*S, ay-53*S, 3*S, 3.5*S, 0, 0, Math.PI*2); ctx.fill();
+      // Eye shine
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(ax-4*S, ay-54.5*S, 1.2*S, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ax+6*S, ay-54.5*S, 1.2*S, 0, Math.PI*2); ctx.fill();
+    } else {
+      ctx.strokeStyle = '#1e1b4b'; ctx.lineWidth = 1.5*S;
+      ctx.beginPath(); ctx.moveTo(ax-8*S, ay-53*S); ctx.lineTo(ax-2*S, ay-53*S); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ax+2*S, ay-53*S); ctx.lineTo(ax+8*S, ay-53*S); ctx.stroke();
+    }
+
+    // Smile
+    ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.5*S;
+    ctx.beginPath(); ctx.arc(ax, ay-47*S, 5*S, 0.15, Math.PI-0.15); ctx.stroke();
+
+    // Status dot
+    const dotPulse = 0.6 + 0.4 * Math.sin(t * 0.1);
+    ctx.fillStyle = isLive ? '#22d3a0' : '#475569';
+    ctx.shadowColor = isLive ? '#22d3a0' : 'transparent';
+    ctx.shadowBlur = isLive ? 12 * dotPulse : 0;
+    ctx.beginPath(); ctx.arc(ax + 14*S, ay-66*S, 6*S, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Name tag
+    ctx.font = `700 ${Math.round(11*S)}px "Space Mono", monospace`;
+    const nameW = ctx.measureText(ag.name).width;
+    const tagAlpha = isLive ? 1 : (isHov || isSel ? 0.9 : 0.55);
+    ctx.globalAlpha = tagAlpha * alpha;
+    ctx.fillStyle = 'rgba(5,7,14,0.88)';
+    ctx.beginPath(); ctx.roundRect(ax - nameW/2 - 7, ay-84*S, nameW+14, 16, 4); ctx.fill();
+    ctx.fillStyle = ag.color;
+    ctx.textAlign = 'center'; ctx.fillText(ag.name, ax, ay-72*S); ctx.textAlign = 'left';
+
+    // Role tag (below name, live only or hovered)
+    if (isLive || isSel || isHov) {
+      ctx.font = `400 9px "Space Mono", monospace`;
+      const roleW = ctx.measureText(ag.role.split('/')[0].trim()).width;
+      ctx.fillStyle = 'rgba(5,7,14,0.7)';
+      ctx.beginPath(); ctx.roundRect(ax - roleW/2 - 5, ay-68*S, roleW+10, 13, 3); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.textAlign = 'center'; ctx.fillText(ag.role.split('/')[0].trim(), ax, ay-58*S); ctx.textAlign = 'left';
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  function loop() {
+    t++;
+    ctx.clearRect(0, 0, W, H);
+
+    // Dark background
+    ctx.fillStyle = '#07090f';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw rooms
+    ROOM_DEFS.forEach(r => drawRoom(r));
+
+    // Center divider glow
+    ctx.strokeStyle = 'rgba(212,168,67,0.15)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6,8]);
+    ctx.beginPath(); ctx.moveTo(W*0.5, GAP*2); ctx.lineTo(W*0.5, H - 32); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(GAP*2, H*0.5); ctx.lineTo(W - GAP*2, H*0.5); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Particles
+    particles.forEach(p => {
+      p.prog += p.speed;
+      if (p.prog >= 1) p.prog = 0;
+      const t2 = p.prog;
+      const cpx = (p.from._x + p.to._x) / 2 + (Math.sin(p.from._x) * 60);
+      const cpy = (p.from._y + p.to._y) / 2 - 40;
+      const bx = (1-t2)*(1-t2)*p.from._x + 2*(1-t2)*t2*cpx + t2*t2*p.to._x;
+      const by = (1-t2)*(1-t2)*p.from._y + 2*(1-t2)*t2*cpy + t2*t2*p.to._y;
+      p.trail = p.trail || [];
+      p.trail.push({x:bx, y:by});
+      if (p.trail.length > 22) p.trail.shift();
+
+      p.trail.forEach((pt, i) => {
+        const a = i / p.trail.length;
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 3*a, 0, Math.PI*2);
+        ctx.fillStyle = p.from.color + Math.floor(a*200).toString(16).padStart(2,'0');
+        ctx.fill();
+      });
+
+      ctx.beginPath(); ctx.arc(bx, by, 5, 0, Math.PI*2);
+      ctx.fillStyle = p.from.color;
+      ctx.shadowColor = p.from.color; ctx.shadowBlur = 16;
+      ctx.fill(); ctx.shadowBlur = 0;
+    });
+
+    // Agents (sorted by y for overlap)
+    hoveredAgent = null;
+    OFFICE_AGENTS.forEach(ag => {
+      if (Math.hypot(mouseX - ag._x, mouseY - ag._y) < 40) hoveredAgent = ag;
+    });
+    [...OFFICE_AGENTS].sort((a,b) => a._y - b._y).forEach(ag => drawAgent(ag, t));
+
+    // Notifications
+    notifTimer--;
+    if (notifTimer <= 0) {
+      notifTimer = 150 + Math.random() * 250;
+      const live = OFFICE_AGENTS.filter(a => a.status === 'live');
+      if (live.length) {
+        const ag = live[Math.floor(Math.random() * live.length)];
+        notifications.push({ x: ag._x, y: ag._y - 80, msg: NOTIF_MSGS[Math.floor(Math.random()*NOTIF_MSGS.length)], color: ag.color, life: 1, vy: -0.7 });
+      }
+    }
+    for (let i = notifications.length-1; i >= 0; i--) {
+      const n = notifications[i];
+      n.y += n.vy; n.life -= 0.013;
+      if (n.life <= 0) { notifications.splice(i,1); continue; }
+      ctx.globalAlpha = n.life;
+      ctx.font = '700 11px "Space Mono", monospace';
+      const nw = ctx.measureText(n.msg).width;
+      ctx.fillStyle = 'rgba(5,7,14,0.9)';
+      ctx.beginPath(); ctx.roundRect(n.x-nw/2-8, n.y-14, nw+16, 18, 5); ctx.fill();
+      ctx.fillStyle = n.color;
+      ctx.shadowColor = n.color; ctx.shadowBlur = 8;
+      ctx.textAlign = 'center'; ctx.fillText(n.msg, n.x, n.y); ctx.textAlign = 'left';
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    }
+
+    // Ticker bar
+    const TH2 = 28, TY = H - TH2;
+    ctx.fillStyle = 'rgba(5,7,14,0.97)';
+    ctx.fillRect(0, TY, W, TH2);
+    ctx.strokeStyle = 'rgba(212,168,67,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,TY); ctx.lineTo(W,TY); ctx.stroke();
+    tickerX -= 1;
+    if (tickerX < -ctx.measureText(TICKER).width) tickerX = W;
+    ctx.font = '700 10px "Space Mono", monospace';
+    ctx.fillStyle = '#d4a843';
+    ctx.fillText(TICKER + TICKER, tickerX, TY + 18);
+    // Live pill
+    const livePulse = 0.5 + 0.5*Math.sin(t*0.1);
+    ctx.fillStyle = '#22d3a0';
+    ctx.shadowColor = '#22d3a0'; ctx.shadowBlur = 8*livePulse;
+    ctx.beginPath(); ctx.arc(W-60, TY+14, 5, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#22d3a0';
+    ctx.font = '700 9px "Space Mono", monospace';
+    ctx.fillText('LIVE', W-50, TY+18);
+
+    officeRAF = requestAnimationFrame(loop);
+  }
+
+  loop();
+}
+
   // Isometric projection
   // Size tiles to fill full canvas width
   const COLS = 13, ROWS = 9;
