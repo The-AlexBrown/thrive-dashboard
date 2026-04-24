@@ -1455,6 +1455,22 @@ function selectAgent(agent) {
   document.getElementById('info-activity').textContent = agent.activity || '—';
 }
 
+// Safe rounded rect polyfill (Safari doesn't support ctx.roundRect)
+function rr(ctx, x, y, w, h, rad) {
+  rad = Math.min(rad || 0, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x + rad, y);
+  ctx.lineTo(x + w - rad, y);
+  ctx.arcTo(x + w, y, x + w, y + rad, rad);
+  ctx.lineTo(x + w, y + h - rad);
+  ctx.arcTo(x + w, y + h, x + w - rad, y + h, rad);
+  ctx.lineTo(x + rad, y + h);
+  ctx.arcTo(x, y + h, x, y + h - rad, rad);
+  ctx.lineTo(x, y + rad);
+  ctx.arcTo(x, y, x + rad, y, rad);
+  ctx.closePath();
+}
+
 function initOffice() {
   if (officeRAF) { cancelAnimationFrame(officeRAF); officeRAF = null; }
 
@@ -1571,14 +1587,14 @@ function initOffice() {
     bg.addColorStop(1, room.color + '08');
     ctx.fillStyle = bg;
     ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 12);
+    rr(ctx, x, y, w, h, 12);
     ctx.fill();
 
     // Border
     ctx.strokeStyle = room.color + '55';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 12);
+    rr(ctx, x, y, w, h, 12);
     ctx.stroke();
 
     // Corner glow dots
@@ -1616,7 +1632,7 @@ function initOffice() {
     ctx.strokeStyle = color + '88';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(ax - dw/2, ay + 10, dw, dh, 6);
+    rr(ctx, ax - dw/2, ay + 10, dw, dh, 6);
     ctx.fill(); ctx.stroke();
 
     // Monitor
@@ -1625,7 +1641,7 @@ function initOffice() {
     ctx.strokeStyle = color + 'cc';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(ax - mw/2, ay + 14, mw, mh, 3);
+    rr(ctx, ax - mw/2, ay + 14, mw, mh, 3);
     ctx.fill(); ctx.stroke();
 
     // Screen glow content
@@ -1636,7 +1652,7 @@ function initOffice() {
     ctx.fillStyle = sg;
     ctx.globalAlpha = 0.7 * pulse;
     ctx.beginPath();
-    ctx.roundRect(ax - mw/2 + 2, ay + 16, mw - 4, mh - 4, 2);
+    rr(ctx, ax - mw/2 + 2, ay + 16, mw - 4, mh - 4, 2);
     ctx.fill();
     ctx.globalAlpha = 1;
 
@@ -1650,7 +1666,7 @@ function initOffice() {
     ctx.strokeStyle = color + '66';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(ax - 20, ay + 44, 40, 8, 2);
+    rr(ctx, ax - 20, ay + 44, 40, 8, 2);
     ctx.fill(); ctx.stroke();
   }
 
@@ -1702,30 +1718,30 @@ function initOffice() {
     // Legs
     const legSwing = isLive ? Math.sin(t * 0.03 + ag._x) * 3 : 0;
     ctx.fillStyle = '#1e293b';
-    ctx.beginPath(); ctx.roundRect(ax-9*S, ay-16*S + legSwing, 8*S, 18*S, 3); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(ax+1*S, ay-16*S - legSwing, 8*S, 18*S, 3); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax-9*S, ay-16*S + legSwing, 8*S, 18*S, 3); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax+1*S, ay-16*S - legSwing, 8*S, 18*S, 3); ctx.fill();
 
     // Shoes
     ctx.fillStyle = '#0f172a';
-    ctx.beginPath(); ctx.roundRect(ax-11*S, ay+1*S, 10*S, 5*S, 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(ax+1*S, ay+1*S, 10*S, 5*S, 2); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax-11*S, ay+1*S, 10*S, 5*S, 2); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax+1*S, ay+1*S, 10*S, 5*S, 2); ctx.fill();
 
     // Body
     const bodyGrad = ctx.createLinearGradient(ax-12*S, ay-38*S, ax+12*S, ay-18*S);
     bodyGrad.addColorStop(0, ag.color + 'ff');
     bodyGrad.addColorStop(1, ag.color + 'aa');
     ctx.fillStyle = bodyGrad;
-    ctx.beginPath(); ctx.roundRect(ax-12*S, ay-38*S, 24*S, 22*S, 4); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax-12*S, ay-38*S, 24*S, 22*S, 4); ctx.fill();
 
     // Collar / shirt detail
     ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.beginPath(); ctx.roundRect(ax-4*S, ay-38*S, 8*S, 10*S, 2); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax-4*S, ay-38*S, 8*S, 10*S, 2); ctx.fill();
 
     // Arms
     const armSwing = isLive ? Math.sin(t * 0.07 + ag._x) * 5 : 0;
     ctx.fillStyle = ag.color + 'dd';
-    ctx.beginPath(); ctx.roundRect(ax-20*S, ay-37*S + armSwing, 8*S, 18*S, 3); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(ax+12*S, ay-37*S - armSwing, 8*S, 18*S, 3); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax-20*S, ay-37*S + armSwing, 8*S, 18*S, 3); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax+12*S, ay-37*S - armSwing, 8*S, 18*S, 3); ctx.fill();
 
     // Hands
     ctx.fillStyle = '#d4956a';
@@ -1734,7 +1750,7 @@ function initOffice() {
 
     // Neck
     ctx.fillStyle = '#d4956a';
-    ctx.beginPath(); ctx.roundRect(ax-5*S, ay-44*S, 10*S, 8*S, 2); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax-5*S, ay-44*S, 10*S, 8*S, 2); ctx.fill();
 
     // Head
     const headGrad = ctx.createRadialGradient(ax-3*S, ay-52*S, 0, ax, ay-50*S, 16*S);
@@ -1783,7 +1799,7 @@ function initOffice() {
     const tagAlpha = isLive ? 1 : (isHov || isSel ? 0.9 : 0.55);
     ctx.globalAlpha = tagAlpha * alpha;
     ctx.fillStyle = 'rgba(5,7,14,0.88)';
-    ctx.beginPath(); ctx.roundRect(ax - nameW/2 - 7, ay-84*S, nameW+14, 16, 4); ctx.fill();
+    ctx.beginPath(); rr(ctx, ax - nameW/2 - 7, ay-84*S, nameW+14, 16, 4); ctx.fill();
     ctx.fillStyle = ag.color;
     ctx.textAlign = 'center'; ctx.fillText(ag.name, ax, ay-72*S); ctx.textAlign = 'left';
 
@@ -1792,7 +1808,7 @@ function initOffice() {
       ctx.font = `400 9px "Space Mono", monospace`;
       const roleW = ctx.measureText(ag.role.split('/')[0].trim()).width;
       ctx.fillStyle = 'rgba(5,7,14,0.7)';
-      ctx.beginPath(); ctx.roundRect(ax - roleW/2 - 5, ay-68*S, roleW+10, 13, 3); ctx.fill();
+      ctx.beginPath(); rr(ctx, ax - roleW/2 - 5, ay-68*S, roleW+10, 13, 3); ctx.fill();
       ctx.fillStyle = 'rgba(255,255,255,0.6)';
       ctx.textAlign = 'center'; ctx.fillText(ag.role.split('/')[0].trim(), ax, ay-58*S); ctx.textAlign = 'left';
     }
@@ -1870,7 +1886,7 @@ function initOffice() {
       ctx.font = '700 11px "Space Mono", monospace';
       const nw = ctx.measureText(n.msg).width;
       ctx.fillStyle = 'rgba(5,7,14,0.9)';
-      ctx.beginPath(); ctx.roundRect(n.x-nw/2-8, n.y-14, nw+16, 18, 5); ctx.fill();
+      ctx.beginPath(); rr(ctx, n.x-nw/2-8, n.y-14, nw+16, 18, 5); ctx.fill();
       ctx.fillStyle = n.color;
       ctx.shadowColor = n.color; ctx.shadowBlur = 8;
       ctx.textAlign = 'center'; ctx.fillText(n.msg, n.x, n.y); ctx.textAlign = 'left';
@@ -2132,7 +2148,7 @@ function initOffice() {
     // Body / shirt
     ctx.fillStyle = agent.color + (isLive ? 'dd' : '60');
     ctx.beginPath();
-    ctx.roundRect(cx - 8, cy + 8, 16, 14, 2);
+    rr(ctx, cx - 8, cy + 8, 16, 14, 2);
     ctx.fill();
 
     // Arms
@@ -2184,7 +2200,7 @@ function initOffice() {
       ctx.globalAlpha = isLive ? 0.9 : 0.7;
       ctx.fillStyle = 'rgba(0,0,0,0.8)';
       ctx.beginPath();
-      ctx.roundRect(cx - tw2/2 - 5, cy - 26, tw2 + 10, 14, 3);
+      rr(ctx, cx - tw2/2 - 5, cy - 26, tw2 + 10, 14, 3);
       ctx.fill();
       ctx.fillStyle = agent.color;
       ctx.textAlign = 'center';
@@ -2341,7 +2357,7 @@ function initOffice() {
       const tw2 = ctx.measureText(n.msg).width;
       ctx.fillStyle = 'rgba(0,0,0,0.85)';
       ctx.beginPath();
-      ctx.roundRect(n.x - tw2/2 - 6, n.y - 12, tw2 + 12, 16, 4);
+      rr(ctx, n.x - tw2/2 - 6, n.y - 12, tw2 + 12, 16, 4);
       ctx.fill();
       ctx.fillStyle = n.color;
       ctx.textAlign = 'center';
