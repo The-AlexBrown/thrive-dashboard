@@ -215,42 +215,346 @@ body::after {
 @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
 /* ── VIRTUAL OFFICE ── */
-.office-canvas-wrap {
-  background: var(--card);
-  border: 1px solid var(--border2);
-  border-radius: 16px;
-  padding: 8px;
-  margin-bottom: 24px;
-  position: relative;
-  overflow: hidden;
-  height: 480px;
+.office-wrap {
+  display: flex;
+  gap: 16px;
+  height: 560px;
 }
 
-.office-canvas-wrap::before {
+.office-building {
+  flex: 1;
+  background: #0a0e1a;
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+  background-color: rgba(255,255,255,0.06);
+}
+
+/* Each room */
+.office-room {
+  background: #0d1220;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: background 0.2s;
+}
+.office-room:hover { background: #101628; }
+
+/* Floor grid */
+.office-room::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(212,168,67,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(212,168,67,0.03) 1px, transparent 1px);
-  background-size: 32px 32px;
-  border-radius: 12px;
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
   pointer-events: none;
 }
 
-#office-canvas { width: 100%; height: 100%; }
+/* Floor strip at bottom */
+.office-room::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 28px;
+  background: rgba(255,255,255,0.015);
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.room-label {
+  position: absolute;
+  top: 10px; left: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.2);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Furniture pieces */
+.desk {
+  position: absolute;
+  width: 52px; height: 28px;
+  background: #1a2236;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.5);
+}
+
+.desk::after {
+  content: '';
+  position: absolute;
+  top: 4px; left: 6px; right: 6px; height: 8px;
+  background: #0d1525;
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+/* Monitor on desk */
+.monitor {
+  position: absolute;
+  width: 20px; height: 14px;
+  background: #0a0e1a;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.monitor-screen {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #0d2040, #051020);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5px;
+  color: rgba(34,211,160,0.8);
+  animation: screenFlicker 4s infinite;
+}
+
+@keyframes screenFlicker {
+  0%,95%,100% { opacity: 1; }
+  96% { opacity: 0.6; }
+  97% { opacity: 1; }
+  98% { opacity: 0.7; }
+}
+
+.plant {
+  position: absolute;
+  font-size: 20px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(34,211,160,0.2));
+}
+
+.bookshelf {
+  position: absolute;
+  width: 16px;
+  background: repeating-linear-gradient(
+    to right,
+    #2a1f4a 0px, #2a1f4a 3px,
+    #3d2d6b 3px, #3d2d6b 5px,
+    #1a3a5c 5px, #1a3a5c 8px,
+    #2d4a1a 8px, #2d4a1a 10px,
+    #1a2236 10px, #1a2236 13px,
+    #4a1a1a 13px, #4a1a1a 16px
+  );
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 2px;
+}
+
+/* ── CHARACTER SPRITES ── */
+.character {
+  position: absolute;
+  z-index: 20;
+  cursor: pointer;
+  transition: transform 0.1s;
+  user-select: none;
+}
+
+.character:hover { transform: scale(1.1); }
+.character:hover .char-name { opacity: 1; }
+
+.char-body {
+  width: 20px;
+  height: 32px;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+/* Head */
+.char-head {
+  width: 14px; height: 12px;
+  border-radius: 3px;
+  position: absolute;
+  top: 0; left: 3px;
+  border: 1px solid rgba(0,0,0,0.4);
+}
+
+/* Hair */
+.char-hair {
+  position: absolute;
+  top: 0; left: 3px;
+  width: 14px; height: 5px;
+  border-radius: 3px 3px 0 0;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+
+/* Eyes */
+.char-eyes {
+  position: absolute;
+  top: 5px; left: 5px;
+  width: 10px; height: 3px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.char-eye {
+  width: 3px; height: 3px;
+  background: #1a0a00;
+  border-radius: 1px;
+  animation: blink 5s infinite;
+}
+
+@keyframes blink {
+  0%,48%,52%,100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+
+/* Torso */
+.char-torso {
+  width: 16px; height: 10px;
+  position: absolute;
+  top: 11px; left: 2px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+
+/* Arms */
+.char-arm {
+  width: 5px; height: 9px;
+  position: absolute;
+  top: 12px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+.char-arm.left { left: -2px; }
+.char-arm.right { right: -2px; }
+
+/* Legs */
+.char-legs {
+  width: 16px; height: 10px;
+  position: absolute;
+  top: 22px; left: 2px;
+  display: flex;
+  gap: 2px;
+}
+.char-leg {
+  flex: 1;
+  border-radius: 0 0 2px 2px;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+/* Name tag */
+.char-name {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  white-space: nowrap;
+  color: var(--white);
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-bottom: 4px;
+  pointer-events: none;
+}
+
+.char-status-dot {
+  position: absolute;
+  bottom: -2px; right: -2px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 1px solid #0d1220;
+  box-shadow: 0 0 5px var(--green);
+  animation: pulse 2s infinite;
+}
+
+.char-status-dot.planned {
+  background: #4a5568;
+  box-shadow: none;
+  animation: none;
+}
+
+/* Typing animation for arms */
+@keyframes typing {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.typing .char-arm.right { animation: typing 0.4s infinite; }
+.typing .char-arm.left { animation: typing 0.4s 0.2s infinite; }
+
+/* Walking */
+@keyframes walkR {
+  0%,100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+@keyframes bobIdle {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.idle { animation: bobIdle 3s ease-in-out infinite; }
+
+/* Info panel */
+.office-info {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.office-info-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 20px;
+  flex: 1;
+  transition: all 0.3s;
+}
+
+.info-avatar {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.info-name { font-size: 18px; font-weight: 700; margin-bottom: 3px; }
+.info-role { font-size: 11px; color: var(--muted2); margin-bottom: 12px; line-height: 1.4; }
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+}
+.info-row:last-child { border: none; }
+.info-key { color: var(--muted2); font-family: 'Space Mono', monospace; font-size: 9px; text-transform: uppercase; }
+.info-val { font-weight: 500; }
 
 .office-legend {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 11px;
   color: var(--muted2);
 }
 
@@ -821,19 +1125,95 @@ body::after {
     <div class="panel-header">
       <div>
         <div class="panel-title">Virtual <span>Office</span></div>
-        <div class="panel-subtitle">Live view of your AI workforce — watch agents pulse as they process</div>
+        <div class="panel-subtitle">Your AI workforce at their desks — click an agent to inspect</div>
       </div>
     </div>
 
-    <div class="office-canvas-wrap">
-      <canvas id="office-canvas"></canvas>
-    </div>
+    <div class="office-wrap">
+      <!-- 2x2 room grid -->
+      <div class="office-building" id="office-building">
 
-    <div class="office-legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#d4a843;box-shadow:0 0 6px #d4a843;"></div> CEO / Director</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;box-shadow:0 0 6px #7c3aed;"></div> COO / Orchestrator</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#22d3a0;box-shadow:0 0 6px #22d3a0;"></div> Active Agent</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#4a5568;"></div> Planned Agent</div>
+        <!-- CEO OFFICE (top-left) -->
+        <div class="office-room" id="room-ceo">
+          <div class="room-label">CEO Office</div>
+          <!-- Furniture -->
+          <div class="desk" style="bottom:60px;left:30px;width:70px;height:36px;background:#1e2a3a;"></div>
+          <div class="monitor" style="bottom:88px;left:38px;"></div>
+          <div class="plant" style="bottom:55px;right:20px;">🌿</div>
+          <div class="bookshelf" style="top:30px;right:14px;width:14px;height:55px;"></div>
+          <!-- Trophy/decor -->
+          <div style="position:absolute;bottom:60px;right:48px;font-size:14px;">🏆</div>
+        </div>
+
+        <!-- C-SUITE (top-right) -->
+        <div class="office-room" id="room-csuite">
+          <div class="room-label">C-Suite</div>
+          <div class="desk" style="bottom:60px;left:28px;width:60px;height:32px;background:#1e1a36;"></div>
+          <div class="monitor" style="bottom:86px;left:36px;"></div>
+          <div class="desk" style="bottom:60px;right:28px;width:60px;height:32px;background:#1e1a36;"></div>
+          <div class="monitor" style="bottom:86px;right:50px;"></div>
+          <div class="plant" style="bottom:55px;left:50%;transform:translateX(-50%);font-size:16px;">🌴</div>
+        </div>
+
+        <!-- SALES & MARKETING (bottom-left) -->
+        <div class="office-room" id="room-sales">
+          <div class="room-label">Sales & Marketing</div>
+          <div class="desk" style="bottom:55px;left:20px;width:55px;height:30px;"></div>
+          <div class="monitor" style="bottom:79px;left:26px;"></div>
+          <div class="desk" style="bottom:55px;left:90px;width:55px;height:30px;"></div>
+          <div class="monitor" style="bottom:79px;left:96px;"></div>
+          <div class="desk" style="bottom:55px;right:20px;width:55px;height:30px;"></div>
+          <div class="monitor" style="bottom:79px;right:42px;"></div>
+          <div class="plant" style="top:30px;right:16px;font-size:16px;">🌱</div>
+        </div>
+
+        <!-- OPERATIONS (bottom-right) -->
+        <div class="office-room" id="room-ops">
+          <div class="room-label">Operations</div>
+          <div class="desk" style="bottom:55px;left:24px;width:55px;height:30px;background:#1a2236;"></div>
+          <div class="monitor" style="bottom:79px;left:32px;"></div>
+          <div class="desk" style="bottom:55px;right:24px;width:55px;height:30px;background:#1a2236;"></div>
+          <div class="monitor" style="bottom:79px;right:44px;"></div>
+          <div class="bookshelf" style="top:28px;left:14px;width:16px;height:60px;"></div>
+          <div style="position:absolute;bottom:56px;left:50%;transform:translateX(-50%);font-size:12px;">💻</div>
+        </div>
+
+      </div>
+
+      <!-- Right info panel -->
+      <div class="office-info">
+        <div class="office-info-card" id="agent-info-panel">
+          <div class="info-avatar" id="info-avatar" style="background:rgba(212,168,67,0.1);border-color:rgba(212,168,67,0.3);">👑</div>
+          <div class="info-name" id="info-name">Alex</div>
+          <div class="info-role" id="info-role">CEO / Vision & Strategy</div>
+          <div class="info-row">
+            <span class="info-key">Status</span>
+            <span class="info-val" id="info-status" style="color:var(--green);">● LIVE</span>
+          </div>
+          <div class="info-row">
+            <span class="info-key">Room</span>
+            <span class="info-val" id="info-room">CEO Office</span>
+          </div>
+          <div class="info-row">
+            <span class="info-key">Platform</span>
+            <span class="info-val" id="info-platform">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-key">Activity</span>
+            <span class="info-val" id="info-activity" style="color:var(--gold);">Strategising</span>
+          </div>
+        </div>
+
+        <div style="background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:16px;">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted2);margin-bottom:10px;">Legend</div>
+          <div class="office-legend" style="flex-direction:column;gap:8px;">
+            <div class="legend-item"><div class="legend-dot" style="background:#d4a843;box-shadow:0 0 6px #d4a843;"></div> CEO / Director</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;box-shadow:0 0 6px #7c3aed;"></div> COO / Orchestrator</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#22d3a0;box-shadow:0 0 6px #22d3a0;"></div> Active Agent</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#4a5568;"></div> Planned Agent</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1102,205 +1482,146 @@ async function loadData() {
 }
 
 // ══════════════════════════════════
-// VIRTUAL OFFICE (Canvas)
+// VIRTUAL OFFICE (Pixel-art style)
 // ══════════════════════════════════
-let officeAnimId = null;
-let officeNodes = [];
-let officeConnections = [];
-let officeParticles = [];
+
+const OFFICE_LAYOUT = [
+  {
+    id: 'alex', name: 'Alex', role: 'CEO / Vision & Strategy',
+    avatar: '👑', color: '#d4a843', status: 'live',
+    room: 'room-ceo', roomName: 'CEO Office',
+    x: '40%', y: '30%', anim: 'idle',
+    activity: 'Setting strategy', platform: '—',
+    hair: '#3a1a00', skin: '#d4956a', shirt: '#1a3a5c', pants: '#0d1525',
+  },
+  {
+    id: 'rex', name: 'Rex', role: 'COO / Strategic Orchestrator',
+    avatar: '🧠', color: '#7c3aed', status: 'planned',
+    room: 'room-csuite', roomName: 'C-Suite',
+    x: '35%', y: '30%', anim: 'typing',
+    activity: 'Orchestrating agents', platform: 'Coming soon',
+    hair: '#1a1a2e', skin: '#c8b89a', shirt: '#2d1b69', pants: '#1a0a3a',
+  },
+  {
+    id: 'ledger', name: 'Ledger', role: 'Finance & CFO Agent',
+    avatar: '💎', color: '#10b981', status: 'planned',
+    room: 'room-csuite', roomName: 'C-Suite',
+    x: '65%', y: '30%', anim: 'idle',
+    activity: 'Running P&L analysis', platform: 'Coming soon',
+    hair: '#2d2d2d', skin: '#b8936a', shirt: '#064e3b', pants: '#022c22',
+  },
+  {
+    id: 'thrive-bot', name: 'Thrive', role: 'Client Success Agent',
+    avatar: '🤖', color: '#22d3a0', status: 'live',
+    room: 'room-sales', roomName: 'Sales & Marketing',
+    x: '18%', y: '28%', anim: 'typing',
+    activity: 'Answering clients', platform: 'Discord / Railway',
+    hair: '#0a2a3a', skin: '#7ec8e3', shirt: '#0e4d4d', pants: '#062020',
+  },
+  {
+    id: 'closer', name: 'Closer', role: 'Sales Manager',
+    avatar: '🎯', color: '#f59e0b', status: 'planned',
+    room: 'room-sales', roomName: 'Sales & Marketing',
+    x: '48%', y: '28%', anim: 'typing',
+    activity: 'Working the pipeline', platform: 'Coming soon',
+    hair: '#1a0a00', skin: '#e0a882', shirt: '#7c2d12', pants: '#3a1008',
+  },
+  {
+    id: 'mailer', name: 'Mailer', role: 'Email Marketing Manager',
+    avatar: '✉️', color: '#ec4899', status: 'planned',
+    room: 'room-sales', roomName: 'Sales & Marketing',
+    x: '78%', y: '28%', anim: 'idle',
+    activity: 'Crafting campaigns', platform: 'Coming soon',
+    hair: '#4a0020', skin: '#f0c090', shirt: '#831843', pants: '#3a0a20',
+  },
+  {
+    id: 'dash', name: 'Dash', role: 'Data & Dashboard Manager',
+    avatar: '📊', color: '#3b82f6', status: 'planned',
+    room: 'room-ops', roomName: 'Operations',
+    x: '28%', y: '28%', anim: 'typing',
+    activity: 'Building dashboards', platform: 'Coming soon',
+    hair: '#0a1a3a', skin: '#8fb8d8', shirt: '#1e3a8a', pants: '#0a1a4a',
+  },
+  {
+    id: 'hunter', name: 'Hunter', role: 'HR / Recruiting Agent',
+    avatar: '🔍', color: '#8b5cf6', status: 'planned',
+    room: 'room-ops', roomName: 'Operations',
+    x: '68%', y: '28%', anim: 'idle',
+    activity: 'Screening candidates', platform: 'Coming soon',
+    hair: '#2d1a4a', skin: '#c4a882', shirt: '#4c1d95', pants: '#2e1065',
+  },
+];
+
+function buildCharacter(agent) {
+  const isLive = agent.status === 'live';
+  const el = document.createElement('div');
+  el.className = 'character ' + (agent.anim || 'idle');
+  el.style.left = agent.x;
+  el.style.bottom = agent.y;
+  if (!isLive) el.style.opacity = '0.5';
+
+  el.innerHTML = `
+    <div class="char-name">${agent.name}</div>
+    <div class="char-body">
+      <div class="char-hair" style="background:${agent.hair};"></div>
+      <div class="char-head" style="background:${agent.skin};"></div>
+      <div class="char-eyes">
+        <div class="char-eye"></div>
+        <div class="char-eye"></div>
+      </div>
+      <div class="char-torso" style="background:${agent.shirt};"></div>
+      <div class="char-arm left" style="background:${agent.shirt};"></div>
+      <div class="char-arm right" style="background:${agent.shirt};"></div>
+      <div class="char-legs">
+        <div class="char-leg" style="background:${agent.pants};"></div>
+        <div class="char-leg" style="background:${agent.pants};"></div>
+      </div>
+      <div class="char-status-dot ${isLive ? '' : 'planned'}"></div>
+    </div>
+  `;
+
+  el.addEventListener('click', () => selectAgent(agent));
+  return el;
+}
+
+function selectAgent(agent) {
+  const isLive = agent.status === 'live';
+  document.getElementById('info-avatar').textContent = agent.avatar;
+  document.getElementById('info-avatar').style.background = agent.color + '20';
+  document.getElementById('info-avatar').style.borderColor = agent.color + '60';
+  document.getElementById('info-name').textContent = agent.name;
+  document.getElementById('info-role').textContent = agent.role;
+  document.getElementById('info-status').textContent = isLive ? '● LIVE' : '○ PLANNED';
+  document.getElementById('info-status').style.color = isLive ? 'var(--green)' : 'var(--muted2)';
+  document.getElementById('info-room').textContent = agent.roomName || '—';
+  document.getElementById('info-platform').textContent = agent.platform || '—';
+  document.getElementById('info-activity').textContent = agent.activity || '—';
+}
 
 function initOffice() {
-  const canvas = document.getElementById('office-canvas');
-  const wrap = canvas.parentElement;
-  canvas.width = wrap.clientWidth - 16;
-  canvas.height = wrap.clientHeight - 16;
-  const ctx = canvas.getContext('2d');
-
-  // Build nodes from all agents
-  const allAgents = [CEO, ...liveAgents, ...FUTURE_AGENTS];
-
-  // Layout positions
-  const W = canvas.width, H = canvas.height;
-
-  const positions = {
-    alex:    { x: W * 0.5, y: H * 0.12 },
-    rex:     { x: W * 0.5, y: H * 0.32 },
-    'thrive-bot': { x: W * 0.18, y: H * 0.65 },
-    dash:    { x: W * 0.32, y: H * 0.65 },
-    closer:  { x: W * 0.46, y: H * 0.65 },
-    ledger:  { x: W * 0.60, y: H * 0.65 },
-    mailer:  { x: W * 0.74, y: H * 0.65 },
-    hunter:  { x: W * 0.88, y: H * 0.65 },
-  };
-
-  officeNodes = allAgents.map(a => {
-    const pos = positions[a.id] || { x: Math.random() * W * 0.8 + W * 0.1, y: Math.random() * H * 0.8 + H * 0.1 };
-    return {
-      ...a,
-      x: pos.x, y: pos.y,
-      radius: a.tier === 'ceo' ? 36 : a.tier === 'coo' ? 30 : 24,
-      pulsePhase: Math.random() * Math.PI * 2,
-      pulseSpeed: a.status === 'live' ? 0.04 + Math.random() * 0.02 : 0.01,
-      activityTimer: 0,
-      activityInterval: 3000 + Math.random() * 5000,
-      lastActivity: Date.now() - Math.random() * 5000,
-    };
+  // Place characters in their rooms
+  OFFICE_LAYOUT.forEach(agent => {
+    const room = document.getElementById(agent.room);
+    if (!room) return;
+    // Avoid duplicate characters on re-init
+    if (room.querySelector('[data-agent="' + agent.id + '"]')) return;
+    const char = buildCharacter(agent);
+    char.setAttribute('data-agent', agent.id);
+    room.appendChild(char);
   });
 
-  // Connections: CEO→Rex, Rex→all workers
-  officeConnections = [];
-  const ceoNode = officeNodes.find(n => n.id === 'cameron');
-  const rexNode = officeNodes.find(n => n.id === 'rex');
-  if (ceoNode && rexNode) officeConnections.push({ from: ceoNode, to: rexNode });
-  const workers = officeNodes.filter(n => n.tier === 'worker');
-  workers.forEach(w => {
-    if (rexNode) officeConnections.push({ from: rexNode, to: w });
-  });
-
-  officeParticles = [];
-
-  if (officeAnimId) cancelAnimationFrame(officeAnimId);
-
-  let t = 0;
-  function drawOffice() {
-    t++;
-    ctx.clearRect(0, 0, W, H);
-
-    // Draw connections
-    officeConnections.forEach(conn => {
-      const dx = conn.to.x - conn.from.x;
-      const dy = conn.to.y - conn.from.y;
-      const fromColor = conn.from.status === 'live' ? conn.from.color : '#2d3748';
-      const toColor = conn.to.status === 'live' ? conn.to.color : '#2d3748';
-
-      const grad = ctx.createLinearGradient(conn.from.x, conn.from.y, conn.to.x, conn.to.y);
-      grad.addColorStop(0, fromColor + '60');
-      grad.addColorStop(1, toColor + '30');
-
-      ctx.beginPath();
-      ctx.moveTo(conn.from.x, conn.from.y);
-      ctx.lineTo(conn.to.x, conn.to.y);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // Data packet travelling along line if both live
-      if (conn.from.status === 'live' && conn.to.status === 'live') {
-        const speed = 0.008;
-        const progress = ((t * speed) % 1 + conn.from.id.length * 0.1) % 1;
-        const px = conn.from.x + dx * progress;
-        const py = conn.from.y + dy * progress;
-        ctx.beginPath();
-        ctx.arc(px, py, 3, 0, Math.PI * 2);
-        ctx.fillStyle = conn.from.color + 'cc';
-        ctx.fill();
+  // Random walking animation — move characters slightly every few seconds
+  setInterval(() => {
+    document.querySelectorAll('.character').forEach(el => {
+      if (Math.random() < 0.15) {
+        const dx = (Math.random() - 0.5) * 14;
+        const currentLeft = parseFloat(el.style.left) || 30;
+        const newLeft = Math.max(8, Math.min(82, currentLeft + dx));
+        el.style.transition = 'left 1.5s ease-in-out';
+        el.style.left = newLeft + '%';
       }
     });
-
-    // Spawn activity particles from live agents
-    officeNodes.forEach(node => {
-      if (node.status === 'live' && Math.random() < 0.03) {
-        for (let i = 0; i < 2; i++) {
-          officeParticles.push({
-            x: node.x, y: node.y,
-            vx: (Math.random() - 0.5) * 1.5,
-            vy: (Math.random() - 0.5) * 1.5,
-            life: 1, decay: 0.02 + Math.random() * 0.01,
-            color: node.color,
-            size: 1.5 + Math.random() * 1.5,
-          });
-        }
-      }
-    });
-
-    // Update & draw particles
-    officeParticles = officeParticles.filter(p => p.life > 0);
-    officeParticles.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      p.life -= p.decay;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = p.color + Math.floor(p.life * 255).toString(16).padStart(2, '0');
-      ctx.fill();
-    });
-
-    // Draw nodes
-    officeNodes.forEach(node => {
-      node.pulsePhase += node.pulseSpeed;
-      const pulse = Math.sin(node.pulsePhase) * 0.3 + 0.7;
-      const isLive = node.status === 'live';
-      const color = isLive ? node.color : '#2d3748';
-      const r = node.radius;
-
-      // Outer glow ring (live only)
-      if (isLive) {
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, r + 10 + pulse * 6, 0, Math.PI * 2);
-        ctx.strokeStyle = color + '20';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, r + 4, 0, Math.PI * 2);
-        ctx.strokeStyle = color + '50';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
-
-      // Main circle
-      const grad = ctx.createRadialGradient(node.x - r * 0.3, node.y - r * 0.3, 0, node.x, node.y, r);
-      grad.addColorStop(0, color + (isLive ? 'cc' : '40'));
-      grad.addColorStop(1, color + (isLive ? '30' : '15'));
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // Border
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-      ctx.strokeStyle = color + (isLive ? 'cc' : '40');
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Emoji
-      ctx.font = `${r * 0.85}px serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.globalAlpha = isLive ? 1 : 0.4;
-      ctx.fillText(node.avatar, node.x, node.y);
-      ctx.globalAlpha = 1;
-
-      // Name label
-      ctx.font = `500 12px 'Space Grotesk', sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillStyle = isLive ? '#f0f4ff' : '#4a5568';
-      ctx.fillText(node.name, node.x, node.y + r + 8);
-
-      // Role label
-      ctx.font = `10px 'Space Mono', monospace`;
-      ctx.fillStyle = isLive ? color + 'cc' : '#2d3748';
-      ctx.fillText(node.role.split(' / ')[0], node.x, node.y + r + 22);
-
-      // Live indicator dot
-      if (isLive) {
-        ctx.beginPath();
-        ctx.arc(node.x + r * 0.65, node.y - r * 0.65, 5, 0, Math.PI * 2);
-        ctx.fillStyle = '#22d3a0';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(node.x + r * 0.65, node.y - r * 0.65, 5 + pulse * 3, 0, Math.PI * 2);
-        ctx.strokeStyle = '#22d3a040';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-    });
-
-    officeAnimId = requestAnimationFrame(drawOffice);
-  }
-
-  drawOffice();
+  }, 3000);
 }
 
 // ══════════════════════════════════
