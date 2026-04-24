@@ -14,7 +14,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 
 // Middleware
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // PDF storage — always local in ~/thrive-bot/pdfs (per bot would need its own folder; using bot id as subfolder)
 const storage = multer.diskStorage({
