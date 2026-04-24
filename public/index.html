@@ -1128,7 +1128,7 @@ body::after {
         <div class="panel-subtitle">Your AI workforce — live, animated, isometric HQ</div>
       </div>
     </div>
-    <div style="display:flex;gap:16px;">
+    <div style="display:flex;gap:16px;align-items:flex-start;">
       <div style="flex:1;background:#07090f;border:1px solid rgba(212,168,67,0.2);border-radius:16px;overflow:hidden;position:relative;">
         <canvas id="office-canvas" style="display:block;width:100%;"></canvas>
         <!-- scanlines overlay -->
@@ -1462,7 +1462,7 @@ function initOffice() {
   const container = canvas.parentElement;
   const DPR = window.devicePixelRatio || 1;
   const W = container.clientWidth;
-  const H = 520;
+  const H = Math.max(580, window.innerHeight - 180);
   canvas.width = W * DPR;
   canvas.height = H * DPR;
   canvas.style.width = W + 'px';
@@ -1471,9 +1471,9 @@ function initOffice() {
   ctx.scale(DPR, DPR);
 
   // Isometric projection
-  const TW = 56, TH = 28;
+  const TW = 72, TH = 36;
   const COLS = 13, ROWS = 9;
-  const OX = W / 2, OY = 60; // origin
+  const OX = W / 2, OY = 80; // origin
 
   function iso(tx, ty) {
     return {
