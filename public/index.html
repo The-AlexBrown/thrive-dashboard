@@ -1122,7 +1122,7 @@ body::after {
 
   <!-- ══ VIRTUAL OFFICE ══ -->
   <div class="panel active" id="panel-office">
-    <div class="panel-header">
+    <div class="panel-header" style="margin-bottom:16px;">
       <div>
         <div class="panel-title">Virtual <span>Office</span></div>
         <div class="panel-subtitle">Your AI workforce — live, animated, isometric HQ</div>
@@ -1462,7 +1462,7 @@ function initOffice() {
   const container = canvas.parentElement;
   const DPR = window.devicePixelRatio || 1;
   const W = container.clientWidth;
-  const H = Math.max(580, window.innerHeight - 180);
+  const H = Math.max(600, window.innerHeight - 160);
   canvas.width = W * DPR;
   canvas.height = H * DPR;
   canvas.style.width = W + 'px';
@@ -1471,9 +1471,12 @@ function initOffice() {
   ctx.scale(DPR, DPR);
 
   // Isometric projection
-  const TW = 72, TH = 36;
+  // Size tiles to fill full canvas width
   const COLS = 13, ROWS = 9;
-  const OX = W / 2, OY = 80; // origin
+  const TW = Math.floor(W / (COLS + ROWS) * 2);
+  const TH = Math.floor(TW / 2);
+  const OX = W / 2;
+  const OY = TH * 1.5; // origin — push grid to top
 
   function iso(tx, ty) {
     return {
