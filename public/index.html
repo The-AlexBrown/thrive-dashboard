@@ -1125,92 +1125,33 @@ body::after {
     <div class="panel-header">
       <div>
         <div class="panel-title">Virtual <span>Office</span></div>
-        <div class="panel-subtitle">Your AI workforce at their desks — click an agent to inspect</div>
+        <div class="panel-subtitle">Your AI workforce — live, animated, isometric HQ</div>
       </div>
     </div>
-
-    <div class="office-wrap">
-      <!-- 2x2 room grid -->
-      <div class="office-building" id="office-building">
-
-        <!-- CEO OFFICE (top-left) -->
-        <div class="office-room" id="room-ceo">
-          <div class="room-label">CEO Office</div>
-          <!-- Furniture -->
-          <div class="desk" style="bottom:60px;left:30px;width:70px;height:36px;background:#1e2a3a;"></div>
-          <div class="monitor" style="bottom:88px;left:38px;"></div>
-          <div class="plant" style="bottom:55px;right:20px;">🌿</div>
-          <div class="bookshelf" style="top:30px;right:14px;width:14px;height:55px;"></div>
-          <!-- Trophy/decor -->
-          <div style="position:absolute;bottom:60px;right:48px;font-size:14px;">🏆</div>
-        </div>
-
-        <!-- C-SUITE (top-right) -->
-        <div class="office-room" id="room-csuite">
-          <div class="room-label">C-Suite</div>
-          <div class="desk" style="bottom:60px;left:28px;width:60px;height:32px;background:#1e1a36;"></div>
-          <div class="monitor" style="bottom:86px;left:36px;"></div>
-          <div class="desk" style="bottom:60px;right:28px;width:60px;height:32px;background:#1e1a36;"></div>
-          <div class="monitor" style="bottom:86px;right:50px;"></div>
-          <div class="plant" style="bottom:55px;left:50%;transform:translateX(-50%);font-size:16px;">🌴</div>
-        </div>
-
-        <!-- SALES & MARKETING (bottom-left) -->
-        <div class="office-room" id="room-sales">
-          <div class="room-label">Sales & Marketing</div>
-          <div class="desk" style="bottom:55px;left:20px;width:55px;height:30px;"></div>
-          <div class="monitor" style="bottom:79px;left:26px;"></div>
-          <div class="desk" style="bottom:55px;left:90px;width:55px;height:30px;"></div>
-          <div class="monitor" style="bottom:79px;left:96px;"></div>
-          <div class="desk" style="bottom:55px;right:20px;width:55px;height:30px;"></div>
-          <div class="monitor" style="bottom:79px;right:42px;"></div>
-          <div class="plant" style="top:30px;right:16px;font-size:16px;">🌱</div>
-        </div>
-
-        <!-- OPERATIONS (bottom-right) -->
-        <div class="office-room" id="room-ops">
-          <div class="room-label">Operations</div>
-          <div class="desk" style="bottom:55px;left:24px;width:55px;height:30px;background:#1a2236;"></div>
-          <div class="monitor" style="bottom:79px;left:32px;"></div>
-          <div class="desk" style="bottom:55px;right:24px;width:55px;height:30px;background:#1a2236;"></div>
-          <div class="monitor" style="bottom:79px;right:44px;"></div>
-          <div class="bookshelf" style="top:28px;left:14px;width:16px;height:60px;"></div>
-          <div style="position:absolute;bottom:56px;left:50%;transform:translateX(-50%);font-size:12px;">💻</div>
-        </div>
-
+    <div style="display:flex;gap:16px;">
+      <div style="flex:1;background:#07090f;border:1px solid rgba(212,168,67,0.2);border-radius:16px;overflow:hidden;position:relative;">
+        <canvas id="office-canvas" style="display:block;width:100%;"></canvas>
+        <!-- scanlines overlay -->
+        <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);border-radius:16px;"></div>
       </div>
-
-      <!-- Right info panel -->
-      <div class="office-info">
-        <div class="office-info-card" id="agent-info-panel">
-          <div class="info-avatar" id="info-avatar" style="background:rgba(212,168,67,0.1);border-color:rgba(212,168,67,0.3);">👑</div>
-          <div class="info-name" id="info-name">Alex</div>
-          <div class="info-role" id="info-role">CEO / Vision & Strategy</div>
-          <div class="info-row">
-            <span class="info-key">Status</span>
-            <span class="info-val" id="info-status" style="color:var(--green);">● LIVE</span>
-          </div>
-          <div class="info-row">
-            <span class="info-key">Room</span>
-            <span class="info-val" id="info-room">CEO Office</span>
-          </div>
-          <div class="info-row">
-            <span class="info-key">Platform</span>
-            <span class="info-val" id="info-platform">—</span>
-          </div>
-          <div class="info-row">
-            <span class="info-key">Activity</span>
-            <span class="info-val" id="info-activity" style="color:var(--gold);">Strategising</span>
-          </div>
+      <!-- Side panel -->
+      <div style="width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;">
+        <div id="agent-info-panel" style="background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:18px;flex:1;">
+          <div id="info-avatar" style="width:48px;height:48px;border-radius:10px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.3);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;">👑</div>
+          <div id="info-name" style="font-size:17px;font-weight:700;margin-bottom:3px;">Alex</div>
+          <div id="info-role" style="font-size:11px;color:var(--muted2);margin-bottom:14px;line-height:1.4;">CEO / Vision & Strategy</div>
+          <div class="info-row"><span class="info-key">Status</span><span class="info-val" id="info-status" style="color:var(--green);">● LIVE</span></div>
+          <div class="info-row"><span class="info-key">Room</span><span class="info-val" id="info-room">CEO Office</span></div>
+          <div class="info-row"><span class="info-key">Platform</span><span class="info-val" id="info-platform">—</span></div>
+          <div class="info-row"><span class="info-key">Activity</span><span class="info-val" id="info-activity" style="color:var(--gold);">Strategising</span></div>
         </div>
-
-        <div style="background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:16px;">
+        <div style="background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:14px;">
           <div style="font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted2);margin-bottom:10px;">Legend</div>
-          <div class="office-legend" style="flex-direction:column;gap:8px;">
-            <div class="legend-item"><div class="legend-dot" style="background:#d4a843;box-shadow:0 0 6px #d4a843;"></div> CEO / Director</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;box-shadow:0 0 6px #7c3aed;"></div> COO / Orchestrator</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#22d3a0;box-shadow:0 0 6px #22d3a0;"></div> Active Agent</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#4a5568;"></div> Planned Agent</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted2);"><div style="width:8px;height:8px;border-radius:50%;background:#d4a843;box-shadow:0 0 6px #d4a843;flex-shrink:0;"></div>CEO / Director</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted2);"><div style="width:8px;height:8px;border-radius:50%;background:#7c3aed;box-shadow:0 0 6px #7c3aed;flex-shrink:0;"></div>COO / Orchestrator</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted2);"><div style="width:8px;height:8px;border-radius:50%;background:#22d3a0;box-shadow:0 0 6px #22d3a0;flex-shrink:0;"></div>Active Agent</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted2);"><div style="width:8px;height:8px;border-radius:50%;background:#4a5568;flex-shrink:0;"></div>Planned Agent</div>
           </div>
         </div>
       </div>
@@ -1482,146 +1423,542 @@ async function loadData() {
 }
 
 // ══════════════════════════════════
-// VIRTUAL OFFICE (Pixel-art style)
+// VIRTUAL OFFICE — ISOMETRIC ENGINE
 // ══════════════════════════════════
 
-const OFFICE_LAYOUT = [
-  {
-    id: 'alex', name: 'Alex', role: 'CEO / Vision & Strategy',
-    avatar: '👑', color: '#d4a843', status: 'live',
-    room: 'room-ceo', roomName: 'CEO Office',
-    x: '40%', y: '30%', anim: 'idle',
-    activity: 'Setting strategy', platform: '—',
-    hair: '#3a1a00', skin: '#d4956a', shirt: '#1a3a5c', pants: '#0d1525',
-  },
-  {
-    id: 'rex', name: 'Rex', role: 'COO / Strategic Orchestrator',
-    avatar: '🧠', color: '#7c3aed', status: 'planned',
-    room: 'room-csuite', roomName: 'C-Suite',
-    x: '35%', y: '30%', anim: 'typing',
-    activity: 'Orchestrating agents', platform: 'Coming soon',
-    hair: '#1a1a2e', skin: '#c8b89a', shirt: '#2d1b69', pants: '#1a0a3a',
-  },
-  {
-    id: 'ledger', name: 'Ledger', role: 'Finance & CFO Agent',
-    avatar: '💎', color: '#10b981', status: 'planned',
-    room: 'room-csuite', roomName: 'C-Suite',
-    x: '65%', y: '30%', anim: 'idle',
-    activity: 'Running P&L analysis', platform: 'Coming soon',
-    hair: '#2d2d2d', skin: '#b8936a', shirt: '#064e3b', pants: '#022c22',
-  },
-  {
-    id: 'thrive-bot', name: 'Thrive', role: 'Client Success Agent',
-    avatar: '🤖', color: '#22d3a0', status: 'live',
-    room: 'room-sales', roomName: 'Sales & Marketing',
-    x: '18%', y: '28%', anim: 'typing',
-    activity: 'Answering clients', platform: 'Discord / Railway',
-    hair: '#0a2a3a', skin: '#7ec8e3', shirt: '#0e4d4d', pants: '#062020',
-  },
-  {
-    id: 'closer', name: 'Closer', role: 'Sales Manager',
-    avatar: '🎯', color: '#f59e0b', status: 'planned',
-    room: 'room-sales', roomName: 'Sales & Marketing',
-    x: '48%', y: '28%', anim: 'typing',
-    activity: 'Working the pipeline', platform: 'Coming soon',
-    hair: '#1a0a00', skin: '#e0a882', shirt: '#7c2d12', pants: '#3a1008',
-  },
-  {
-    id: 'mailer', name: 'Mailer', role: 'Email Marketing Manager',
-    avatar: '✉️', color: '#ec4899', status: 'planned',
-    room: 'room-sales', roomName: 'Sales & Marketing',
-    x: '78%', y: '28%', anim: 'idle',
-    activity: 'Crafting campaigns', platform: 'Coming soon',
-    hair: '#4a0020', skin: '#f0c090', shirt: '#831843', pants: '#3a0a20',
-  },
-  {
-    id: 'dash', name: 'Dash', role: 'Data & Dashboard Manager',
-    avatar: '📊', color: '#3b82f6', status: 'planned',
-    room: 'room-ops', roomName: 'Operations',
-    x: '28%', y: '28%', anim: 'typing',
-    activity: 'Building dashboards', platform: 'Coming soon',
-    hair: '#0a1a3a', skin: '#8fb8d8', shirt: '#1e3a8a', pants: '#0a1a4a',
-  },
-  {
-    id: 'hunter', name: 'Hunter', role: 'HR / Recruiting Agent',
-    avatar: '🔍', color: '#8b5cf6', status: 'planned',
-    room: 'room-ops', roomName: 'Operations',
-    x: '68%', y: '28%', anim: 'idle',
-    activity: 'Screening candidates', platform: 'Coming soon',
-    hair: '#2d1a4a', skin: '#c4a882', shirt: '#4c1d95', pants: '#2e1065',
-  },
+// Agent data for the isometric office
+const OFFICE_AGENTS = [
+  { id:'alex',      name:'Alex',   role:'CEO / Vision & Strategy',      avatar:'👑', color:'#d4a843', status:'live',    room:'CEO Office',        tx:2,  ty:2, activity:'Setting strategy',      platform:'—' },
+  { id:'rex',       name:'Rex',    role:'COO / Strategic Orchestrator', avatar:'🧠', color:'#7c3aed', status:'planned', room:'C-Suite',            tx:9,  ty:1, activity:'Orchestrating agents',  platform:'Coming soon' },
+  { id:'ledger',    name:'Ledger', role:'Finance & CFO Agent',          avatar:'💎', color:'#10b981', status:'planned', room:'C-Suite',            tx:10, ty:2, activity:'P&L analysis',         platform:'Coming soon' },
+  { id:'thrive-bot',name:'Thrive', role:'Client Success Agent',         avatar:'🤖', color:'#22d3a0', status:'live',    room:'Sales & Marketing',  tx:1,  ty:5, activity:'Answering clients',    platform:'Discord' },
+  { id:'closer',    name:'Closer', role:'Sales Manager',                avatar:'🎯', color:'#f59e0b', status:'planned', room:'Sales & Marketing',  tx:3,  ty:6, activity:'Working pipeline',     platform:'Coming soon' },
+  { id:'mailer',    name:'Mailer', role:'Email Marketing Manager',      avatar:'✉️',  color:'#ec4899', status:'planned', room:'Sales & Marketing',  tx:5,  ty:5, activity:'Crafting campaigns',   platform:'Coming soon' },
+  { id:'dash',      name:'Dash',   role:'Data & Dashboard Manager',     avatar:'📊', color:'#3b82f6', status:'planned', room:'Operations',         tx:7,  ty:5, activity:'Building dashboards',  platform:'Coming soon' },
+  { id:'hunter',    name:'Hunter', role:'HR / Recruiting Agent',        avatar:'🔍', color:'#8b5cf6', status:'planned', room:'Operations',         tx:10, ty:6, activity:'Screening candidates', platform:'Coming soon' },
 ];
 
-function buildCharacter(agent) {
-  const isLive = agent.status === 'live';
-  const el = document.createElement('div');
-  el.className = 'character ' + (agent.anim || 'idle');
-  el.style.left = agent.x;
-  el.style.bottom = agent.y;
-  if (!isLive) el.style.opacity = '0.5';
-
-  el.innerHTML = `
-    <div class="char-name">${agent.name}</div>
-    <div class="char-body">
-      <div class="char-hair" style="background:${agent.hair};"></div>
-      <div class="char-head" style="background:${agent.skin};"></div>
-      <div class="char-eyes">
-        <div class="char-eye"></div>
-        <div class="char-eye"></div>
-      </div>
-      <div class="char-torso" style="background:${agent.shirt};"></div>
-      <div class="char-arm left" style="background:${agent.shirt};"></div>
-      <div class="char-arm right" style="background:${agent.shirt};"></div>
-      <div class="char-legs">
-        <div class="char-leg" style="background:${agent.pants};"></div>
-        <div class="char-leg" style="background:${agent.pants};"></div>
-      </div>
-      <div class="char-status-dot ${isLive ? '' : 'planned'}"></div>
-    </div>
-  `;
-
-  el.addEventListener('click', () => selectAgent(agent));
-  return el;
-}
+let officeRAF = null;
 
 function selectAgent(agent) {
   const isLive = agent.status === 'live';
-  document.getElementById('info-avatar').textContent = agent.avatar;
-  document.getElementById('info-avatar').style.background = agent.color + '20';
-  document.getElementById('info-avatar').style.borderColor = agent.color + '60';
+  const el = document.getElementById('info-avatar');
+  el.textContent = agent.avatar;
+  el.style.background = agent.color + '22';
+  el.style.borderColor = agent.color + '66';
   document.getElementById('info-name').textContent = agent.name;
   document.getElementById('info-role').textContent = agent.role;
   document.getElementById('info-status').textContent = isLive ? '● LIVE' : '○ PLANNED';
-  document.getElementById('info-status').style.color = isLive ? 'var(--green)' : 'var(--muted2)';
-  document.getElementById('info-room').textContent = agent.roomName || '—';
+  document.getElementById('info-status').style.color = isLive ? '#22d3a0' : '#718096';
+  document.getElementById('info-room').textContent = agent.room;
   document.getElementById('info-platform').textContent = agent.platform || '—';
   document.getElementById('info-activity').textContent = agent.activity || '—';
 }
 
 function initOffice() {
-  // Place characters in their rooms
-  OFFICE_LAYOUT.forEach(agent => {
-    const room = document.getElementById(agent.room);
-    if (!room) return;
-    // Avoid duplicate characters on re-init
-    if (room.querySelector('[data-agent="' + agent.id + '"]')) return;
-    const char = buildCharacter(agent);
-    char.setAttribute('data-agent', agent.id);
-    room.appendChild(char);
+  if (officeRAF) { cancelAnimationFrame(officeRAF); officeRAF = null; }
+
+  const canvas = document.getElementById('office-canvas');
+  const container = canvas.parentElement;
+  const DPR = window.devicePixelRatio || 1;
+  const W = container.clientWidth;
+  const H = 520;
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(DPR, DPR);
+
+  // Isometric projection
+  const TW = 56, TH = 28;
+  const COLS = 13, ROWS = 9;
+  const OX = W / 2, OY = 60; // origin
+
+  function iso(tx, ty) {
+    return {
+      x: OX + (tx - ty) * TW / 2,
+      y: OY + (tx + ty) * TH / 2
+    };
+  }
+
+  // Room definitions [minTx, maxTx, minTy, maxTy, color, label]
+  const ROOMS = [
+    { minX:0, maxX:5,  minY:0, maxY:3, fill:'rgba(212,168,67,0.04)',  border:'rgba(212,168,67,0.15)',  label:'CEO OFFICE',       labelColor:'#d4a843' },
+    { minX:7, maxX:12, minY:0, maxY:3, fill:'rgba(124,58,237,0.05)',  border:'rgba(124,58,237,0.2)',   label:'C-SUITE',          labelColor:'#7c3aed' },
+    { minX:0, maxX:5,  minY:4, maxY:8, fill:'rgba(245,158,11,0.04)',  border:'rgba(245,158,11,0.15)',  label:'SALES & MARKETING',labelColor:'#f59e0b' },
+    { minX:7, maxX:12, minY:4, maxY:8, fill:'rgba(59,130,246,0.05)',  border:'rgba(59,130,246,0.18)',  label:'OPERATIONS',       labelColor:'#3b82f6' },
+  ];
+
+  // Desk positions [tx, ty, color]
+  const DESKS = [
+    {tx:2, ty:2, color:'#1e2a3a'}, {tx:9, ty:1, color:'#1e1a36'}, {tx:10,ty:2, color:'#1e1a36'},
+    {tx:1, ty:5, color:'#162416'}, {tx:3, ty:6, color:'#2a1a0a'}, {tx:5, ty:5, color:'#2a0e1a'},
+    {tx:7, ty:5, color:'#0e1a2a'}, {tx:10,ty:6, color:'#1a0e2a'},
+  ];
+
+  // Particles
+  const particles = [];
+  // Notifications
+  const notifications = [];
+  let notifTimer = 0;
+  const NOTIF_MSGS = ['✓ Task done','📩 Sent reply','⚡ Processing','🔄 Syncing','✨ Response','💬 Answered','📊 Updated'];
+
+  // Ticker
+  const TICKER = '● THRIVE ONLINE  ·  Clients served today  ·  Knowledge base active  ·  Discord connected  ·  Awaiting Rex deployment  ·  Next: Closer agent  ·  Ledger coming soon  ·  ';
+  let tickerX = W;
+
+  // Mouse tracking
+  let mouseX = -999, mouseY = -999, selectedAgent = null, hoveredAgent = null;
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left;
+    mouseY = e.clientY - r.top;
+  });
+  canvas.addEventListener('click', e => {
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left;
+    const my = e.clientY - r.top;
+    let best = null, bestD = 30;
+    OFFICE_AGENTS.forEach(ag => {
+      const p = iso(ag.tx, ag.ty);
+      const d = Math.hypot(mx - p.x, my - (p.y - 20));
+      if (d < bestD) { bestD = d; best = ag; }
+    });
+    if (best) { selectedAgent = best; selectAgent(best); }
   });
 
-  // Random walking animation — move characters slightly every few seconds
-  setInterval(() => {
-    document.querySelectorAll('.character').forEach(el => {
-      if (Math.random() < 0.15) {
-        const dx = (Math.random() - 0.5) * 14;
-        const currentLeft = parseFloat(el.style.left) || 30;
-        const newLeft = Math.max(8, Math.min(82, currentLeft + dx));
-        el.style.transition = 'left 1.5s ease-in-out';
-        el.style.left = newLeft + '%';
-      }
+  // Spawn initial particles for live connections
+  function spawnParticle(from, to) {
+    const p = iso(from.tx, from.ty);
+    const q = iso(to.tx, to.ty);
+    particles.push({
+      x: p.x, y: p.y - 20,
+      tx: q.x, ty: q.y - 20,
+      prog: Math.random(),
+      speed: 0.004 + Math.random() * 0.003,
+      color: from.color,
+      trail: [],
     });
-  }, 3000);
+  }
+
+  // Seed live→live connections
+  const alexAgent = OFFICE_AGENTS[0];
+  const thriveAgent = OFFICE_AGENTS[3];
+  spawnParticle(alexAgent, thriveAgent);
+  spawnParticle(thriveAgent, alexAgent);
+
+  // Draw isometric tile (rhombus)
+  function drawTile(tx, ty, fillTop, fillLeft, fillRight, alpha=1) {
+    const p = iso(tx, ty);
+    const p1 = iso(tx+1, ty);
+    const p2 = iso(tx+1, ty+1);
+    const p3 = iso(tx, ty+1);
+
+    ctx.globalAlpha = alpha;
+
+    // Top face
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y); ctx.lineTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
+    ctx.closePath();
+    ctx.fillStyle = fillTop;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Draw isometric box (desk/object)
+  function drawBox(tx, ty, w, h, topColor, leftColor, rightColor) {
+    const p  = iso(tx, ty);
+    const p1 = iso(tx+w, ty);
+    const p2 = iso(tx+w, ty+w);
+    const p3 = iso(tx,  ty+w);
+
+    // Top
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y-h); ctx.lineTo(p1.x, p1.y-h);
+    ctx.lineTo(p2.x, p2.y-h); ctx.lineTo(p3.x, p3.y-h);
+    ctx.closePath();
+    ctx.fillStyle = topColor;
+    ctx.fill();
+
+    // Left face
+    ctx.beginPath();
+    ctx.moveTo(p3.x, p3.y-h); ctx.lineTo(p2.x, p2.y-h);
+    ctx.lineTo(p2.x, p2.y); ctx.lineTo(p3.x, p3.y);
+    ctx.closePath();
+    ctx.fillStyle = leftColor;
+    ctx.fill();
+
+    // Right face
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y-h); ctx.lineTo(p3.x, p3.y-h);
+    ctx.lineTo(p3.x, p3.y); ctx.lineTo(p.x, p.y);
+    ctx.closePath();
+    ctx.fillStyle = rightColor;
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 0.5;
+
+    // Outline top
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y-h); ctx.lineTo(p1.x, p1.y-h);
+    ctx.lineTo(p2.x, p2.y-h); ctx.lineTo(p3.x, p3.y-h);
+    ctx.closePath(); ctx.stroke();
+  }
+
+  // Draw monitor on top of desk
+  function drawMonitor(tx, ty, t, agentColor) {
+    const p = iso(tx, ty);
+    const mx = p.x, my = p.y - 32;
+
+    // Screen glow
+    const pulse = 0.6 + 0.4 * Math.sin(t * 0.05 + tx);
+    ctx.shadowColor = agentColor || '#22d3a0';
+    ctx.shadowBlur = 12 * pulse;
+
+    // Screen body
+    ctx.fillStyle = '#0a0e1a';
+    ctx.fillRect(mx - 11, my - 14, 22, 16);
+
+    // Screen content
+    const grad = ctx.createLinearGradient(mx-10, my-13, mx+10, my+2);
+    grad.addColorStop(0, (agentColor || '#22d3a0') + '99');
+    grad.addColorStop(1, (agentColor || '#22d3a0') + '22');
+    ctx.fillStyle = grad;
+    ctx.fillRect(mx - 9, my - 12, 18, 13);
+
+    // Fake text lines on screen
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    for (let i = 0; i < 3; i++) {
+      const lineW = 6 + Math.sin(t * 0.02 + i * 2 + tx) * 3;
+      ctx.fillRect(mx - 8 + i * 6, my - 9 + i * 4, lineW, 1.5);
+    }
+
+    ctx.shadowBlur = 0;
+
+    // Monitor stand
+    ctx.fillStyle = '#1a2236';
+    ctx.fillRect(mx - 2, my + 2, 4, 4);
+    ctx.fillRect(mx - 5, my + 5, 10, 2);
+  }
+
+  // Draw agent character
+  function drawAgent(agent, t) {
+    const p = iso(agent.tx, agent.ty);
+    const isLive = agent.status === 'live';
+    const isSel = selectedAgent && selectedAgent.id === agent.id;
+    const isHov = hoveredAgent && hoveredAgent.id === agent.id;
+    const alpha = isLive ? 1 : 0.4;
+    const bob = isLive ? Math.sin(t * 0.04 + agent.tx * 1.3) * 3 : 0;
+    const cx = p.x, cy = p.y - 40 + bob;
+
+    ctx.globalAlpha = alpha;
+
+    // Selection ring
+    if (isSel) {
+      ctx.beginPath();
+      ctx.arc(cx, cy + 18, 20, 0, Math.PI * 2);
+      ctx.strokeStyle = agent.color;
+      ctx.lineWidth = 2;
+      ctx.shadowColor = agent.color;
+      ctx.shadowBlur = 16;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else if (isHov) {
+      ctx.beginPath();
+      ctx.arc(cx, cy + 18, 18, 0, Math.PI * 2);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.5 * alpha;
+      ctx.stroke();
+      ctx.globalAlpha = alpha;
+    }
+
+    // Shadow on floor
+    ctx.beginPath();
+    ctx.ellipse(cx, p.y - 2, 12, 5, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fill();
+
+    // Legs
+    ctx.fillStyle = isLive ? '#1a2040' : '#2a2a2a';
+    ctx.fillRect(cx - 6, cy + 20, 5, 10);
+    ctx.fillRect(cx + 1, cy + 20, 5, 10);
+
+    // Body / shirt
+    ctx.fillStyle = agent.color + (isLive ? 'dd' : '60');
+    ctx.beginPath();
+    ctx.roundRect(cx - 8, cy + 8, 16, 14, 2);
+    ctx.fill();
+
+    // Arms
+    const armSwing = isLive ? Math.sin(t * 0.08 + agent.tx) * 4 : 0;
+    ctx.fillStyle = agent.color + 'aa';
+    ctx.fillRect(cx - 14, cy + 9 + armSwing, 6, 10);
+    ctx.fillRect(cx + 8,  cy + 9 - armSwing, 6, 10);
+
+    // Head
+    ctx.fillStyle = '#d4956a';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy + 3, 8, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hair
+    ctx.fillStyle = isLive ? '#2a1500' : '#333';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy - 3, 8, 5, 0, Math.PI, 0);
+    ctx.fill();
+
+    // Eyes
+    ctx.fillStyle = '#111';
+    const blink = Math.sin(t * 0.01 + agent.tx * 10) > 0.98 ? 0.5 : 1;
+    ctx.beginPath(); ctx.ellipse(cx - 3, cy + 3, 1.5, 1.5 * blink, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx + 3, cy + 3, 1.5, 1.5 * blink, 0, 0, Math.PI * 2); ctx.fill();
+
+    // Mouth smile
+    ctx.strokeStyle = '#8b4513';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy + 6, 3, 0.2, Math.PI - 0.2);
+    ctx.stroke();
+
+    // Status dot
+    const dotPulse = 0.7 + 0.3 * Math.sin(t * 0.08);
+    ctx.beginPath();
+    ctx.arc(cx + 8, cy - 4, 4, 0, Math.PI * 2);
+    ctx.fillStyle = isLive ? '#22d3a0' : '#4a5568';
+    ctx.shadowColor = isLive ? '#22d3a0' : 'transparent';
+    ctx.shadowBlur = isLive ? 8 * dotPulse : 0;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Name tag (always show for live, show on hover for planned)
+    if (isLive || isHov || isSel) {
+      const label = agent.name;
+      ctx.font = '700 10px "Space Mono", monospace';
+      const tw2 = ctx.measureText(label).width;
+      ctx.globalAlpha = isLive ? 0.9 : 0.7;
+      ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      ctx.beginPath();
+      ctx.roundRect(cx - tw2/2 - 5, cy - 26, tw2 + 10, 14, 3);
+      ctx.fill();
+      ctx.fillStyle = agent.color;
+      ctx.textAlign = 'center';
+      ctx.fillText(label, cx, cy - 15);
+      ctx.textAlign = 'left';
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Draw room label
+  function drawRoomLabel(room, t) {
+    const p = iso(room.minX, room.minY);
+    ctx.font = '700 9px "Space Mono", monospace';
+    ctx.fillStyle = room.labelColor;
+    ctx.globalAlpha = 0.7;
+    ctx.shadowColor = room.labelColor;
+    ctx.shadowBlur = 10;
+    ctx.fillText(room.label, p.x + 10, p.y + 8);
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+  }
+
+  // Main loop
+  let t = 0;
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    t++;
+
+    // === FLOOR TILES ===
+    for (let ty = 0; ty < ROWS; ty++) {
+      for (let tx = 0; tx < COLS; tx++) {
+        // Find room for this tile
+        const room = ROOMS.find(r => tx >= r.minX && tx <= r.maxX && ty >= r.minY && ty <= r.maxY);
+        const fillTop = room ? room.fill.replace('0.04','0.06').replace('0.05','0.07') : 'rgba(13,21,37,0.8)';
+        drawTile(tx, ty, fillTop, 'rgba(0,0,0,0.2)', 'rgba(0,0,0,0.3)');
+      }
+    }
+
+    // === ROOM OUTLINES ===
+    ROOMS.forEach(room => {
+      const tl = iso(room.minX, room.minY);
+      const tr = iso(room.maxX+1, room.minY);
+      const br = iso(room.maxX+1, room.maxY+1);
+      const bl = iso(room.minX, room.maxY+1);
+      ctx.beginPath();
+      ctx.moveTo(tl.x, tl.y); ctx.lineTo(tr.x, tr.y);
+      ctx.lineTo(br.x, br.y); ctx.lineTo(bl.x, bl.y);
+      ctx.closePath();
+      ctx.strokeStyle = room.border;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      drawRoomLabel(room, t);
+    });
+
+    // === DESKS ===
+    DESKS.forEach(d => {
+      const ag = OFFICE_AGENTS.find(a => a.tx === d.tx && a.ty === d.ty);
+      drawBox(d.tx - 0.3, d.ty - 0.3, 0.7, 14, d.color + 'cc', d.color + '66', d.color + '44');
+      if (ag) drawMonitor(d.tx, d.ty, t, ag.color);
+    });
+
+    // Decorative props
+    // Plants
+    [[5.5, 0.5], [0.5, 3.5], [6.5, 4.5], [12.5, 0.5]].forEach(([tx, ty]) => {
+      const p = iso(tx, ty);
+      ctx.font = '20px serif';
+      ctx.textAlign = 'center';
+      ctx.globalAlpha = 0.7;
+      ctx.fillText('🌿', p.x, p.y - 8);
+      ctx.globalAlpha = 1;
+    });
+
+    // Trophy in CEO office
+    const trophyP = iso(3.5, 0.5);
+    ctx.font = '16px serif';
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.9;
+    ctx.fillText('🏆', trophyP.x, trophyP.y - 8);
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'left';
+
+    // === PARTICLES (data flow) ===
+    particles.forEach((p2, i) => {
+      p2.prog += p2.speed;
+      if (p2.prog >= 1) p2.prog = 0;
+
+      // Bezier along path
+      const mx2 = (p2.x + p2.tx) / 2;
+      const my2 = (p2.y + p2.ty) / 2 - 30;
+      const bx = (1-p2.prog)*(1-p2.prog)*p2.x + 2*(1-p2.prog)*p2.prog*mx2 + p2.prog*p2.prog*p2.tx;
+      const by = (1-p2.prog)*(1-p2.prog)*p2.y + 2*(1-p2.prog)*p2.prog*my2 + p2.prog*p2.prog*p2.ty;
+
+      p2.trail.push({x:bx, y:by});
+      if (p2.trail.length > 18) p2.trail.shift();
+
+      // Draw trail
+      p2.trail.forEach((pt, ti) => {
+        const a = ti / p2.trail.length;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 2.5 * a, 0, Math.PI * 2);
+        ctx.fillStyle = p2.color + Math.floor(a * 180).toString(16).padStart(2,'0');
+        ctx.fill();
+      });
+
+      // Draw orb
+      ctx.beginPath();
+      ctx.arc(bx, by, 4, 0, Math.PI * 2);
+      ctx.fillStyle = p2.color;
+      ctx.shadowColor = p2.color;
+      ctx.shadowBlur = 14;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+    // === AGENTS ===
+    // Sort by ty+tx for correct iso draw order
+    const sorted = [...OFFICE_AGENTS].sort((a,b) => (a.tx+a.ty)-(b.tx+b.ty));
+
+    // Update hovered
+    hoveredAgent = null;
+    sorted.forEach(ag => {
+      const p2 = iso(ag.tx, ag.ty);
+      const d = Math.hypot(mouseX - p2.x, mouseY - (p2.y - 20));
+      if (d < 28) hoveredAgent = ag;
+    });
+
+    sorted.forEach(ag => drawAgent(ag, t));
+
+    // === NOTIFICATIONS ===
+    notifTimer++;
+    if (notifTimer > 180 + Math.random() * 300) {
+      notifTimer = 0;
+      const liveAgs = OFFICE_AGENTS.filter(a => a.status === 'live');
+      if (liveAgs.length) {
+        const ag = liveAgs[Math.floor(Math.random() * liveAgs.length)];
+        const p2 = iso(ag.tx, ag.ty);
+        notifications.push({
+          x: p2.x, y: p2.y - 55,
+          msg: NOTIF_MSGS[Math.floor(Math.random() * NOTIF_MSGS.length)],
+          color: ag.color,
+          life: 1, vy: -0.6,
+        });
+      }
+    }
+
+    notifications.forEach((n, i) => {
+      n.y += n.vy;
+      n.life -= 0.012;
+      if (n.life <= 0) { notifications.splice(i, 1); return; }
+
+      ctx.globalAlpha = n.life;
+      ctx.font = '700 10px "Space Mono", monospace';
+      const tw2 = ctx.measureText(n.msg).width;
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.beginPath();
+      ctx.roundRect(n.x - tw2/2 - 6, n.y - 12, tw2 + 12, 16, 4);
+      ctx.fill();
+      ctx.fillStyle = n.color;
+      ctx.textAlign = 'center';
+      ctx.fillText(n.msg, n.x, n.y);
+      ctx.textAlign = 'left';
+      ctx.globalAlpha = 1;
+    });
+
+    // === TICKER ===
+    const tickH = 28;
+    const tickY = H - tickH;
+
+    ctx.fillStyle = 'rgba(5,7,14,0.95)';
+    ctx.fillRect(0, tickY, W, tickH);
+    ctx.strokeStyle = 'rgba(212,168,67,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, tickY); ctx.lineTo(W, tickY); ctx.stroke();
+
+    ctx.font = '700 10px "Space Mono", monospace';
+    const tickerFull = TICKER + TICKER;
+    const tw3 = ctx.measureText(TICKER).width;
+    tickerX -= 0.8;
+    if (tickerX < -tw3) tickerX = W;
+
+    ctx.fillStyle = '#d4a843';
+    ctx.fillText(tickerFull, tickerX, tickY + 18);
+
+    // Ticker badge
+    ctx.fillStyle = '#22d3a0';
+    ctx.font = '700 9px "Space Mono", monospace';
+    ctx.fillText('LIVE', W - 50, tickY + 18);
+    ctx.beginPath();
+    ctx.arc(W - 58, tickY + 14, 4, 0, Math.PI * 2);
+    const livePulse = 0.6 + 0.4 * Math.sin(t * 0.1);
+    ctx.fillStyle = '#22d3a0';
+    ctx.shadowColor = '#22d3a0';
+    ctx.shadowBlur = 8 * livePulse;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Ambient glow from live workstations
+    OFFICE_AGENTS.filter(a => a.status === 'live').forEach(ag => {
+      const p2 = iso(ag.tx, ag.ty);
+      const glow = ctx.createRadialGradient(p2.x, p2.y - 20, 0, p2.x, p2.y - 20, 60);
+      const pulse = 0.04 + 0.02 * Math.sin(t * 0.03 + ag.tx);
+      glow.addColorStop(0, ag.color + Math.floor(pulse * 255).toString(16).padStart(2,'0'));
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.fillRect(p2.x - 60, p2.y - 80, 120, 120);
+    });
+
+    officeRAF = requestAnimationFrame(loop);
+  }
+
+  loop();
 }
 
 // ══════════════════════════════════
