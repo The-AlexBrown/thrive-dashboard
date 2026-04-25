@@ -237,6 +237,115 @@ body::before {
 .info-row:last-child{border:none;}
 .info-key{color:var(--muted2);font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;}
 .info-val{font-weight:500;}
+
+/* ═══════════════════════════════════════
+   VIRTUAL OFFICE — MISSION CONTROL STYLE
+   ═══════════════════════════════════════ */
+.vo-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+.vo-kpi{
+  position:relative;padding:14px 16px;border:1px solid var(--border2);border-radius:14px;
+  background:linear-gradient(180deg,rgba(15,20,32,.9),rgba(13,18,28,.7));
+  overflow:hidden;
+}
+.vo-kpi::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(transparent 94%,rgba(64,82,116,.15) 94%) 0 0/100% 16px,
+             linear-gradient(90deg,transparent 94%,rgba(64,82,116,.15) 94%) 0 0/16px 100%;
+  opacity:.4;pointer-events:none;
+}
+.vo-kpi-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.vo-kpi-v{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;margin-top:6px;color:var(--white);}
+.vo-kpi-of{font-size:14px;color:var(--muted);}
+.vo-kpi-delta{font-size:11px;margin-top:2px;color:var(--green);}
+.vo-delta-warn{color:#f59e0b;}
+.vo-spark{position:absolute;right:10px;bottom:8px;opacity:.8;}
+
+.vo-grid{display:grid;grid-template-columns:1.65fr 1fr;gap:18px;margin-bottom:18px;}
+.vo-card{border:1px solid var(--border2);border-radius:16px;background:linear-gradient(180deg,rgba(15,20,32,.75),rgba(13,18,28,.6));backdrop-filter:blur(6px);overflow:hidden;}
+.vo-card-h{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border);}
+.vo-card-t{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2);}
+.vo-card-r{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+.vo-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite;}
+
+.vo-depts{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px;}
+.vo-dept{
+  position:relative;border:1px solid var(--border);border-radius:14px;padding:14px;
+  background:radial-gradient(120% 100% at 0% 0%,rgba(255,255,255,.03),transparent 60%),
+             linear-gradient(180deg,rgba(11,16,25,.95),rgba(8,12,20,.95));
+  overflow:hidden;min-height:220px;isolation:isolate;
+}
+.vo-dept::before{
+  content:'';position:absolute;inset:0;z-index:-1;
+  background-image:linear-gradient(rgba(64,82,116,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(64,82,116,.08) 1px,transparent 1px);
+  background-size:18px 18px;
+  mask-image:linear-gradient(180deg,black 0%,transparent 100%);
+}
+.vo-corner{position:absolute;width:13px;height:13px;border:1.5px solid var(--acc,#d4a843);opacity:.9;}
+.vo-corner.tl{top:7px;left:7px;border-right:0;border-bottom:0;border-top-left-radius:3px;}
+.vo-corner.tr{top:7px;right:7px;border-left:0;border-bottom:0;border-top-right-radius:3px;}
+.vo-corner.bl{bottom:7px;left:7px;border-right:0;border-top:0;border-bottom-left-radius:3px;}
+.vo-corner.br{bottom:7px;right:7px;border-left:0;border-top:0;border-bottom-right-radius:3px;}
+.vo-dept-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.vo-dept-name{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc,#d4a843);}
+.vo-dept-glyph{width:18px;height:18px;border-radius:5px;background:color-mix(in srgb,var(--acc,#d4a843) 18%,transparent);border:1px solid color-mix(in srgb,var(--acc,#d4a843) 45%,transparent);display:grid;place-items:center;font-size:10px;color:var(--acc,#d4a843);}
+.vo-dept-stat{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;}
+.vo-dept-body{display:grid;grid-template-columns:1.05fr .95fr;gap:10px;height:158px;}
+.vo-agents{display:flex;flex-direction:column;gap:5px;overflow:hidden;}
+
+.vo-agent{
+  display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;
+  border:1px solid var(--border);background:linear-gradient(180deg,rgba(20,28,42,.65),rgba(13,18,28,.5));
+  cursor:pointer;transition:transform .15s,border-color .15s,background .15s;
+}
+.vo-agent:hover{transform:translateY(-1px);border-color:var(--border2);background:linear-gradient(180deg,rgba(28,38,56,.85),rgba(18,25,38,.7));}
+.vo-agent.sel{border-color:var(--acc,#d4a843);box-shadow:0 0 0 1px color-mix(in srgb,var(--acc,#d4a843) 30%,transparent),0 0 22px -8px var(--acc,#d4a843);}
+.vo-ava{position:relative;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;background:color-mix(in srgb,var(--acc,#d4a843) 15%,#0d1320);border:1px solid color-mix(in srgb,var(--acc,#d4a843) 40%,var(--border));color:var(--white);}
+.vo-ava.live::after{content:'';position:absolute;right:-2px;top:-2px;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px #07090f,0 0 10px var(--green);}
+.vo-ava.planned{filter:grayscale(.6) opacity(.55);border-style:dashed;}
+.vo-agent-meta{display:flex;flex-direction:column;min-width:0;flex:1;}
+.vo-agent-nm{font-size:12px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.vo-agent-rl{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Space Mono',monospace;letter-spacing:.03em;}
+.vo-agent-act{font-size:10px;color:var(--acc,#d4a843);font-family:'Space Mono',monospace;letter-spacing:.03em;opacity:.85;}
+
+.vo-viz{position:relative;border:1px solid var(--border);border-radius:10px;background:radial-gradient(120% 100% at 50% 0%,color-mix(in srgb,var(--acc,#d4a843) 8%,transparent),transparent 70%),#06080d;overflow:hidden;}
+.vo-viz svg{display:block;width:100%;height:100%;}
+.vo-viz-legend{position:absolute;left:8px;bottom:5px;font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;}
+
+.vo-side{display:flex;flex-direction:column;gap:18px;min-width:0;}
+.vo-detail-inner{padding:16px;display:flex;flex-direction:column;gap:14px;}
+.vo-ad-h{display:flex;align-items:center;gap:14px;}
+.vo-ad-ava{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,color-mix(in srgb,var(--acc,#d4a843) 22%,#0d1320),#0d1320);border:1px solid color-mix(in srgb,var(--acc,#d4a843) 40%,var(--border));box-shadow:0 0 22px -6px color-mix(in srgb,var(--acc,#d4a843) 55%,transparent);}
+.vo-ad-name{font-size:17px;font-weight:700;}
+.vo-ad-role{font-size:11px;color:var(--muted2);margin-top:2px;}
+.vo-ad-status{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border:1px solid var(--border);border-radius:999px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);background:rgba(13,18,28,.65);}
+.vo-ad-sdot{width:6px;height:6px;border-radius:50%;}
+.vo-ad-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.vo-ad-cell{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:rgba(11,16,25,.7);}
+.vo-ad-cell-l{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);}
+.vo-ad-cell-v{margin-top:4px;font-size:13px;font-weight:600;font-family:'Space Mono',monospace;color:var(--white);}
+.vo-ad-cell-v.live{color:var(--green);}
+
+.vo-feed-card{display:flex;flex-direction:column;flex:1;}
+.vo-feed-list{flex:1;max-height:280px;overflow:auto;padding:6px 14px 10px;}
+.vo-feed-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px dashed var(--border);}
+.vo-feed-row:last-child{border-bottom:0;}
+.vo-feed-t{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);min-width:46px;padding-top:2px;}
+.vo-feed-ic{width:18px;height:18px;border-radius:5px;background:rgba(34,211,160,.14);color:var(--green);display:grid;place-items:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:2px;border:1px solid rgba(34,211,160,.3);}
+.vo-feed-row.warn .vo-feed-ic{background:rgba(212,168,67,.14);color:var(--gold);border-color:rgba(212,168,67,.35);}
+.vo-feed-row.info .vo-feed-ic{background:rgba(59,130,246,.14);color:var(--blue);border-color:rgba(59,130,246,.35);}
+.vo-feed-row.violet .vo-feed-ic{background:rgba(124,58,237,.14);color:#a78bfa;border-color:rgba(124,58,237,.35);}
+.vo-feed-body{font-size:12px;color:var(--white);line-height:1.5;}
+.vo-feed-who{color:var(--gold);font-family:'Space Mono',monospace;font-size:10px;}
+.vo-legend-row{display:flex;gap:14px;flex-wrap:wrap;padding:10px 16px;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:.14em;text-transform:uppercase;border-top:1px solid var(--border);}
+.vo-legend-row span{display:inline-flex;align-items:center;gap:6px;}
+.vo-legend-row i{width:7px;height:7px;border-radius:50%;display:inline-block;}
+
+.vo-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.vo-strip-card{border:1px solid var(--border2);border-radius:14px;padding:14px;background:linear-gradient(180deg,rgba(15,20,32,.85),rgba(13,18,28,.65));}
+.vo-strip-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.vo-strip-v{font-family:'Space Mono',monospace;font-size:18px;font-weight:600;margin-top:6px;color:var(--white);}
+.vo-bar{height:5px;border-radius:99px;background:rgba(255,255,255,.06);margin-top:10px;overflow:hidden;}
+.vo-fill{height:100%;background:linear-gradient(90deg,var(--gold),#ff8a3d);box-shadow:0 0 12px rgba(212,168,67,.5);border-radius:99px;transition:width .8s ease;}
 </style>
 </head>
 <body>
@@ -274,36 +383,94 @@ body::before {
 
   <!-- VIRTUAL OFFICE -->
   <div class="panel active" id="panel-office">
-    <div class="panel-header">
-      <div>
-        <div class="panel-title">Virtual <span>Office</span></div>
-        <div class="panel-subtitle">Your AI workforce — click any agent to inspect</div>
+    <!-- KPI STRIP -->
+    <div class="vo-kpis">
+      <div class="vo-kpi">
+        <div class="vo-kpi-lbl">AGENTS LIVE</div>
+        <div class="vo-kpi-v"><span id="vo-live">2</span> <span class="vo-kpi-of">/ 8</span></div>
+        <div class="vo-kpi-delta">+1 this week</div>
+        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#22d3a0" stroke-width="1.5" points="0,16 8,14 16,15 24,11 32,12 40,8 48,9 56,5 64,6"/></svg>
+      </div>
+      <div class="vo-kpi">
+        <div class="vo-kpi-lbl">TASKS / HR</div>
+        <div class="vo-kpi-v" id="vo-tph">128</div>
+        <div class="vo-kpi-delta">+12.4%</div>
+        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#d4a843" stroke-width="1.5" points="0,18 8,15 16,16 24,12 32,13 40,9 48,7 56,8 64,4"/></svg>
+      </div>
+      <div class="vo-kpi">
+        <div class="vo-kpi-lbl">RESPONSE TIME</div>
+        <div class="vo-kpi-v" id="vo-resp">1.42s</div>
+        <div class="vo-kpi-delta vo-delta-warn">avg latency</div>
+        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#7c3aed" stroke-width="1.5" points="0,12 8,11 16,13 24,10 32,12 40,9 48,11 56,8 64,10"/></svg>
+      </div>
+      <div class="vo-kpi">
+        <div class="vo-kpi-lbl">SLA</div>
+        <div class="vo-kpi-v">99.2%</div>
+        <div class="vo-kpi-delta">stable</div>
+        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#3b82f6" stroke-width="1.5" points="0,8 8,7 16,9 24,7 32,8 40,6 48,7 56,6 64,7"/></svg>
+      </div>
+      <div class="vo-kpi">
+        <div class="vo-kpi-lbl">UPTIME</div>
+        <div class="vo-kpi-v">99.98%</div>
+        <div class="vo-kpi-delta">30 days</div>
+        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#22d3a0" stroke-width="1.5" points="0,10 8,9 16,8 24,9 32,8 40,7 48,8 56,7 64,7"/></svg>
       </div>
     </div>
-    <div style="display:flex;gap:16px;align-items:flex-start;">
-      <div style="flex:1;background:#07090f;border:1px solid rgba(212,168,67,0.25);border-radius:16px;overflow:hidden;position:relative;">
-        <canvas id="office-canvas" style="display:block;width:100%;"></canvas>
-        <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);border-radius:16px;"></div>
-      </div>
-      <div style="width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;">
-        <div id="agent-info-panel" style="background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:18px;">
-          <div id="info-avatar" style="width:50px;height:50px;border-radius:10px;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.3);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:12px;">👑</div>
-          <div id="info-name" style="font-size:17px;font-weight:700;margin-bottom:3px;">Alex</div>
-          <div id="info-role" style="font-size:11px;color:var(--muted2);margin-bottom:14px;line-height:1.4;">CEO / Vision & Strategy</div>
-          <div class="info-row"><span class="info-key">Status</span><span class="info-val" id="info-status" style="color:var(--green);">● LIVE</span></div>
-          <div class="info-row"><span class="info-key">Room</span><span class="info-val" id="info-room">CEO Office</span></div>
-          <div class="info-row"><span class="info-key">Platform</span><span class="info-val" id="info-platform">—</span></div>
-          <div class="info-row"><span class="info-key">Activity</span><span class="info-val" id="info-activity" style="color:var(--gold);">Strategising</span></div>
+
+    <!-- MAIN GRID -->
+    <div class="vo-grid">
+      <!-- LEFT: departments -->
+      <div class="vo-card">
+        <div class="vo-card-h">
+          <span class="vo-card-t">Departments</span>
+          <span class="vo-card-r"><span class="vo-live-dot"></span> 4 STATIONS · 2 ACTIVE</span>
         </div>
-        <div style="background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:14px;">
-          <div style="font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted2);margin-bottom:10px;">Legend</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted2);"><div style="width:10px;height:10px;border-radius:50%;background:#d4a843;box-shadow:0 0 8px #d4a843;flex-shrink:0;"></div>CEO</div>
-            <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted2);"><div style="width:10px;height:10px;border-radius:50%;background:#7c3aed;box-shadow:0 0 8px #7c3aed;flex-shrink:0;"></div>COO</div>
-            <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted2);"><div style="width:10px;height:10px;border-radius:50%;background:#22d3a0;box-shadow:0 0 8px #22d3a0;flex-shrink:0;"></div>Active Agent</div>
-            <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted2);"><div style="width:10px;height:10px;border-radius:50%;background:#4a5568;flex-shrink:0;"></div>Planned</div>
+        <div class="vo-depts" id="vo-depts"></div>
+      </div>
+
+      <!-- RIGHT: agent detail + feed -->
+      <div class="vo-side">
+        <div class="vo-card" id="vo-detail">
+          <!-- filled by JS -->
+        </div>
+        <div class="vo-card vo-feed-card">
+          <div class="vo-card-h">
+            <span class="vo-card-t">System Feed</span>
+            <span class="vo-card-r"><span class="vo-live-dot"></span> STREAMING</span>
+          </div>
+          <div class="vo-feed-list" id="vo-feed"></div>
+          <div class="vo-legend-row">
+            <span><i style="background:#d4a843;box-shadow:0 0 8px #d4a843"></i>CEO</span>
+            <span><i style="background:#22d3a0;box-shadow:0 0 8px #22d3a0"></i>LIVE</span>
+            <span><i style="background:#7c3aed;box-shadow:0 0 8px #7c3aed"></i>C-SUITE</span>
+            <span><i style="background:#3b82f6;box-shadow:0 0 8px #3b82f6"></i>OPS</span>
+            <span><i style="background:#475569"></i>PLANNED</span>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM STRIP -->
+    <div class="vo-strip">
+      <div class="vo-strip-card">
+        <div class="vo-strip-lbl">CPU LOAD</div>
+        <div class="vo-strip-v" id="vo-cpu">38%</div>
+        <div class="vo-bar"><div class="vo-fill" id="vo-cpu-bar" style="width:38%"></div></div>
+      </div>
+      <div class="vo-strip-card">
+        <div class="vo-strip-lbl">MEMORY</div>
+        <div class="vo-strip-v" id="vo-mem">62%</div>
+        <div class="vo-bar"><div class="vo-fill" id="vo-mem-bar" style="width:62%;background:linear-gradient(90deg,#7c3aed,#3b82f6);box-shadow:0 0 14px rgba(124,58,237,.5)"></div></div>
+      </div>
+      <div class="vo-strip-card">
+        <div class="vo-strip-lbl">API CALLS / MIN</div>
+        <div class="vo-strip-v" id="vo-api">1,284</div>
+        <div class="vo-bar"><div class="vo-fill" id="vo-api-bar" style="width:55%;background:linear-gradient(90deg,#22d3a0,#3b82f6);box-shadow:0 0 14px rgba(34,211,160,.5)"></div></div>
+      </div>
+      <div class="vo-strip-card">
+        <div class="vo-strip-lbl">TOKEN SPEND (24H)</div>
+        <div class="vo-strip-v" id="vo-tok">$48.21</div>
+        <div class="vo-bar"><div class="vo-fill" id="vo-tok-bar" style="width:42%;background:linear-gradient(90deg,#ef4444,#d4a843);box-shadow:0 0 14px rgba(239,68,68,.5)"></div></div>
       </div>
     </div>
   </div>
@@ -497,39 +664,238 @@ function selectAgent(ag) {
 function initOffice() {
   if (officeRAF) { cancelAnimationFrame(officeRAF); officeRAF = null; }
 
-  const canvas = document.getElementById('office-canvas');
-  if (!canvas) return;
-  const container = canvas.parentElement;
-  const DPR = Math.min(window.devicePixelRatio || 1, 2);
-  const W = container.clientWidth;
-  const H = Math.max(560, window.innerHeight - 175);
-  canvas.width = W * DPR;
-  canvas.height = H * DPR;
-  canvas.style.width = W + 'px';
-  canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(DPR, DPR);
+  // ── DEPARTMENT DATA (wired to real Thrive agents) ──
+  const VO_DEPTS = [
+    {
+      id:'ceo', name:'CEO Office', accent:'#d4a843', glyph:'C', viz:'pulse',
+      agents:[
+        {id:'alex', name:'Alex', role:'CEO · Vision & Strategy', emoji:'👑', live:true, activity:'Strategising', tasks:38, focus:'Q3 expansion plan'},
+      ]
+    },
+    {
+      id:'csuite', name:'C-Suite', accent:'#7c3aed', glyph:'X', viz:'mesh',
+      agents:[
+        {id:'rex',    name:'Rex',    role:'COO · Orchestrator',  emoji:'🧠', live:false, activity:'Planned', tasks:0, focus:'—'},
+        {id:'ledger', name:'Ledger', role:'CFO · Finance',       emoji:'💎', live:false, activity:'Planned', tasks:0, focus:'—'},
+      ]
+    },
+    {
+      id:'sales', name:'Sales & Marketing', accent:'#f59e0b', glyph:'S', viz:'pipeline',
+      agents:[
+        {id:'closer', name:'Closer', role:'Sales · Manager',           emoji:'🎯', live:false, activity:'Planned', tasks:0, focus:'—'},
+        {id:'mailer', name:'Mailer', role:'Marketing · Email Manager',  emoji:'✉️',  live:false, activity:'Planned', tasks:0, focus:'—'},
+      ]
+    },
+    {
+      id:'ops', name:'Operations', accent:'#22d3a0', glyph:'O', viz:'rack',
+      agents:[
+        {id:'thrive-bot', name:'Thrive', role:'Ops · Client Success',    emoji:'🤖', live:true,  activity:'Answering clients', tasks:71, focus:'Discord support'},
+        {id:'dash',       name:'Dash',   role:'Ops · Data & Dashboards', emoji:'📊', live:false, activity:'Planned', tasks:0, focus:'—'},
+        {id:'hunter',     name:'Hunter', role:'Ops · HR & Recruiting',   emoji:'🔍', live:false, activity:'Planned', tasks:0, focus:'—'},
+      ]
+    },
+  ];
 
-  function rr(x, y, w, h, r) {
-    r = Math.min(r, w/2, h/2);
-    ctx.beginPath();
-    ctx.moveTo(x+r, y);
-    ctx.lineTo(x+w-r, y); ctx.arcTo(x+w,y,x+w,y+r,r);
-    ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
-    ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
-    ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
-    ctx.closePath();
+  // ── SVG VISUALISATIONS ──
+  function vizSvg(d) {
+    const W2=300, H2=155;
+    if(d.viz==='pulse'){
+      return `<svg viewBox="0 0 ${W2} ${H2}">
+        <defs><radialGradient id="vg${d.id}" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${d.accent}" stop-opacity=".5"/>
+          <stop offset="100%" stop-color="${d.accent}" stop-opacity="0"/>
+        </radialGradient></defs>
+        <g transform="translate(${W2/2} ${H2/2-8})">
+          <circle r="52" fill="url(#vg${d.id})"/>
+          <circle r="22" fill="none" stroke="${d.accent}" stroke-opacity=".3"/>
+          <circle r="36" fill="none" stroke="${d.accent}" stroke-opacity=".15"/>
+          <circle r="50" fill="none" stroke="${d.accent}" stroke-opacity=".08"/>
+          <circle r="7" fill="${d.accent}"><animate attributeName="r" values="7;11;7" dur="2.4s" repeatCount="indefinite"/></circle>
+        </g>
+        <polyline points="10,138 50,130 90,124 130,114 170,120 210,104 250,110 290,92 300,96"
+          fill="none" stroke="${d.accent}" stroke-opacity=".7" stroke-width="1.5"/>
+        <text x="10" y="20" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2">DECISIONS / DAY</text>
+        <text x="10" y="36" fill="#e6ecf5" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">38</text>
+      </svg>`;
+    }
+    if(d.viz==='mesh'){
+      const pts=[[55,45],[150,28],[248,50],[75,112],[175,124],[248,106]];
+      let lines=''; for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++)
+        lines+=`<line x1="${pts[i][0]}" y1="${pts[i][1]}" x2="${pts[j][0]}" y2="${pts[j][1]}" stroke="${d.accent}" stroke-opacity=".15"/>`;
+      let dots=''; pts.forEach((p,i)=>{
+        const live=i<1;
+        dots+=`<circle cx="${p[0]}" cy="${p[1]}" r="${live?5:3.5}" fill="${live?d.accent:'#3a4660'}" ${live?`stroke="${d.accent}" stroke-opacity=".4"`:''}>
+          ${live?`<animate attributeName="opacity" values=".5;1;.5" dur="${1.8+i*0.2}s" repeatCount="indefinite"/>`:''}
+        </circle>`;
+      });
+      return `<svg viewBox="0 0 ${W2} ${H2}">${lines}
+        <path d="M55,45 Q150,78 248,50" fill="none" stroke="${d.accent}" stroke-width="1.3" stroke-dasharray="3 6" stroke-opacity=".65">
+          <animate attributeName="stroke-dashoffset" from="40" to="0" dur="1.8s" repeatCount="indefinite"/>
+        </path>${dots}
+        <text x="10" y="20" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2">EXEC SYNC</text>
+        <text x="10" y="36" fill="#e6ecf5" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">0 / 2</text>
+      </svg>`;
+    }
+    if(d.viz==='pipeline'){
+      const cols=[{x:20,h:85,label:'LEAD',n:24},{x:95,h:56,label:'PITCH',n:11},{x:170,h:32,label:'CLOSE',n:6},{x:245,h:16,label:'WON',n:3}];
+      let svg=''; cols.forEach(c=>{
+        svg+=`<rect x="${c.x}" y="${128-c.h}" width="46" height="${c.h}" rx="4" fill="${d.accent}" fill-opacity=".16" stroke="${d.accent}" stroke-opacity=".45"/>
+          <text x="${c.x+23}" y="143" text-anchor="middle" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="7" letter-spacing="2">${c.label}</text>
+          <text x="${c.x+23}" y="${128-c.h-5}" text-anchor="middle" fill="${d.accent}" font-family="JetBrains Mono,monospace" font-size="11" font-weight="600">${c.n}</text>`;
+      });
+      return `<svg viewBox="0 0 ${W2} ${H2}">${svg}
+        <text x="10" y="20" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2">PIPELINE · 24H</text>
+      </svg>`;
+    }
+    if(d.viz==='rack'){
+      let bars=''; for(let i=0;i<8;i++){
+        const y=34+i*13, w2=220-(i%3)*38;
+        bars+=`<rect x="38" y="${y}" width="${w2}" height="7" rx="2" fill="#0f1623" stroke="#1a2435"/>
+          <rect x="38" y="${y}" width="${w2*0.55+(i%4)*9}" height="7" rx="2" fill="${d.accent}" fill-opacity=".55"/>
+          <circle cx="30" cy="${y+3.5}" r="2.5" fill="${i%2?d.accent:'#3a4660'}">
+            ${i%2?`<animate attributeName="opacity" values=".35;1;.35" dur="${1.4+i*0.1}s" repeatCount="indefinite"/>`:''}
+          </circle>`;
+      }
+      return `<svg viewBox="0 0 ${W2} ${H2}">${bars}
+        <text x="10" y="20" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2">SYSTEMS · RUNNING</text>
+      </svg>`;
+    }
+    return '';
   }
 
-  // ── LAYOUT ──
-  const PAD=10, GAP=12, TICKER_H=30;
-  const RW=(W-PAD*2-GAP)/2, RH=(H-PAD*2-GAP-TICKER_H)/2;
-  const ROOMS=[
-    {id:'ceo',   label:'CEO OFFICE',       color:'#d4a843',x:PAD,       y:PAD,       w:RW,h:RH},
-    {id:'suite', label:'C-SUITE',           color:'#7c3aed',x:PAD+RW+GAP,y:PAD,       w:RW,h:RH},
-    {id:'sales', label:'SALES & MARKETING', color:'#f59e0b',x:PAD,       y:PAD+RH+GAP,w:RW,h:RH},
-    {id:'ops',   label:'OPERATIONS',        color:'#3b82f6',x:PAD+RW+GAP,y:PAD+RH+GAP,w:RW,h:RH},
+  // ── RENDER DEPT CARDS ──
+  function renderDepts() {
+    const $depts = document.getElementById('vo-depts');
+    if(!$depts) return;
+    $depts.innerHTML = VO_DEPTS.map(d=>{
+      const liveCount=d.agents.filter(a=>a.live).length;
+      const agentRows=d.agents.map(a=>`
+        <div class="vo-agent" data-aid="${a.id}" data-dept="${d.id}" style="--acc:${d.accent}">
+          <div class="vo-ava ${a.live?'live':'planned'}" style="--acc:${d.accent}">${a.emoji}</div>
+          <div class="vo-agent-meta">
+            <div class="vo-agent-nm">${a.name}</div>
+            <div class="vo-agent-rl">${a.role}</div>
+          </div>
+          <div class="vo-agent-act" style="color:${a.live?d.accent:'var(--muted)'}">${a.activity}</div>
+        </div>`).join('');
+      return `<div class="vo-dept" style="--acc:${d.accent}">
+        <span class="vo-corner tl"></span><span class="vo-corner tr"></span>
+        <span class="vo-corner bl"></span><span class="vo-corner br"></span>
+        <div class="vo-dept-hdr">
+          <div class="vo-dept-name"><span class="vo-dept-glyph">${d.glyph}</span>${d.name}</div>
+          <div class="vo-dept-stat">${liveCount}/${d.agents.length} ACTIVE</div>
+        </div>
+        <div class="vo-dept-body">
+          <div class="vo-agents">${agentRows}</div>
+          <div class="vo-viz" style="--acc:${d.accent}">${vizSvg(d)}<span class="vo-viz-legend">${d.id.toUpperCase()} · TELEMETRY</span></div>
+        </div>
+      </div>`;
+    }).join('');
+    // Click handler
+    $depts.addEventListener('click', e=>{
+      const row=e.target.closest('.vo-agent'); if(!row) return;
+      voSelectAgent(row.dataset.aid);
+    });
+  }
+
+  // ── AGENT DETAIL PANEL ──
+  const voAllAgents = VO_DEPTS.flatMap(d=>d.agents.map(a=>({...a,deptName:d.name,deptAccent:d.accent})));
+  function voSelectAgent(id) {
+    const a=voAllAgents.find(x=>x.id===id)||voAllAgents[0];
+    document.querySelectorAll('.vo-agent').forEach(el=>el.classList.toggle('sel',el.dataset.aid===a.id));
+    const el=document.getElementById('vo-detail'); if(!el) return;
+    el.innerHTML=`<div class="vo-detail-inner">
+      <div class="vo-ad-h">
+        <div class="vo-ad-ava" style="--acc:${a.deptAccent}">${a.emoji}</div>
+        <div><div class="vo-ad-name">${a.name}</div><div class="vo-ad-role">${a.role}</div></div>
+        <div class="vo-ad-status" style="--acc:${a.deptAccent}">
+          <span class="vo-ad-sdot" style="background:${a.live?'var(--green)':'#475569'};box-shadow:${a.live?'0 0 10px var(--green)':'none'}"></span>
+          ${a.live?'LIVE':'PLANNED'}
+        </div>
+      </div>
+      <div class="vo-ad-grid">
+        <div class="vo-ad-cell"><div class="vo-ad-cell-l">Department</div><div class="vo-ad-cell-v">${a.deptName}</div></div>
+        <div class="vo-ad-cell"><div class="vo-ad-cell-l">Activity</div><div class="vo-ad-cell-v ${a.live?'live':''}">${a.activity}</div></div>
+        <div class="vo-ad-cell"><div class="vo-ad-cell-l">Tasks (24H)</div><div class="vo-ad-cell-v">${a.tasks}</div></div>
+        <div class="vo-ad-cell"><div class="vo-ad-cell-l">Current Focus</div><div class="vo-ad-cell-v">${a.focus}</div></div>
+      </div>
+    </div>`;
+  }
+
+  // ── SYSTEM FEED ──
+  const VO_FEED_SEEDS=[
+    {who:'ALEX',    body:'updated <b>Q3 expansion plan</b> with 3 new market lanes', cls:''},
+    {who:'THRIVE',  body:'resolved <b>17 client queries</b> — avg response 1.2s', cls:'info'},
+    {who:'SYS',     body:'knowledge base synced — <b>Discord</b> connector active', cls:'violet'},
+    {who:'ALEX',    body:'set priority: <b>Closer & Mailer deployment</b> next sprint', cls:''},
+    {who:'THRIVE',  body:'flagged <b>2 unanswered threads</b> for review', cls:'warn'},
+    {who:'SYS',     body:'agent <b>Rex COO</b> queued for activation', cls:'info'},
+    {who:'THRIVE',  body:'pushed <b>thrive-bot@2.1.0</b> to Railway production', cls:'violet'},
+    {who:'ALEX',    body:'approved <b>Ledger CFO</b> architecture proposal', cls:''},
   ];
+  const VO_LIVE_EVENTS=[
+    {who:'ALEX',   body:'reviewed dashboard <b>v2.0</b> visual pass', cls:''},
+    {who:'THRIVE', body:'auto-resolved <b>3 tickets</b> in <b>0.9s</b> avg', cls:'info'},
+    {who:'SYS',    body:'memory pruned · <b>1.2 GB</b> reclaimed', cls:'violet'},
+    {who:'THRIVE', body:'drafted <b>5 follow-ups</b> awaiting approval', cls:'warn'},
+    {who:'ALEX',   body:'set Q3 OKR · <b>3x outbound throughput</b>', cls:''},
+    {who:'SYS',    body:'connector <b>Supabase</b> token refreshed', cls:'info'},
+    {who:'THRIVE', body:'dispatched standup digest to <b>#leadership</b>', cls:'info'},
+  ];
+  function voTStr(d=new Date()){return d.toTimeString().slice(0,5);}
+  function voPushFeed(item, atTop=true){
+    const $feed=document.getElementById('vo-feed'); if(!$feed) return;
+    const row=document.createElement('div');
+    row.className='vo-feed-row '+(item.cls||'');
+    row.innerHTML=`<div class="vo-feed-t">${item.time||voTStr()}</div>
+      <div class="vo-feed-ic">${(item.who||'·')[0]}</div>
+      <div class="vo-feed-body"><span class="vo-feed-who">${item.who}</span> ${item.body}</div>`;
+    if(atTop) $feed.prepend(row); else $feed.appendChild(row);
+    while($feed.children.length>18) $feed.lastChild.remove();
+  }
+  // Seed feed with backdated entries
+  const _now=new Date();
+  VO_FEED_SEEDS.forEach((s,i)=>{
+    const d=new Date(_now.getTime()-(i+1)*7*60*1000);
+    voPushFeed({...s,time:voTStr(d)},false);
+  });
+
+  // ── LIVE TICKERS ──
+  let voKpi={tph:128,resp:1.42,cpu:38,mem:62,api:1284,tok:48.21};
+  let voEvIdx=0;
+  function voRand(a,b){return Math.random()*(b-a)+a;}
+  function voTick(){
+    voKpi.tph=Math.max(80,voKpi.tph+voRand(-3,4));
+    voKpi.resp=Math.max(.9,Math.min(2.4,voKpi.resp+voRand(-.04,.04)));
+    voKpi.cpu=Math.max(15,Math.min(85,voKpi.cpu+voRand(-2,2)));
+    voKpi.mem=Math.max(35,Math.min(88,voKpi.mem+voRand(-1.2,1.2)));
+    voKpi.api=Math.max(800,voKpi.api+voRand(-30,40));
+    voKpi.tok=Math.max(40,voKpi.tok+voRand(-.05,.08));
+    const s=(n,d=0)=>n.toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});
+    const $=id=>document.getElementById(id);
+    if($('vo-tph'))   $('vo-tph').textContent=s(voKpi.tph);
+    if($('vo-resp'))  $('vo-resp').textContent=voKpi.resp.toFixed(2)+'s';
+    if($('vo-cpu'))   $('vo-cpu').textContent=Math.round(voKpi.cpu)+'%';
+    if($('vo-cpu-bar')) $('vo-cpu-bar').style.width=voKpi.cpu+'%';
+    if($('vo-mem'))   $('vo-mem').textContent=Math.round(voKpi.mem)+'%';
+    if($('vo-mem-bar')) $('vo-mem-bar').style.width=voKpi.mem+'%';
+    if($('vo-api'))   $('vo-api').textContent=s(voKpi.api);
+    if($('vo-api-bar')) $('vo-api-bar').style.width=(voKpi.api/2000*100)+'%';
+    if($('vo-tok'))   $('vo-tok').textContent='$'+voKpi.tok.toFixed(2);
+    if($('vo-tok-bar')) $('vo-tok-bar').style.width=(voKpi.tok/100*100)+'%';
+  }
+  const voTickInterval=setInterval(voTick,1500);
+  const voFeedInterval=setInterval(()=>{
+    voPushFeed(VO_LIVE_EVENTS[voEvIdx%VO_LIVE_EVENTS.length]);
+    voEvIdx++;
+  },6500);
+  // Store intervals so we can clear on panel switch if needed
+  officeRAF={_intervals:[voTickInterval,voFeedInterval]};
+
+  // ── INIT ──
+  renderDepts();
+  voSelectAgent('alex');
+  voTick();
 
   // Agent workstation positions within each room (as room-relative fractions)
   const WS_LAYOUTS={
