@@ -325,11 +325,11 @@ body::before {
     <div class="vo-wrap">
       <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:4px;">
         <div class="vo-legend">
-          <span class="vo-leg"><i style="background:#f4b73a"></i>CEO</span>
-          <span class="vo-leg"><i style="background:#a98bff"></i>EXEC</span>
-          <span class="vo-leg"><i style="background:#5fd4ff"></i>SALES</span>
-          <span class="vo-leg"><i style="background:#3ae3b9"></i>OPS</span>
-          <span class="vo-leg"><i style="background:#ff9c64"></i>SUPPORT</span>
+          <span class="vo-leg"><i style="background:#f4b73a"></i>CEO OFFICE</span>
+          <span class="vo-leg"><i style="background:#a98bff"></i>C-SUITE</span>
+          <span class="vo-leg"><i style="background:#ec4899"></i>SALES & MKTG</span>
+          <span class="vo-leg"><i style="background:#3ae3b9"></i>OPERATIONS</span>
+          <span class="vo-leg"><i style="background:#9aa6bb;opacity:.5"></i>PLANNED</span>
         </div>
       </div>
       <div class="vo-stage-wrap">
@@ -561,23 +561,29 @@ function initOffice() {
     ctx.imageSmoothingEnabled = false;
   }
 
+  // 4 rooms matching real org structure: CEO / C-Suite / Sales & Marketing / Operations
   const ROOMS = [
-    { id:'ceo',     name:'CEO OFFICE', accent:'#f4b73a', floor:'#1c2032', wall:'#0f1422', x:6,   y:8,   w:170, h:84 },
-    { id:'csuite',  name:'C-SUITE',    accent:'#a98bff', floor:'#1a1b30', wall:'#0e1124', x:184, y:8,   w:170, h:84 },
-    { id:'sales',   name:'SALES',      accent:'#5fd4ff', floor:'#152a2e', wall:'#091a1d', x:6,   y:98,  w:114, h:84 },
-    { id:'ops',     name:'OPS',        accent:'#3ae3b9', floor:'#142a25', wall:'#081a16', x:124, y:98,  w:114, h:84 },
-    { id:'support', name:'SUPPORT',    accent:'#ff9c64', floor:'#2a1d1c', wall:'#1a0e0e', x:242, y:98,  w:112, h:84 },
+    { id:'ceo',    name:'CEO OFFICE',      accent:'#f4b73a', floor:'#1c2032', wall:'#0f1422', x:6,   y:8,  w:170, h:84 },
+    { id:'csuite', name:'C-SUITE',         accent:'#a98bff', floor:'#1a1b30', wall:'#0e1124', x:184, y:8,  w:170, h:84 },
+    { id:'sales',  name:'SALES & MKTG',    accent:'#ec4899', floor:'#2a1525', wall:'#1a0a18', x:6,   y:98, w:170, h:84 },
+    { id:'ops',    name:'OPERATIONS',      accent:'#3ae3b9', floor:'#142a25', wall:'#081a16', x:184, y:98, w:170, h:84 },
   ];
 
+  // Agents match the real Thrive org chart exactly.
+  // LIVE = deployed. PLANNED = coming soon.
   const VO_AGENTS = [
-    { id:'alex',     name:'Alex',     role:'CEO · Vision',       room:'ceo',     hue:'#f4b73a', skin:'#ffd0a4', hair:'#3a1d12', shirt:'#ff8a3d', pants:'#3b2740', live:true,  task:'Reviewing Q3 plan',     tasks:38, focus:'Q3 expansion',    alert:null },
-    { id:'rex',      name:'Rex',      role:'COO · Ops',          room:'ceo',     hue:'#5fd4ff', skin:'#f3c8a8', hair:'#1c2230', shirt:'#3aa6ff', pants:'#1b2536', live:true,  task:'Sprint review',         tasks:71, focus:'Sprint planning',  alert:null },
-    { id:'ledger',   name:'Ledger',   role:'CFO · Finance',      room:'csuite',  hue:'#a98bff', skin:'#f0caa6', hair:'#2b1408', shirt:'#8a6bff', pants:'#231423', live:true,  task:'P&L review',            tasks:22, focus:'Financials',       alert:null },
-    { id:'closer',   name:'Closer',   role:'AE · Sales',         room:'sales',   hue:'#5fd4ff', skin:'#f7caa6', hair:'#2a1408', shirt:'#3a8fff', pants:'#1d2a3a', live:false, task:'Standby',               tasks:0,  focus:'—',               alert:null },
-    { id:'mailer',   name:'Mailer',   role:'Email · Marketing',  room:'sales',   hue:'#ff6b8a', skin:'#f7caa6', hair:'#2a1408', shirt:'#ff4d6d', pants:'#1d2a3a', live:true,  task:'Sequence push',         tasks:54, focus:'Cold outbound',    alert:['weekly-asset-review failed'] },
-    { id:'thrive',   name:'Thrive',   role:'Ops · Client Bot',   room:'ops',     hue:'#3ae3b9', skin:'#e6c69a', hair:'#171a24', shirt:'#1bd1a1', pants:'#0e2a23', live:true,  task:'2 chats live',          tasks:120,focus:'Discord support',   alert:null },
-    { id:'dash',     name:'Dash',     role:'Ops · Monitoring',   room:'ops',     hue:'#5fd4ff', skin:'#e6c69a', hair:'#171a24', shirt:'#3a8fff', pants:'#0e1a2a', live:true,  task:'Watching metrics',      tasks:88, focus:'p95 latency',      alert:null },
-    { id:'hunter',   name:'Hunter',   role:'HR · Recruiting',    room:'support', hue:'#ff9c64', skin:'#f3c79f', hair:'#2a1408', shirt:'#ff7a3d', pants:'#2a1414', live:false, task:'Standby',               tasks:0,  focus:'—',               alert:null },
+    // CEO OFFICE — Alex is live
+    { id:'alex',    name:'Alex',    role:'CEO · Vision & Strategy',      room:'ceo',     hue:'#f4b73a', skin:'#ffd0a4', hair:'#3a1d12', shirt:'#ff8a3d', pants:'#3b2740', live:true,  task:'Setting Q3 strategy',  tasks:38, focus:'Q3 expansion plan', alert:null },
+    // C-SUITE — Rex & Ledger planned
+    { id:'rex',     name:'Rex',     role:'COO · Strategic Orchestrator', room:'csuite',  hue:'#a98bff', skin:'#f3c8a8', hair:'#1c2230', shirt:'#7a5cff', pants:'#1b2536', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
+    { id:'ledger',  name:'Ledger',  role:'CFO · Finance',                room:'csuite',  hue:'#10b981', skin:'#f0caa6', hair:'#2b1408', shirt:'#0d9a6e', pants:'#0d2a1e', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
+    // SALES & MARKETING — Closer & Mailer planned
+    { id:'closer',  name:'Closer',  role:'Sales Manager',                room:'sales',   hue:'#f59e0b', skin:'#f7caa6', hair:'#2a1408', shirt:'#d48200', pants:'#2a1a0a', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
+    { id:'mailer',  name:'Mailer',  role:'Email Marketing Manager',      room:'sales',   hue:'#ec4899', skin:'#f7c5b0', hair:'#2a0f14', shirt:'#cc2070', pants:'#2a1020', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
+    // OPERATIONS — Thrive is live, Dash & Hunter planned
+    { id:'thrive',  name:'Thrive',  role:'Ops · Client Success',         room:'ops',     hue:'#3ae3b9', skin:'#e6c69a', hair:'#171a24', shirt:'#1bd1a1', pants:'#0e2a23', live:true,  task:'Answering Discord',    tasks:71, focus:'Discord support',   alert:null },
+    { id:'dash',    name:'Dash',    role:'Ops · Data & Dashboards',      room:'ops',     hue:'#3b82f6', skin:'#e6c69a', hair:'#171a24', shirt:'#2060cc', pants:'#0e1a2a', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
+    { id:'hunter',  name:'Hunter',  role:'HR · Recruiting',              room:'ops',     hue:'#8b5cf6', skin:'#f3c79f', hair:'#2a1408', shirt:'#6d3fd4', pants:'#1a1030', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
   ];
 
   // Furniture per room
@@ -797,7 +803,7 @@ function initOffice() {
 
   // ── INTERACTION ──
   let voHoverId=null, hoverRoom=null;
-  let voSelectedId = 'alex';
+  let voSelectedId = 'alex'; // default to Alex (the only live human)
 
   function toLogical(e) {
     const r=stage.getBoundingClientRect();
@@ -878,19 +884,19 @@ function initOffice() {
 
   // ── FEED ──
   const VO_FEED_SEEDS=[
-    {who:'ALEX',    body:'updated <b>Q3 expansion plan</b> with 3 new lanes', cls:''},
-    {who:'REX',     body:'closed <b>17 sprint tasks</b> · burndown on track', cls:'info'},
-    {who:'MAILER',  body:'pushed <b>weekly outbound</b> · 1,284 sends', cls:'warn'},
-    {who:'THRIVE',  body:'<b>2 live chats</b> · avg response 0.9s', cls:'green'},
-    {who:'DASH',    body:'p95 latency steady at <b>142ms</b>', cls:'green'},
-    {who:'LEDGER',  body:'P&L snapshot ready · <b>MRR +18%</b>', cls:'violet'},
+    {who:'ALEX',   body:'reviewing <b>Q3 expansion plan</b> · 3 new lanes flagged', cls:''},
+    {who:'THRIVE', body:'answered <b>14 Discord questions</b> this session', cls:'green'},
+    {who:'ALEX',   body:'Thrive Bot deployed on <b>Railway + Discord</b>', cls:'info'},
+    {who:'SYSTEM', body:'Knowledge base synced · <b>Supabase</b> connected', cls:'info'},
+    {who:'SYSTEM', body:'Rex (COO) · Ledger (CFO) <b>coming soon</b>', cls:'violet'},
+    {who:'SYSTEM', body:'Closer · Mailer · Dash · Hunter <b>in pipeline</b>', cls:'violet'},
   ];
   const VO_LIVE_EVENTS=[
-    {who:'ALEX',    body:'reviewed <b>onboarding plan</b>', cls:''},
-    {who:'REX',     body:'merged <b>thrive-dashboard@2.0</b>', cls:'info'},
-    {who:'THRIVE',  body:'resolved <b>3 tickets</b> in Discord', cls:'green'},
-    {who:'MAILER',  body:'queued <b>next campaign batch</b>', cls:'warn'},
-    {who:'DASH',    body:'triggered <b>latency alert</b> · p99 spike', cls:'violet'},
+    {who:'ALEX',   body:'updated <b>strategy board</b> · Q3 focus confirmed', cls:''},
+    {who:'THRIVE', body:'resolved <b>Discord query</b> in 1.2s', cls:'green'},
+    {who:'ALEX',   body:'onboarding <b>new agent pipeline</b> review', cls:''},
+    {who:'THRIVE', body:'KB lookup · returned <b>3 chunks</b>', cls:'green'},
+    {who:'SYSTEM', body:'all systems <b>nominal</b> · 99.9% uptime', cls:'info'},
   ];
   const $vofeed=document.getElementById('vo-feed');
   function voTStr(d=new Date()){return d.toTimeString().slice(0,5);}
