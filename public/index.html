@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Thrive Agent HQ</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #07090f;
@@ -241,16 +241,50 @@ body::before {
 /* ═══════════════════════════════════
    VIRTUAL OFFICE
    ═══════════════════════════════════ */
-#office-canvas{display:block;width:100%;border-radius:16px;cursor:pointer;border:1px solid var(--border2);}
-.vo-tooltip{
-  position:fixed;z-index:999;pointer-events:none;
-  background:rgba(13,18,28,.95);border:1px solid var(--border2);
-  border-radius:12px;padding:10px 14px;backdrop-filter:blur(12px);
-  box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:220px;
+.vo-wrap{display:flex;flex-direction:column;gap:14px;}
+.vo-stage-wrap{
+  border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:10px;
+  background:linear-gradient(180deg,rgba(14,18,28,.85),rgba(10,13,20,.7));
 }
-.vo-tt-name{font-size:14px;font-weight:700;margin-bottom:2px;}
-.vo-tt-role{font-size:11px;color:var(--muted2);font-family:'Space Mono',monospace;margin-bottom:6px;}
-.vo-tt-act{font-size:11px;padding:4px 8px;border-radius:6px;font-family:'Space Mono',monospace;display:inline-block;}
+#office-canvas{display:block;width:100%;height:auto;border-radius:10px;background:#0a0d14;cursor:default;image-rendering:pixelated;image-rendering:crisp-edges;}
+.vo-hint{margin-top:6px;font-family:'VT323',monospace;color:var(--muted);font-size:14px;letter-spacing:.06em;text-align:center;}
+.vo-info{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;}
+.vo-panel{border:1px solid var(--border2);border-radius:14px;background:linear-gradient(180deg,rgba(16,21,33,.85),rgba(11,15,24,.6));overflow:hidden;}
+.vo-panel-h{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);font-family:'VT323',monospace;font-size:16px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);}
+.vo-panel-h .d{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+.vo-agent-card{padding:16px;display:flex;gap:16px;align-items:flex-start;}
+.vo-portrait{width:96px;height:96px;border-radius:14px;background:#0d1320;border:1px solid var(--border);position:relative;overflow:hidden;flex-shrink:0;display:grid;place-items:center;image-rendering:pixelated;}
+.vo-agent-meta{flex:1;min-width:0;}
+.vo-agent-name{font-size:22px;font-weight:700;letter-spacing:-.01em;}
+.vo-agent-role{font-family:'VT323',monospace;font-size:16px;letter-spacing:.1em;margin-top:2px;text-transform:uppercase;}
+.vo-agent-where{font-size:12px;color:var(--muted);margin-top:4px;}
+.vo-agent-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.vo-tag{font-family:'VT323',monospace;font-size:13px;letter-spacing:.08em;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);background:rgba(15,20,32,.6);color:var(--muted2);}
+.vo-tag.live{color:#0a1a14;background:var(--green);border-color:var(--green);}
+.vo-tag.warn{color:#3b1605;background:#ffb464;border-color:#ffb464;}
+.vo-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px;}
+.vo-stat{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:rgba(13,18,28,.65);}
+.vo-stat .l{font-family:'VT323',monospace;color:var(--muted);font-size:13px;letter-spacing:.16em;text-transform:uppercase;}
+.vo-stat .v{font-size:14px;color:var(--white);font-weight:600;margin-top:3px;}
+.vo-stat .v.warn{color:var(--gold);}
+.vo-alerts{padding:0 14px 14px;}
+.vo-alert{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px dashed rgba(255,107,138,.4);background:rgba(255,107,138,.07);color:#ffd2dc;font-family:'VT323',monospace;font-size:14px;letter-spacing:.06em;margin-top:8px;}
+.vo-alert.ok{border-color:rgba(58,227,185,.45);background:rgba(58,227,185,.07);color:#bff5e6;}
+.vo-alert .x{font-weight:700;color:#ff6b8a;}
+.vo-alert.ok .x{color:var(--green);}
+.vo-feed-list{max-height:320px;overflow:auto;padding:6px 14px 14px;}
+.vo-feed-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px dashed var(--border);align-items:flex-start;}
+.vo-feed-row:last-child{border-bottom:0;}
+.vo-feed-row .t{font-family:'VT323',monospace;color:var(--muted);font-size:13px;min-width:46px;padding-top:1px;}
+.vo-feed-row .who{font-family:'VT323',monospace;font-size:13px;color:var(--gold);letter-spacing:.04em;}
+.vo-feed-row .body{font-size:12px;line-height:1.55;color:var(--white);}
+.vo-feed-row.warn .who{color:#ff6b8a;}
+.vo-feed-row.info .who{color:#5fd4ff;}
+.vo-feed-row.violet .who{color:#a98bff;}
+.vo-feed-row.green .who{color:var(--green);}
+.vo-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px;}
+.vo-leg{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border:1px solid var(--border);border-radius:8px;background:rgba(15,20,32,.6);font-family:'VT323',monospace;font-size:14px;letter-spacing:.06em;color:var(--muted2);}
+.vo-leg i{width:8px;height:8px;border-radius:2px;display:inline-block;}
 </style>
 </head>
 <body>
@@ -288,8 +322,33 @@ body::before {
 
   <!-- VIRTUAL OFFICE -->
   <div class="panel active" id="panel-office">
-    <canvas id="office-canvas"></canvas>
-    <div class="vo-tooltip" id="vo-tooltip" style="display:none"></div>
+    <div class="vo-wrap">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:4px;">
+        <div class="vo-legend">
+          <span class="vo-leg"><i style="background:#f4b73a"></i>CEO</span>
+          <span class="vo-leg"><i style="background:#a98bff"></i>EXEC</span>
+          <span class="vo-leg"><i style="background:#5fd4ff"></i>SALES</span>
+          <span class="vo-leg"><i style="background:#3ae3b9"></i>OPS</span>
+          <span class="vo-leg"><i style="background:#ff9c64"></i>SUPPORT</span>
+        </div>
+      </div>
+      <div class="vo-stage-wrap">
+        <canvas id="office-canvas" width="1440" height="760"></canvas>
+        <div class="vo-hint">tip: click any agent to inspect · hover a room to highlight it</div>
+      </div>
+      <section class="vo-info">
+        <div class="vo-panel">
+          <div class="vo-panel-h"><span class="d"></span>Agent Inspector</div>
+          <div class="vo-agent-card" id="vo-agent-card"></div>
+          <div class="vo-stats" id="vo-agent-stats"></div>
+          <div class="vo-alerts" id="vo-agent-alerts"></div>
+        </div>
+        <div class="vo-panel">
+          <div class="vo-panel-h"><span class="d"></span>System Feed</div>
+          <div class="vo-feed-list" id="vo-feed"></div>
+        </div>
+      </section>
+    </div>
   </div>
 
   <!-- ORG CHART -->
@@ -478,336 +537,394 @@ function selectAgent(ag) {
   selectedAgent = ag;
 }
 
+
 function initOffice() {
   if (officeRAF) { cancelAnimationFrame(officeRAF); officeRAF = null; }
-  // Clear any stale interval objects from previous Opus version
-  if (officeRAF && officeRAF._intervals) { officeRAF._intervals.forEach(clearInterval); }
 
-  const canvas = document.getElementById('office-canvas');
-  if (!canvas) return;
-  const container = canvas.parentElement;
-  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const stage = document.getElementById('office-canvas');
+  if (!stage) return;
+  const ctx = stage.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
 
-  function resize() {
-    const W = container.clientWidth;
-    const H = Math.max(520, window.innerHeight - 160);
-    canvas.width = W * DPR;
-    canvas.height = H * DPR;
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    return { W, H };
-  }
-  let { W, H } = resize();
+  const W = 360, H = 190;
+  let DPR = window.devicePixelRatio || 1;
+  let SCALE = 4;
 
-  const ctx = canvas.getContext('2d');
-  ctx.scale(DPR, DPR);
-
-  // Rounded rect helper
-  function rr(x, y, w, h, r) {
-    r = Math.min(r, w/2, h/2);
-    ctx.beginPath();
-    ctx.moveTo(x+r, y);
-    ctx.lineTo(x+w-r, y); ctx.arcTo(x+w, y, x+w, y+r, r);
-    ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
-    ctx.lineTo(x+r, y+h); ctx.arcTo(x, y+h, x, y+h-r, r);
-    ctx.lineTo(x, y+r); ctx.arcTo(x, y, x+r, y, r);
-    ctx.closePath();
+  function fitCanvas() {
+    const cssW = stage.parentElement.clientWidth - 20;
+    SCALE = Math.max(2, Math.floor(cssW / W));
+    stage.width  = W * SCALE * DPR;
+    stage.height = H * SCALE * DPR;
+    stage.style.width  = '100%';
+    stage.style.height = (H * SCALE) + 'px';
+    ctx.setTransform(SCALE * DPR, 0, 0, SCALE * DPR, 0, 0);
+    ctx.imageSmoothingEnabled = false;
   }
 
-  // ── ROOMS ──
-  const PAD = 14, GAP = 12;
-  const TICKER_H = 32;
-
-  function buildRooms(W, H) {
-    const RW = (W - PAD*2 - GAP) / 2;
-    const RH = (H - PAD*2 - GAP - TICKER_H) / 2;
-    return [
-      { id:'ceo',   label:'CEO OFFICE',       color:'#d4a843', x:PAD,         y:PAD,         w:RW, h:RH },
-      { id:'suite', label:'C-SUITE',           color:'#7c3aed', x:PAD+RW+GAP,  y:PAD,         w:RW, h:RH },
-      { id:'sales', label:'SALES & MARKETING', color:'#f59e0b', x:PAD,         y:PAD+RH+GAP,  w:RW, h:RH },
-      { id:'ops',   label:'OPERATIONS',        color:'#22d3a0', x:PAD+RW+GAP,  y:PAD+RH+GAP,  w:RW, h:RH },
-    ];
-  }
-  let ROOMS = buildRooms(W, H);
-
-  // ── AGENTS ──
-  const AGENTS = [
-    { id:'alex',      name:'Alex',    role:'CEO · Vision & Strategy',    emoji:'👑', status:'live',    roomId:'ceo',   color:'#d4a843', activity:'Strategising'      },
-    { id:'rex',       name:'Rex',     role:'COO · Orchestrator',         emoji:'🧠', status:'planned', roomId:'suite', color:'#7c3aed', activity:'Coming soon'       },
-    { id:'ledger',    name:'Ledger',  role:'CFO · Finance',              emoji:'💎', status:'planned', roomId:'suite', color:'#a78bfa', activity:'Coming soon'       },
-    { id:'closer',    name:'Closer',  role:'Sales · Manager',            emoji:'🎯', status:'planned', roomId:'sales', color:'#f59e0b', activity:'Coming soon'       },
-    { id:'mailer',    name:'Mailer',  role:'Marketing · Email',          emoji:'✉️', status:'planned', roomId:'sales', color:'#ec4899', activity:'Coming soon'       },
-    { id:'thrive',    name:'Thrive',  role:'Ops · Client Success',       emoji:'🤖', status:'live',    roomId:'ops',   color:'#22d3a0', activity:'Answering clients' },
-    { id:'dash',      name:'Dash',    role:'Ops · Dashboards',           emoji:'📊', status:'planned', roomId:'ops',   color:'#3b82f6', activity:'Coming soon'       },
-    { id:'hunter',    name:'Hunter',  role:'Ops · HR & Recruiting',      emoji:'🔍', status:'planned', roomId:'ops',   color:'#8b5cf6', activity:'Coming soon'       },
+  const ROOMS = [
+    { id:'ceo',     name:'CEO OFFICE', accent:'#f4b73a', floor:'#1c2032', wall:'#0f1422', x:6,   y:8,   w:170, h:84 },
+    { id:'csuite',  name:'C-SUITE',    accent:'#a98bff', floor:'#1a1b30', wall:'#0e1124', x:184, y:8,   w:170, h:84 },
+    { id:'sales',   name:'SALES',      accent:'#5fd4ff', floor:'#152a2e', wall:'#091a1d', x:6,   y:98,  w:114, h:84 },
+    { id:'ops',     name:'OPS',        accent:'#3ae3b9', floor:'#142a25', wall:'#081a16', x:124, y:98,  w:114, h:84 },
+    { id:'support', name:'SUPPORT',    accent:'#ff9c64', floor:'#2a1d1c', wall:'#1a0e0e', x:242, y:98,  w:112, h:84 },
   ];
 
-  // Assign positions within rooms
-  const ROOM_SLOTS = { ceo:[[.5,.5]], suite:[[.35,.45],[.65,.55]], sales:[[.3,.48],[.68,.52]], ops:[[.22,.5],[.5,.45],[.78,.5]] };
-  AGENTS.forEach((ag, i) => {
-    const room = ROOMS.find(r => r.id === ag.roomId);
-    ag._room = room;
-    const slots = ROOM_SLOTS[ag.roomId] || [[.5,.5]];
-    const idx = AGENTS.filter(a => a.roomId===ag.roomId).indexOf(ag);
-    const slot = slots[idx % slots.length];
-    ag._bx = room.x + slot[0] * room.w; // base x
-    ag._by = room.y + slot[1] * room.h; // base y
-    ag._x = ag._bx;
-    ag._y = ag._by;
-    ag._phase = Math.random() * Math.PI * 2;
-    ag._bobSpeed = 0.018 + Math.random() * 0.01;
-    ag._bobAmp = ag.status === 'live' ? 5 : 2;
-    ag._pulsePhase = Math.random() * Math.PI * 2;
-  });
-
-  // ── PARTICLES (live agents only) ──
-  const liveAgs = AGENTS.filter(a => a.status === 'live');
-  const particles = [];
-  liveAgs.forEach((from, i) => {
-    liveAgs.forEach((to, j) => {
-      if (j <= i) return;
-      for (let k = 0; k < 6; k++) {
-        particles.push({ from, to, prog: k/6, speed: 0.004 + Math.random()*0.003 });
-      }
-    });
-  });
-
-  // ── ACTIVITY BUBBLES ──
-  const BUBBLE_MSGS = [
-    'Query resolved ✓', 'Syncing KB…', 'Task complete ✓', 'Client replied 💬',
-    'Report generated 📊', 'Signal sent 📡', 'Processing… ⚡', 'Strategy updated 🎯',
-    'Discord ping 🤖', 'New question 🧠',
+  const VO_AGENTS = [
+    { id:'alex',     name:'Alex',     role:'CEO · Vision',       room:'ceo',     hue:'#f4b73a', skin:'#ffd0a4', hair:'#3a1d12', shirt:'#ff8a3d', pants:'#3b2740', live:true,  task:'Reviewing Q3 plan',     tasks:38, focus:'Q3 expansion',    alert:null },
+    { id:'rex',      name:'Rex',      role:'COO · Ops',          room:'ceo',     hue:'#5fd4ff', skin:'#f3c8a8', hair:'#1c2230', shirt:'#3aa6ff', pants:'#1b2536', live:true,  task:'Sprint review',         tasks:71, focus:'Sprint planning',  alert:null },
+    { id:'ledger',   name:'Ledger',   role:'CFO · Finance',      room:'csuite',  hue:'#a98bff', skin:'#f0caa6', hair:'#2b1408', shirt:'#8a6bff', pants:'#231423', live:true,  task:'P&L review',            tasks:22, focus:'Financials',       alert:null },
+    { id:'closer',   name:'Closer',   role:'AE · Sales',         room:'sales',   hue:'#5fd4ff', skin:'#f7caa6', hair:'#2a1408', shirt:'#3a8fff', pants:'#1d2a3a', live:false, task:'Standby',               tasks:0,  focus:'—',               alert:null },
+    { id:'mailer',   name:'Mailer',   role:'Email · Marketing',  room:'sales',   hue:'#ff6b8a', skin:'#f7caa6', hair:'#2a1408', shirt:'#ff4d6d', pants:'#1d2a3a', live:true,  task:'Sequence push',         tasks:54, focus:'Cold outbound',    alert:['weekly-asset-review failed'] },
+    { id:'thrive',   name:'Thrive',   role:'Ops · Client Bot',   room:'ops',     hue:'#3ae3b9', skin:'#e6c69a', hair:'#171a24', shirt:'#1bd1a1', pants:'#0e2a23', live:true,  task:'2 chats live',          tasks:120,focus:'Discord support',   alert:null },
+    { id:'dash',     name:'Dash',     role:'Ops · Monitoring',   room:'ops',     hue:'#5fd4ff', skin:'#e6c69a', hair:'#171a24', shirt:'#3a8fff', pants:'#0e1a2a', live:true,  task:'Watching metrics',      tasks:88, focus:'p95 latency',      alert:null },
+    { id:'hunter',   name:'Hunter',   role:'HR · Recruiting',    room:'support', hue:'#ff9c64', skin:'#f3c79f', hair:'#2a1408', shirt:'#ff7a3d', pants:'#2a1414', live:false, task:'Standby',               tasks:0,  focus:'—',               alert:null },
   ];
-  const bubbles = [];
-  function spawnBubble() {
-    const ag = liveAgs[Math.floor(Math.random() * liveAgs.length)];
-    if (!ag) return;
-    bubbles.push({
-      x: ag._x, y: ag._y - 28,
-      text: BUBBLE_MSGS[Math.floor(Math.random() * BUBBLE_MSGS.length)],
-      color: ag.color, life: 1.0, vx: (Math.random()-.5)*0.4, vy: -0.5,
-    });
-  }
 
-  // ── TICKER ──
-  const TICKER = '  ●  THRIVE HQ ONLINE  ·  Alex CEO active  ·  Thrive Bot live on Discord  ·  Knowledge base synced  ·  Rex COO coming soon  ·  Ledger CFO coming soon  ·  Closer & Mailer in pipeline  ·  ';
-  let tickerX = W;
-
-  // ── TOOLTIP ──
-  const tooltip = document.getElementById('vo-tooltip');
-  let hoveredAgent = null;
-  canvas.addEventListener('mousemove', e => {
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-    let best = null, bestD = 36;
-    AGENTS.forEach(ag => {
-      const d = Math.hypot(mx - ag._x, my - ag._y);
-      if (d < bestD) { bestD = d; best = ag; }
-    });
-    hoveredAgent = best;
-    if (best) {
-      const liveCol = best.status === 'live' ? best.color : '#475569';
-      tooltip.style.display = 'block';
-      tooltip.style.left = (e.clientX + 14) + 'px';
-      tooltip.style.top = (e.clientY - 10) + 'px';
-      tooltip.innerHTML = `
-        <div class="vo-tt-name" style="color:${best.color}">${best.emoji} ${best.name}</div>
-        <div class="vo-tt-role">${best.role}</div>
-        <div class="vo-tt-act" style="background:${liveCol}22;color:${liveCol};border:1px solid ${liveCol}44">${best.activity}</div>`;
-    } else {
-      tooltip.style.display = 'none';
+  // Furniture per room
+  function roomFurniture(r) {
+    const f = [];
+    const rx = r.x + 8, ry = r.y + 16;
+    const inW = r.w - 16;
+    const deskCount = Math.max(2, Math.min(4, Math.round(inW / 38)));
+    for (let i = 0; i < deskCount; i++) {
+      f.push({ kind:'desk', x: rx + 6 + i*Math.floor((inW-12)/deskCount), y: ry + Math.floor((r.h-22)*0.55) + (i%2?-2:4) });
     }
+    f.push({ kind:'monitor', x: rx + Math.floor(inW*0.78), y: ry + 4 });
+    f.push({ kind:'plant', x: r.x + 2,       y: r.y + r.h - 10 });
+    f.push({ kind:'plant', x: r.x + r.w - 8, y: r.y + r.h - 10 });
+    return f;
+  }
+  const FURNITURE = {};
+  ROOMS.forEach(r => FURNITURE[r.id] = roomFurniture(r));
+
+  // Agent starting positions
+  function rngRoomPoint(r) {
+    return {
+      x: r.x + 14 + Math.random()*(r.w - 28),
+      y: r.y + 22 + Math.random()*(r.h - 34)
+    };
+  }
+  VO_AGENTS.forEach(a => {
+    const r = ROOMS.find(rr => rr.id === a.room);
+    const s = rngRoomPoint(r);
+    a.x = s.x; a.y = s.y; a.tx = s.x; a.ty = s.y;
+    a.dir = 1; a.bobT = Math.random()*Math.PI*2;
+    a.idleT = 30 + Math.random()*120; a.speed = 0.18 + Math.random()*0.12;
+    a.state = 'idle';
   });
-  canvas.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; hoveredAgent = null; });
+
+  // Data flow particles
+  const flows = [];
+  function spawnFlows() {
+    const live = VO_AGENTS.filter(a => a.live);
+    if (live.length < 2) return;
+    if (flows.length < 14 && Math.random() < 0.08) {
+      const a = live[Math.floor(Math.random()*live.length)];
+      let b = live[Math.floor(Math.random()*live.length)];
+      if (a === b) return;
+      flows.push({ ax:a.x+5, ay:a.y+5, bx:b.x+5, by:b.y+5, t:0, life:60+Math.random()*40, c:a.hue });
+    }
+  }
 
   // ── DRAW HELPERS ──
-  function drawRoom(room) {
-    const { x, y, w, h, color, label } = room;
+  function rect2(x,y,w,h,c) { ctx.fillStyle=c; ctx.fillRect(Math.round(x),Math.round(y),w,h); }
 
-    // Floor fill
-    const bg = ctx.createLinearGradient(x, y, x+w, y+h);
-    bg.addColorStop(0, '#0d1117'); bg.addColorStop(1, '#07090f');
-    ctx.fillStyle = bg;
-    rr(x, y, w, h, 16); ctx.fill();
-
-    // Tile grid
-    ctx.save();
-    rr(x+2, y+2, w-4, h-4, 14); ctx.clip();
-    ctx.strokeStyle = color + '14'; ctx.lineWidth = 1;
-    for (let gx = x; gx < x+w; gx += 44) { ctx.beginPath(); ctx.moveTo(gx, y); ctx.lineTo(gx, y+h); ctx.stroke(); }
-    for (let gy = y; gy < y+h; gy += 44) { ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x+w, gy); ctx.stroke(); }
-
-    // Room glow
-    const vg = ctx.createRadialGradient(x+w*.5, y+h*.5, 0, x+w*.5, y+h*.5, Math.max(w,h)*.65);
-    vg.addColorStop(0, color + '0e'); vg.addColorStop(1, 'transparent');
-    ctx.fillStyle = vg; ctx.fillRect(x, y, w, h);
-    ctx.restore();
-
-    // Border glow
-    ctx.shadowColor = color; ctx.shadowBlur = 18;
-    ctx.strokeStyle = color + 'aa'; ctx.lineWidth = 1.5;
-    rr(x, y, w, h, 16); ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    // Corner brackets
-    const cs = 16;
-    ctx.strokeStyle = color + 'cc'; ctx.lineWidth = 2;
-    [[x+4,y+4,1,1],[x+w-4,y+4,-1,1],[x+4,y+h-4,1,-1],[x+w-4,y+h-4,-1,-1]].forEach(([cx,cy,sx,sy]) => {
-      ctx.beginPath(); ctx.moveTo(cx+sx*cs, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy+sy*cs); ctx.stroke();
-    });
-
-    // Label badge
-    ctx.font = '700 9px "Space Mono",monospace';
-    const lw = ctx.measureText(label).width;
-    ctx.fillStyle = color + '1a'; ctx.strokeStyle = color + '55'; ctx.lineWidth = 1;
-    rr(x+12, y+10, lw+20, 20, 5); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 8;
-    ctx.fillText(label, x+22, y+23); ctx.shadowBlur = 0;
-  }
-
-  function drawAgent(ag, t) {
-    const live = ag.status === 'live';
-    const bob = Math.sin(t * ag._bobSpeed + ag._phase) * ag._bobAmp;
-    const x = ag._x, y = ag._y + bob;
-    const pulse = 0.5 + 0.5 * Math.sin(t * 0.05 + ag._pulsePhase);
-    const r = live ? 20 : 14;
-    const color = ag.color;
-
-    if (live) {
-      // Outer glow ring
-      ctx.beginPath(); ctx.arc(x, y, r + 10 + pulse*6, 0, Math.PI*2);
-      const grd = ctx.createRadialGradient(x, y, r, x, y, r+16+pulse*6);
-      grd.addColorStop(0, color + '55'); grd.addColorStop(1, 'transparent');
-      ctx.fillStyle = grd; ctx.fill();
-
-      // Pulse ring
-      ctx.beginPath(); ctx.arc(x, y, r + 4 + pulse*8, 0, Math.PI*2);
-      ctx.strokeStyle = color + Math.floor((1-pulse)*140+40).toString(16).padStart(2,'0');
-      ctx.lineWidth = 1; ctx.stroke();
-    }
-
-    // Main circle
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
-    const cg = ctx.createRadialGradient(x-r*.3, y-r*.3, 0, x, y, r);
-    cg.addColorStop(0, live ? color + 'ff' : color + '55');
-    cg.addColorStop(1, live ? color + 'aa' : color + '22');
-    ctx.fillStyle = cg;
-    if (live) { ctx.shadowColor = color; ctx.shadowBlur = 22; }
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    // Border
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
-    ctx.strokeStyle = live ? color : color + '66';
-    ctx.lineWidth = live ? 2 : 1;
-    ctx.stroke();
-
-    // Emoji
-    ctx.font = `${live ? 16 : 11}px serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.globalAlpha = live ? 1 : 0.5;
-    ctx.fillText(ag.emoji, x, y);
-    ctx.globalAlpha = 1;
-
-    // Name label
-    ctx.font = live ? '600 10px "Space Grotesk",sans-serif' : '500 9px "Space Grotesk",sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    ctx.fillStyle = live ? '#f0f4ff' : '#4a5568';
-    ctx.fillText(ag.name, x, y + r + 5);
-    ctx.textBaseline = 'alphabetic';
-  }
-
-  function drawParticles(t) {
-    particles.forEach(p => {
-      p.prog += p.speed;
-      if (p.prog > 1) p.prog -= 1;
-      const fx = p.from._x, fy = p.from._y;
-      const tx = p.to._x, ty = p.to._y;
-      const px = fx + (tx-fx)*p.prog, py = fy + (ty-fy)*p.prog;
-      const alpha = Math.sin(p.prog * Math.PI);
-      ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI*2);
-      ctx.fillStyle = p.from.color + Math.floor(alpha*220).toString(16).padStart(2,'0');
-      ctx.shadowColor = p.from.color; ctx.shadowBlur = 8*alpha;
-      ctx.fill(); ctx.shadowBlur = 0;
+  function drawFloors() {
+    ctx.fillStyle = '#06080d'; ctx.fillRect(0,0,W,H);
+    ROOMS.forEach(r => {
+      rect2(r.x, r.y, r.w, 14, r.wall);
+      rect2(r.x, r.y+14, r.w, r.h-14, r.floor);
+      // tile checker
+      for (let yy=r.y+14; yy<r.y+r.h; yy+=4)
+        for (let xx=r.x; xx<r.x+r.w; xx+=4)
+          if (((xx+yy)/4)%2===0) { ctx.fillStyle='rgba(255,255,255,0.025)'; ctx.fillRect(xx,yy,2,2); }
+      // glow
+      const vg = ctx.createRadialGradient(r.x+r.w/2, r.y+r.h/2, 0, r.x+r.w/2, r.y+r.h/2, Math.max(r.w,r.h)*0.65);
+      vg.addColorStop(0, r.accent+'12'); vg.addColorStop(1, 'transparent');
+      ctx.fillStyle = vg; ctx.fillRect(r.x, r.y, r.w, r.h);
+      // corners
+      ['tl','tr','bl','br'].forEach(c => {
+        const cx = c.includes('r') ? r.x+r.w-4 : r.x;
+        const cy = c.includes('b') ? r.y+r.h-1 : r.y;
+        rect2(cx, cy,                      4, 1, r.accent);
+        rect2(c.includes('r')?r.x+r.w-1:r.x, c.includes('b')?r.y+r.h-4:r.y, 1, 4, r.accent);
+      });
+      // border
+      ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+      ctx.strokeRect(r.x+.5, r.y+.5, r.w-1, r.h-1);
+      // room label
+      ctx.fillStyle = r.accent;
+      ctx.font = '5px "Press Start 2P",monospace';
+      ctx.textBaseline = 'top';
+      ctx.fillText(r.name, r.x+4, r.y+3);
+      // hover highlight
+      if (hoverRoom && hoverRoom.id === r.id) {
+        ctx.strokeStyle = r.accent; ctx.lineWidth = 1;
+        ctx.strokeRect(r.x+.5, r.y+.5, r.w-1, r.h-1);
+        ctx.globalAlpha = 0.05; ctx.fillStyle = r.accent; ctx.fillRect(r.x,r.y,r.w,r.h);
+        ctx.globalAlpha = 1;
+      }
     });
   }
 
-  function drawConnectionLines() {
-    liveAgs.forEach((a, i) => {
-      liveAgs.forEach((b, j) => {
-        if (j <= i) return;
-        ctx.beginPath(); ctx.moveTo(a._x, a._y); ctx.lineTo(b._x, b._y);
-        ctx.strokeStyle = a.color + '18'; ctx.lineWidth = 1;
-        ctx.setLineDash([4, 10]); ctx.stroke(); ctx.setLineDash([]);
+  function drawFurniture() {
+    ROOMS.forEach(r => {
+      FURNITURE[r.id].forEach(f => {
+        if (f.kind==='desk') {
+          rect2(f.x, f.y,    14, 4, '#5a3a22');
+          rect2(f.x, f.y,    14, 1, '#7d4f2c');
+          rect2(f.x, f.y+4,  14, 2, '#3a2614');
+          rect2(f.x,   f.y+6, 1, 2, '#2c1c0e');
+          rect2(f.x+13,f.y+6, 1, 2, '#2c1c0e');
+          rect2(f.x+4, f.y-4, 6, 4, '#1a1f2c');
+          rect2(f.x+5, f.y-3, 4, 2, r.accent);
+        }
+        if (f.kind==='monitor') {
+          rect2(f.x, f.y,     10, 6, '#13182a');
+          rect2(f.x+1, f.y+1,  8, 4, r.accent);
+          const sl = (Date.now()/180)%4;
+          rect2(f.x+1, f.y+1+Math.floor(sl), 8, 1, 'rgba(255,255,255,0.6)');
+        }
+        if (f.kind==='plant') {
+          rect2(f.x,   f.y,    4, 4, '#2c1808');
+          rect2(f.x-1, f.y-3,  6, 3, '#2dbb5b');
+          rect2(f.x,   f.y-5,  4, 2, '#5be08a');
+        }
       });
     });
   }
 
-  function drawBubbles() {
-    for (let i = bubbles.length-1; i >= 0; i--) {
-      const b = bubbles[i];
-      b.x += b.vx; b.y += b.vy; b.life -= 0.012;
-      if (b.life <= 0) { bubbles.splice(i, 1); continue; }
-      const alpha = Math.min(1, b.life * 3);
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.font = '500 10px "Space Grotesk",sans-serif';
-      const tw = ctx.measureText(b.text).width;
-      rr(b.x - tw/2 - 8, b.y - 12, tw + 16, 22, 8);
-      ctx.fillStyle = '#0d1117'; ctx.strokeStyle = b.color + '88'; ctx.lineWidth = 1;
-      ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#f0f4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(b.text, b.x, b.y);
-      ctx.restore();
+  function drawAgent(a) {
+    const bob = Math.sin(a.bobT)*0.6;
+    const vx = a.tx-a.x, vy = a.ty-a.y;
+    const moving = Math.hypot(vx,vy) > 0.4;
+    const walkPhase = moving ? Math.floor((Date.now()/120)%2) : 0;
+    const X = Math.round(a.x), Y = Math.round(a.y+bob);
+    const flip = a.dir < 0;
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(X+5,Y+15,5,1.4,0,0,Math.PI*2); ctx.fill();
+    const p = (dx,dy,c) => { const X2=flip?(X+9-dx):(X+dx); ctx.fillStyle=c; ctx.fillRect(X2,Y+dy,1,1); };
+    // legs
+    const lA=walkPhase?0:1, lB=walkPhase?1:0;
+    p(3,12+lA,a.pants); p(3,13+lA,a.pants); p(3,14+lA,'#000');
+    p(6,12+lB,a.pants); p(6,13+lB,a.pants); p(6,14+lB,'#000');
+    // body
+    for(let dx=2;dx<=7;dx++) for(let dy=7;dy<=12;dy++) p(dx,dy,a.shirt);
+    p(2,7,'rgba(255,255,255,0.18)'); p(3,7,'rgba(255,255,255,0.2)'); p(4,7,'rgba(255,255,255,0.15)');
+    p(4,9,a.hue); p(5,9,a.hue);
+    // arms
+    const aA=walkPhase?1:0;
+    p(1,8+aA,a.shirt); p(1,9+aA,a.shirt); p(1,10+aA,a.skin);
+    p(8,8-aA,a.shirt); p(8,9-aA,a.shirt); p(8,10-aA,a.skin);
+    // head
+    for(let dx=3;dx<=6;dx++) for(let dy=2;dy<=6;dy++) p(dx,dy,a.skin);
+    for(let dx=3;dx<=6;dx++) p(dx,1,a.hair);
+    p(3,2,a.hair); p(6,2,a.hair); p(4,2,a.hair);
+    p(4,4,'#0a0a0a'); p(5,4,'#0a0a0a');
+    p(4,5,'#0a0a0a'); p(5,5,'#0a0a0a');
+    p(3,5,'#ff9aa8'); p(6,5,'#ff9aa8');
+    // selection ring
+    if (voSelectedId===a.id) {
+      ctx.strokeStyle=a.hue; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.ellipse(X+5,Y+15,7,2,0,0,Math.PI*2); ctx.stroke();
+      ctx.fillStyle=a.hue; ctx.globalAlpha=0.18+Math.sin(Date.now()/250)*0.08;
+      ctx.beginPath(); ctx.ellipse(X+5,Y+8,8,10,0,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+    }
+    // hover ring
+    if (voHoverId===a.id && voSelectedId!==a.id) {
+      ctx.strokeStyle='#ffffff'; ctx.globalAlpha=0.5; ctx.lineWidth=1;
+      ctx.strokeRect(X-1,Y-1,12,17); ctx.globalAlpha=1;
+    }
+    // live dot
+    if (a.live) { rect2(X+8,Y+1,2,2,'#3ae3b9'); rect2(X+8,Y+1,1,1,'#bff5e6'); }
+    // name label
+    ctx.font='5px "Press Start 2P",monospace';
+    ctx.textAlign='center'; ctx.textBaseline='bottom';
+    const labelW=Math.max(20,a.name.length*5+4);
+    rect2(X+5-labelW/2,Y-9,labelW,7,'rgba(0,0,0,0.65)');
+    ctx.fillStyle=a.live?'#ffffff':'#9aa6bb';
+    ctx.fillText(a.name,X+5,Y-3);
+    // alert pill
+    if (a.alert && a.alert.length) {
+      a.alert.forEach((msg,i) => {
+        const aw=Math.max(60,msg.length*4+10);
+        rect2(X+5-aw/2,Y-18-i*8,aw,7,'#5a1620');
+        rect2(X+5-aw/2,Y-18-i*8,1,7,'#ff6b8a');
+        ctx.fillStyle='#ff9eaf'; ctx.font='5px "Press Start 2P",monospace';
+        ctx.fillText('x '+msg,X+5,Y-12-i*8);
+      });
+    }
+    ctx.textAlign='start';
+  }
+
+  function drawFlowParticles() {
+    flows.forEach(f => {
+      f.t++; const k=f.t/f.life; if(k>1)return;
+      const x=f.ax+(f.bx-f.ax)*k, y=f.ay+(f.by-f.ay)*k-Math.sin(k*Math.PI)*6;
+      rect2(x,y,1,1,f.c); rect2(x-1,y,1,1,'rgba(255,255,255,0.25)');
+    });
+    for(let i=flows.length-1;i>=0;i--) if(flows[i].t>=flows[i].life) flows.splice(i,1);
+  }
+
+  function updateAgents() {
+    VO_AGENTS.forEach(a => {
+      a.bobT+=0.08;
+      if (a.state==='idle') {
+        a.idleT--;
+        if (a.idleT<=0) {
+          const r=ROOMS.find(rr=>rr.id===a.room);
+          const pt=rngRoomPoint(r);
+          a.tx=pt.x; a.ty=pt.y; a.dir=(a.tx>=a.x)?1:-1; a.state='walk';
+        }
+      } else {
+        const vx=a.tx-a.x,vy=a.ty-a.y,d=Math.hypot(vx,vy);
+        if(d<0.5){a.x=a.tx;a.y=a.ty;a.state='idle';a.idleT=60+Math.random()*180;}
+        else{a.x+=(vx/d)*a.speed;a.y+=(vy/d)*a.speed;}
+      }
+    });
+  }
+
+  function hitAgent(mx,my) {
+    for(let i=VO_AGENTS.length-1;i>=0;i--) {
+      const a=VO_AGENTS[i];
+      if(mx>=a.x-1&&mx<=a.x+10&&my>=a.y-1&&my<=a.y+16) return a;
+    }
+    return null;
+  }
+  function hitRoom(mx,my) { return ROOMS.find(r=>mx>=r.x&&mx<=r.x+r.w&&my>=r.y&&my<=r.y+r.h)||null; }
+
+  // ── INTERACTION ──
+  let voHoverId=null, hoverRoom=null;
+  let voSelectedId = 'alex';
+
+  function toLogical(e) {
+    const r=stage.getBoundingClientRect();
+    return { mx:(e.clientX-r.left)/r.width*W, my:(e.clientY-r.top)/r.height*H };
+  }
+  stage.addEventListener('mousemove', e => {
+    const {mx,my}=toLogical(e);
+    const a=hitAgent(mx,my);
+    voHoverId=a?a.id:null; hoverRoom=hitRoom(mx,my);
+    stage.style.cursor=a?'pointer':'default';
+  });
+  stage.addEventListener('mouseleave', ()=>{ voHoverId=null; hoverRoom=null; });
+  stage.addEventListener('click', e => {
+    const {mx,my}=toLogical(e);
+    const a=hitAgent(mx,my);
+    if(a){ voSelectedId=a.id; voRenderInspector(); }
+  });
+
+  // ── INSPECTOR ──
+  function voDrawPortrait(a, target) {
+    const c=document.createElement('canvas'); c.width=11; c.height=16;
+    const cx=c.getContext('2d'); cx.imageSmoothingEnabled=false;
+    const p=(x,y,col)=>{cx.fillStyle=col;cx.fillRect(x,y,1,1);};
+    for(let dx=3;dx<=3;dx++){p(dx,12,a.pants);p(dx,13,a.pants);p(dx,14,'#000');}
+    for(let dx=6;dx<=6;dx++){p(dx,12,a.pants);p(dx,13,a.pants);p(dx,14,'#000');}
+    for(let dx=2;dx<=7;dx++) for(let dy=7;dy<=12;dy++) p(dx,dy,a.shirt);
+    p(4,9,a.hue); p(5,9,a.hue);
+    p(1,8,a.shirt);p(1,9,a.shirt);p(1,10,a.skin);
+    p(8,8,a.shirt);p(8,9,a.shirt);p(8,10,a.skin);
+    for(let dx=3;dx<=6;dx++) for(let dy=2;dy<=6;dy++) p(dx,dy,a.skin);
+    for(let dx=3;dx<=6;dx++) p(dx,1,a.hair);
+    p(4,4,'#0a0a0a');p(5,4,'#0a0a0a');p(4,5,'#0a0a0a');p(5,5,'#0a0a0a');
+    p(3,5,'#ff9aa8');p(6,5,'#ff9aa8');
+    target.innerHTML='';
+    const big=document.createElement('canvas'); big.width=88; big.height=88;
+    const bcx=big.getContext('2d'); bcx.imageSmoothingEnabled=false;
+    bcx.fillStyle='#0d1320'; bcx.fillRect(0,0,88,88);
+    const grd=bcx.createRadialGradient(44,44,2,44,44,44);
+    grd.addColorStop(0,a.hue+'55'); grd.addColorStop(1,'#0d132000');
+    bcx.fillStyle=grd; bcx.fillRect(0,0,88,88);
+    bcx.drawImage(c,0,0,11,16,14,8,60,80);
+    target.appendChild(big);
+  }
+
+  function voRenderInspector() {
+    const a=VO_AGENTS.find(x=>x.id===voSelectedId)||VO_AGENTS[0];
+    const room=ROOMS.find(r=>r.id===a.room);
+    const card=document.getElementById('vo-agent-card');
+    if(!card) return;
+    card.innerHTML=`
+      <div class="vo-portrait" id="vo-portrait" style="border-color:${a.hue}55;box-shadow:0 0 28px -8px ${a.hue}"></div>
+      <div class="vo-agent-meta">
+        <div class="vo-agent-name">${a.name}</div>
+        <div class="vo-agent-role" style="color:${a.hue}">${a.role}</div>
+        <div class="vo-agent-where">${room.name}</div>
+        <div class="vo-agent-tags">
+          <span class="vo-tag ${a.live?'live':''}">${a.live?'LIVE':'STANDBY'}</span>
+          ${a.alert?`<span class="vo-tag warn">${a.alert.length} ALERT${a.alert.length>1?'S':''}</span>`:''}
+          <span class="vo-tag">${a.tasks} TASKS · 24H</span>
+        </div>
+      </div>`;
+    voDrawPortrait(a, document.getElementById('vo-portrait'));
+    const stats=document.getElementById('vo-agent-stats');
+    if(stats) stats.innerHTML=`
+      <div class="vo-stat"><div class="l">Activity</div><div class="v">${a.task}</div></div>
+      <div class="vo-stat"><div class="l">Current Focus</div><div class="v">${a.focus}</div></div>
+      <div class="vo-stat"><div class="l">Tasks (24h)</div><div class="v">${a.tasks}</div></div>
+      <div class="vo-stat"><div class="l">Status</div><div class="v ${a.live?'':'warn'}">${a.live?'Online':'Standby'}</div></div>`;
+    const alerts=document.getElementById('vo-agent-alerts');
+    if(alerts) {
+      if(a.alert&&a.alert.length) {
+        alerts.innerHTML=a.alert.map(m=>`<div class="vo-alert"><span class="x">x</span>${m}</div>`).join('');
+      } else {
+        alerts.innerHTML=`<div class="vo-alert ok"><span class="x">✓</span>no active alerts</div>`;
+      }
     }
   }
 
-  function drawTicker() {
-    const ty = H - TICKER_H;
-    ctx.fillStyle = '#07090f'; ctx.fillRect(0, ty, W, TICKER_H);
-    ctx.strokeStyle = 'rgba(212,168,67,0.2)'; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(0, ty); ctx.lineTo(W, ty); ctx.stroke();
-    ctx.font = '500 10px "Space Mono",monospace';
-    ctx.fillStyle = '#d4a843';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(TICKER + TICKER, tickerX, ty + TICKER_H/2);
-    const tw = ctx.measureText(TICKER).width;
-    tickerX -= 1.2;
-    if (tickerX < -tw) tickerX = W;
-    ctx.textBaseline = 'alphabetic';
+  // ── FEED ──
+  const VO_FEED_SEEDS=[
+    {who:'ALEX',    body:'updated <b>Q3 expansion plan</b> with 3 new lanes', cls:''},
+    {who:'REX',     body:'closed <b>17 sprint tasks</b> · burndown on track', cls:'info'},
+    {who:'MAILER',  body:'pushed <b>weekly outbound</b> · 1,284 sends', cls:'warn'},
+    {who:'THRIVE',  body:'<b>2 live chats</b> · avg response 0.9s', cls:'green'},
+    {who:'DASH',    body:'p95 latency steady at <b>142ms</b>', cls:'green'},
+    {who:'LEDGER',  body:'P&L snapshot ready · <b>MRR +18%</b>', cls:'violet'},
+  ];
+  const VO_LIVE_EVENTS=[
+    {who:'ALEX',    body:'reviewed <b>onboarding plan</b>', cls:''},
+    {who:'REX',     body:'merged <b>thrive-dashboard@2.0</b>', cls:'info'},
+    {who:'THRIVE',  body:'resolved <b>3 tickets</b> in Discord', cls:'green'},
+    {who:'MAILER',  body:'queued <b>next campaign batch</b>', cls:'warn'},
+    {who:'DASH',    body:'triggered <b>latency alert</b> · p99 spike', cls:'violet'},
+  ];
+  const $vofeed=document.getElementById('vo-feed');
+  function voTStr(d=new Date()){return d.toTimeString().slice(0,5);}
+  function voPushFeed(item,atTop=true){
+    if(!$vofeed)return;
+    const row=document.createElement('div');
+    row.className='vo-feed-row '+(item.cls||'');
+    row.innerHTML=`<div class="t">${item.time||voTStr()}</div><div><div class="who">${item.who}</div><div class="body">${item.body}</div></div>`;
+    if(atTop)$vofeed.prepend(row);else $vofeed.appendChild(row);
+    while($vofeed.children.length>20)$vofeed.lastChild.remove();
   }
-
-  // ── BUBBLE SPAWN TIMER ──
-  let bubbleTimer = 0;
-  let t = 0;
+  const _n=new Date();
+  VO_FEED_SEEDS.forEach((s,i)=>{ const d=new Date(_n.getTime()-(i+1)*6*60*1000); voPushFeed({...s,time:voTStr(d)},false); });
+  let voEvIdx=0;
+  const voFeedInterval=setInterval(()=>{ voPushFeed(VO_LIVE_EVENTS[voEvIdx%VO_LIVE_EVENTS.length]); voEvIdx++; },7000);
 
   // ── MAIN LOOP ──
-  function loop() {
-    try {
-      t++;
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#07090f'; ctx.fillRect(0, 0, W, H);
-
-      ROOMS.forEach(r => drawRoom(r));
-      drawConnectionLines();
-      drawParticles(t);
-      AGENTS.forEach(ag => drawAgent(ag, t));
-      drawBubbles();
-      drawTicker();
-
-      // Spawn activity bubble every ~5s
-      bubbleTimer++;
-      if (bubbleTimer > 300) { spawnBubble(); bubbleTimer = 0; }
-
-    } catch(err) { console.error('Office render error:', err); }
-    officeRAF = requestAnimationFrame(loop);
+  function loop(){
+    drawFloors();
+    drawFurniture();
+    spawnFlows();
+    drawFlowParticles();
+    updateAgents();
+    VO_AGENTS.slice().sort((a,b)=>a.y-b.y).forEach(drawAgent);
+    officeRAF=requestAnimationFrame(loop);
   }
+
+  const _resizeVO = () => { DPR=window.devicePixelRatio||1; fitCanvas(); };
+  window.addEventListener('resize', _resizeVO);
+
+  voRenderInspector();
+  fitCanvas();
   loop();
-</ENDOFJS
-
-echo "Written $(wc -l < /tmp/new_office.js) lines"
-
-
+}
 
 // ── ORG CHART ──
 function agentCardHTML(agent) {
