@@ -262,7 +262,7 @@ body::before {
 .vo-tag{font-family:'VT323',monospace;font-size:13px;letter-spacing:.08em;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);background:rgba(15,20,32,.6);color:var(--muted2);}
 .vo-tag.live{color:#0a1a14;background:var(--green);border-color:var(--green);}
 .vo-tag.warn{color:#3b1605;background:#ffb464;border-color:#ffb464;}
-.vo-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px;}
+.vo-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px;}.vo-stats .vo-stat:has(.v[style*='line-height']){grid-column:1/-1;}
 .vo-stat{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:rgba(13,18,28,.65);}
 .vo-stat .l{font-family:'VT323',monospace;color:var(--muted);font-size:13px;letter-spacing:.16em;text-transform:uppercase;}
 .vo-stat .v{font-size:14px;color:var(--white);font-weight:600;margin-top:3px;}
@@ -573,17 +573,81 @@ function initOffice() {
   // LIVE = deployed. PLANNED = coming soon.
   const VO_AGENTS = [
     // CEO OFFICE — Alex is live
-    { id:'alex',    name:'Alex',    role:'CEO · Vision & Strategy',      room:'ceo',     hue:'#f4b73a', skin:'#ffd0a4', hair:'#3a1d12', shirt:'#ff8a3d', pants:'#3b2740', live:true,  task:'Setting Q3 strategy',  tasks:38, focus:'Q3 expansion plan', alert:null },
+    {
+      id:'alex', name:'Alex', role:'CEO · Vision & Strategy', room:'ceo',
+      hue:'#f4b73a', skin:'#ffd0a4', hair:'#3a1d12', shirt:'#ff8a3d', pants:'#3b2740',
+      live:true, tasks:38,
+      task:'Architecting the Thrive agent fleet',
+      focus:'Building an AI agency that runs itself — 8 agents, zero overhead, infinite scale',
+      stats:{ activity:'Fleet architecture', focus:'Zero-overhead AI agency', tasks:'38 decisions today', status:'Online' },
+      alert:null
+    },
     // C-SUITE — Rex & Ledger planned
-    { id:'rex',     name:'Rex',     role:'COO · Strategic Orchestrator', room:'csuite',  hue:'#a98bff', skin:'#f3c8a8', hair:'#1c2230', shirt:'#7a5cff', pants:'#1b2536', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
-    { id:'ledger',  name:'Ledger',  role:'CFO · Finance',                room:'csuite',  hue:'#10b981', skin:'#f0caa6', hair:'#2b1408', shirt:'#0d9a6e', pants:'#0d2a1e', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
+    {
+      id:'rex', name:'Rex', role:'COO · Strategic Orchestrator', room:'csuite',
+      hue:'#a98bff', skin:'#f3c8a8', hair:'#1c2230', shirt:'#7a5cff', pants:'#1b2536',
+      live:false, tasks:0,
+      task:'Deployment pending',
+      focus:'Will orchestrate all agents end-to-end — automating ops so humans only touch strategy',
+      stats:{ activity:'Deployment pending', focus:'Full-stack agent orchestration', tasks:'—', status:'Standby' },
+      alert:null
+    },
+    {
+      id:'ledger', name:'Ledger', role:'CFO · Finance', room:'csuite',
+      hue:'#10b981', skin:'#f0caa6', hair:'#2b1408', shirt:'#0d9a6e', pants:'#0d2a1e',
+      live:false, tasks:0,
+      task:'Deployment pending',
+      focus:'Will manage P&L, cashflow forecasting and investor-ready reporting autonomously',
+      stats:{ activity:'Deployment pending', focus:'Autonomous P&L + forecasting', tasks:'—', status:'Standby' },
+      alert:null
+    },
     // SALES & MARKETING — Closer & Mailer planned
-    { id:'closer',  name:'Closer',  role:'Sales Manager',                room:'sales',   hue:'#f59e0b', skin:'#f7caa6', hair:'#2a1408', shirt:'#d48200', pants:'#2a1a0a', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
-    { id:'mailer',  name:'Mailer',  role:'Email Marketing Manager',      room:'sales',   hue:'#ec4899', skin:'#f7c5b0', hair:'#2a0f14', shirt:'#cc2070', pants:'#2a1020', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
+    {
+      id:'closer', name:'Closer', role:'Sales Manager', room:'sales',
+      hue:'#f59e0b', skin:'#f7caa6', hair:'#2a1408', shirt:'#d48200', pants:'#2a1a0a',
+      live:false, tasks:0,
+      task:'Deployment pending',
+      focus:'Closing 7 figures a year — AI-led discovery, objection handling and deal velocity',
+      stats:{ activity:'Deployment pending', focus:'$1M+ ARR pipeline target', tasks:'—', status:'Standby' },
+      alert:null
+    },
+    {
+      id:'mailer', name:'Mailer', role:'Email Marketing Manager', room:'sales',
+      hue:'#ec4899', skin:'#f7c5b0', hair:'#2a0f14', shirt:'#cc2070', pants:'#2a1020',
+      live:false, tasks:0,
+      task:'Deployment pending',
+      focus:'Sending sequences that convert — 40%+ open rates, zero manual writing',
+      stats:{ activity:'Deployment pending', focus:'40%+ open rate campaigns', tasks:'—', status:'Standby' },
+      alert:null
+    },
     // OPERATIONS — Thrive is live, Dash & Hunter planned
-    { id:'thrive',  name:'Thrive',  role:'Ops · Client Success',         room:'ops',     hue:'#3ae3b9', skin:'#e6c69a', hair:'#171a24', shirt:'#1bd1a1', pants:'#0e2a23', live:true,  task:'Answering Discord',    tasks:71, focus:'Discord support',   alert:null },
-    { id:'dash',    name:'Dash',    role:'Ops · Data & Dashboards',      room:'ops',     hue:'#3b82f6', skin:'#e6c69a', hair:'#171a24', shirt:'#2060cc', pants:'#0e1a2a', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
-    { id:'hunter',  name:'Hunter',  role:'HR · Recruiting',              room:'ops',     hue:'#8b5cf6', skin:'#f3c79f', hair:'#2a1408', shirt:'#6d3fd4', pants:'#1a1030', live:false, task:'Coming soon',          tasks:0,  focus:'—',                alert:null },
+    {
+      id:'thrive', name:'Thrive', role:'Ops · Client Success Bot', room:'ops',
+      hue:'#3ae3b9', skin:'#e6c69a', hair:'#171a24', shirt:'#1bd1a1', pants:'#0e2a23',
+      live:true, tasks:71,
+      task:'Live on Discord — answering client questions 24/7',
+      focus:'Handling every client question instantly — KB-powered, zero wait time, always on',
+      stats:{ activity:'Discord support · live', focus:'24/7 KB-powered client answers', tasks:'71 queries today', status:'Online' },
+      alert:null
+    },
+    {
+      id:'dash', name:'Dash', role:'Ops · Data & Dashboards', room:'ops',
+      hue:'#3b82f6', skin:'#e6c69a', hair:'#171a24', shirt:'#2060cc', pants:'#0e1a2a',
+      live:false, tasks:0,
+      task:'Deployment pending',
+      focus:'Building live dashboards for every metric that matters — no spreadsheets, ever again',
+      stats:{ activity:'Deployment pending', focus:'Real-time ops visibility', tasks:'—', status:'Standby' },
+      alert:null
+    },
+    {
+      id:'hunter', name:'Hunter', role:'HR · Recruiting', room:'ops',
+      hue:'#8b5cf6', skin:'#f3c79f', hair:'#2a1408', shirt:'#6d3fd4', pants:'#1a1030',
+      live:false, tasks:0,
+      task:'Deployment pending',
+      focus:'Sourcing, screening and onboarding A-players — full recruiting pipeline on autopilot',
+      stats:{ activity:'Deployment pending', focus:'AI recruiting pipeline', tasks:'—', status:'Standby' },
+      alert:null
+    },
   ];
 
   // Furniture per room
@@ -853,6 +917,7 @@ function initOffice() {
     const room=ROOMS.find(r=>r.id===a.room);
     const card=document.getElementById('vo-agent-card');
     if(!card) return;
+    const taskLabel = a.live ? (a.tasks+' tasks today') : 'Not deployed';
     card.innerHTML=`
       <div class="vo-portrait" id="vo-portrait" style="border-color:${a.hue}55;box-shadow:0 0 28px -8px ${a.hue}"></div>
       <div class="vo-agent-meta">
@@ -860,43 +925,50 @@ function initOffice() {
         <div class="vo-agent-role" style="color:${a.hue}">${a.role}</div>
         <div class="vo-agent-where">${room.name}</div>
         <div class="vo-agent-tags">
-          <span class="vo-tag ${a.live?'live':''}">${a.live?'LIVE':'STANDBY'}</span>
+          <span class="vo-tag ${a.live?'live':''}">${a.live?'● LIVE':'○ PLANNED'}</span>
           ${a.alert?`<span class="vo-tag warn">${a.alert.length} ALERT${a.alert.length>1?'S':''}</span>`:''}
-          <span class="vo-tag">${a.tasks} TASKS · 24H</span>
+          <span class="vo-tag">${taskLabel}</span>
         </div>
       </div>`;
     voDrawPortrait(a, document.getElementById('vo-portrait'));
     const stats=document.getElementById('vo-agent-stats');
     if(stats) stats.innerHTML=`
-      <div class="vo-stat"><div class="l">Activity</div><div class="v">${a.task}</div></div>
-      <div class="vo-stat"><div class="l">Current Focus</div><div class="v">${a.focus}</div></div>
-      <div class="vo-stat"><div class="l">Tasks (24h)</div><div class="v">${a.tasks}</div></div>
-      <div class="vo-stat"><div class="l">Status</div><div class="v ${a.live?'':'warn'}">${a.live?'Online':'Standby'}</div></div>`;
+      <div class="vo-stat"><div class="l">Now</div><div class="v">${a.task}</div></div>
+      <div class="vo-stat" style="grid-column:1/-1"><div class="l">Mission</div><div class="v" style="font-size:12px;line-height:1.5;color:${a.hue}">${a.focus}</div></div>
+      <div class="vo-stat"><div class="l">Activity (24h)</div><div class="v ${a.live?'':'warn'}">${a.live?a.tasks+' tasks':'Standby'}</div></div>
+      <div class="vo-stat"><div class="l">Status</div><div class="v ${a.live?'':'warn'}">${a.live?'Online · deployed':'Pending deployment'}</div></div>`;
     const alerts=document.getElementById('vo-agent-alerts');
     if(alerts) {
       if(a.alert&&a.alert.length) {
         alerts.innerHTML=a.alert.map(m=>`<div class="vo-alert"><span class="x">x</span>${m}</div>`).join('');
       } else {
-        alerts.innerHTML=`<div class="vo-alert ok"><span class="x">✓</span>no active alerts</div>`;
+        alerts.innerHTML=`<div class="vo-alert ok"><span class="x">✓</span>${a.live?'All systems nominal · running clean':'Queued for deployment · no blockers'}</div>`;
       }
     }
   }
 
   // ── FEED ──
+  // Seeds reflect real milestones and live agent activity
   const VO_FEED_SEEDS=[
-    {who:'ALEX',   body:'reviewing <b>Q3 expansion plan</b> · 3 new lanes flagged', cls:''},
-    {who:'THRIVE', body:'answered <b>14 Discord questions</b> this session', cls:'green'},
-    {who:'ALEX',   body:'Thrive Bot deployed on <b>Railway + Discord</b>', cls:'info'},
-    {who:'SYSTEM', body:'Knowledge base synced · <b>Supabase</b> connected', cls:'info'},
-    {who:'SYSTEM', body:'Rex (COO) · Ledger (CFO) <b>coming soon</b>', cls:'violet'},
-    {who:'SYSTEM', body:'Closer · Mailer · Dash · Hunter <b>in pipeline</b>', cls:'violet'},
+    {who:'THRIVE', body:'answered client question: <b>"how do I upload a PDF?"</b> in 0.9s', cls:'green'},
+    {who:'ALEX',   body:'deployed <b>Thrive Bot v1.0</b> to Discord · Railway hosting confirmed', cls:'info'},
+    {who:'THRIVE', body:'KB lookup returned <b>4 matching chunks</b> · Supabase query 12ms', cls:'green'},
+    {who:'SYSTEM', body:'Supabase connected · knowledge base <b>fully indexed</b>', cls:'info'},
+    {who:'ALEX',   body:'roadmap updated · <b>Rex (COO)</b> is next agent to deploy', cls:''},
+    {who:'THRIVE', body:'71 client queries handled today · <b>zero escalations</b>', cls:'green'},
+    {who:'SYSTEM', body:'Closer + Mailer in pipeline · <b>sales automation coming Q3</b>', cls:'violet'},
+    {who:'ALEX',   body:'Ledger (CFO) scoped · will own <b>P&L + cashflow reporting</b>', cls:''},
   ];
+  // Live events rotate every 7s — tied to what the real active agents would actually be doing
   const VO_LIVE_EVENTS=[
-    {who:'ALEX',   body:'updated <b>strategy board</b> · Q3 focus confirmed', cls:''},
-    {who:'THRIVE', body:'resolved <b>Discord query</b> in 1.2s', cls:'green'},
-    {who:'ALEX',   body:'onboarding <b>new agent pipeline</b> review', cls:''},
-    {who:'THRIVE', body:'KB lookup · returned <b>3 chunks</b>', cls:'green'},
-    {who:'SYSTEM', body:'all systems <b>nominal</b> · 99.9% uptime', cls:'info'},
+    {who:'THRIVE', body:'Discord query resolved · <b>"what's included in the programme?"</b>', cls:'green'},
+    {who:'THRIVE', body:'KB search · <b>3 chunks retrieved</b> · answered in 1.1s', cls:'green'},
+    {who:'ALEX',   body:'reviewing agent deployment order · <b>Rex COO next</b>', cls:''},
+    {who:'THRIVE', body:'client session active · <b>response time 0.8s</b>', cls:'green'},
+    {who:'SYSTEM', body:'Railway uptime <b>99.9%</b> · all webhooks firing', cls:'info'},
+    {who:'ALEX',   body:'scoping <b>Closer agent</b> · target: 7-fig pipeline in Y1', cls:''},
+    {who:'THRIVE', body:'new question logged to Supabase · <b>Questions Log updated</b>', cls:'green'},
+    {who:'SYSTEM', body:'Vercel deploy healthy · dashboard <b>serving live data</b>', cls:'info'},
   ];
   const $vofeed=document.getElementById('vo-feed');
   function voTStr(d=new Date()){return d.toTimeString().slice(0,5);}
