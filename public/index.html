@@ -238,114 +238,19 @@ body::before {
 .info-key{color:var(--muted2);font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;}
 .info-val{font-weight:500;}
 
-/* ═══════════════════════════════════════
-   VIRTUAL OFFICE — MISSION CONTROL STYLE
-   ═══════════════════════════════════════ */
-.vo-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
-.vo-kpi{
-  position:relative;padding:14px 16px;border:1px solid var(--border2);border-radius:14px;
-  background:linear-gradient(180deg,rgba(15,20,32,.9),rgba(13,18,28,.7));
-  overflow:hidden;
+/* ═══════════════════════════════════
+   VIRTUAL OFFICE
+   ═══════════════════════════════════ */
+#office-canvas{display:block;width:100%;border-radius:16px;cursor:pointer;border:1px solid var(--border2);}
+.vo-tooltip{
+  position:fixed;z-index:999;pointer-events:none;
+  background:rgba(13,18,28,.95);border:1px solid var(--border2);
+  border-radius:12px;padding:10px 14px;backdrop-filter:blur(12px);
+  box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:220px;
 }
-.vo-kpi::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(transparent 94%,rgba(64,82,116,.15) 94%) 0 0/100% 16px,
-             linear-gradient(90deg,transparent 94%,rgba(64,82,116,.15) 94%) 0 0/16px 100%;
-  opacity:.4;pointer-events:none;
-}
-.vo-kpi-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
-.vo-kpi-v{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;margin-top:6px;color:var(--white);}
-.vo-kpi-of{font-size:14px;color:var(--muted);}
-.vo-kpi-delta{font-size:11px;margin-top:2px;color:var(--green);}
-.vo-delta-warn{color:#f59e0b;}
-.vo-spark{position:absolute;right:10px;bottom:8px;opacity:.8;}
-
-.vo-grid{display:grid;grid-template-columns:1.65fr 1fr;gap:18px;margin-bottom:18px;}
-.vo-card{border:1px solid var(--border2);border-radius:16px;background:linear-gradient(180deg,rgba(15,20,32,.75),rgba(13,18,28,.6));backdrop-filter:blur(6px);overflow:hidden;}
-.vo-card-h{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border);}
-.vo-card-t{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted2);}
-.vo-card-r{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:8px;}
-.vo-live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite;}
-
-.vo-depts{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px;}
-.vo-dept{
-  position:relative;border:1px solid var(--border);border-radius:14px;padding:14px;
-  background:radial-gradient(120% 100% at 0% 0%,rgba(255,255,255,.03),transparent 60%),
-             linear-gradient(180deg,rgba(11,16,25,.95),rgba(8,12,20,.95));
-  overflow:hidden;min-height:220px;isolation:isolate;
-}
-.vo-dept::before{
-  content:'';position:absolute;inset:0;z-index:-1;
-  background-image:linear-gradient(rgba(64,82,116,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(64,82,116,.08) 1px,transparent 1px);
-  background-size:18px 18px;
-  mask-image:linear-gradient(180deg,black 0%,transparent 100%);
-}
-.vo-corner{position:absolute;width:13px;height:13px;border:1.5px solid var(--acc,#d4a843);opacity:.9;}
-.vo-corner.tl{top:7px;left:7px;border-right:0;border-bottom:0;border-top-left-radius:3px;}
-.vo-corner.tr{top:7px;right:7px;border-left:0;border-bottom:0;border-top-right-radius:3px;}
-.vo-corner.bl{bottom:7px;left:7px;border-right:0;border-top:0;border-bottom-left-radius:3px;}
-.vo-corner.br{bottom:7px;right:7px;border-left:0;border-top:0;border-bottom-right-radius:3px;}
-.vo-dept-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.vo-dept-name{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc,#d4a843);}
-.vo-dept-glyph{width:18px;height:18px;border-radius:5px;background:color-mix(in srgb,var(--acc,#d4a843) 18%,transparent);border:1px solid color-mix(in srgb,var(--acc,#d4a843) 45%,transparent);display:grid;place-items:center;font-size:10px;color:var(--acc,#d4a843);}
-.vo-dept-stat{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;}
-.vo-dept-body{display:grid;grid-template-columns:1.05fr .95fr;gap:10px;height:158px;}
-.vo-agents{display:flex;flex-direction:column;gap:5px;overflow:hidden;}
-
-.vo-agent{
-  display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;
-  border:1px solid var(--border);background:linear-gradient(180deg,rgba(20,28,42,.65),rgba(13,18,28,.5));
-  cursor:pointer;transition:transform .15s,border-color .15s,background .15s;
-}
-.vo-agent:hover{transform:translateY(-1px);border-color:var(--border2);background:linear-gradient(180deg,rgba(28,38,56,.85),rgba(18,25,38,.7));}
-.vo-agent.sel{border-color:var(--acc,#d4a843);box-shadow:0 0 0 1px color-mix(in srgb,var(--acc,#d4a843) 30%,transparent),0 0 22px -8px var(--acc,#d4a843);}
-.vo-ava{position:relative;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;background:color-mix(in srgb,var(--acc,#d4a843) 15%,#0d1320);border:1px solid color-mix(in srgb,var(--acc,#d4a843) 40%,var(--border));color:var(--white);}
-.vo-ava.live::after{content:'';position:absolute;right:-2px;top:-2px;width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px #07090f,0 0 10px var(--green);}
-.vo-ava.planned{filter:grayscale(.6) opacity(.55);border-style:dashed;}
-.vo-agent-meta{display:flex;flex-direction:column;min-width:0;flex:1;}
-.vo-agent-nm{font-size:12px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.vo-agent-rl{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Space Mono',monospace;letter-spacing:.03em;}
-.vo-agent-act{font-size:10px;color:var(--acc,#d4a843);font-family:'Space Mono',monospace;letter-spacing:.03em;opacity:.85;}
-
-.vo-viz{position:relative;border:1px solid var(--border);border-radius:10px;background:radial-gradient(120% 100% at 50% 0%,color-mix(in srgb,var(--acc,#d4a843) 8%,transparent),transparent 70%),#06080d;overflow:hidden;}
-.vo-viz svg{display:block;width:100%;height:100%;}
-.vo-viz-legend{position:absolute;left:8px;bottom:5px;font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;}
-
-.vo-side{display:flex;flex-direction:column;gap:18px;min-width:0;}
-.vo-detail-inner{padding:16px;display:flex;flex-direction:column;gap:14px;}
-.vo-ad-h{display:flex;align-items:center;gap:14px;}
-.vo-ad-ava{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,color-mix(in srgb,var(--acc,#d4a843) 22%,#0d1320),#0d1320);border:1px solid color-mix(in srgb,var(--acc,#d4a843) 40%,var(--border));box-shadow:0 0 22px -6px color-mix(in srgb,var(--acc,#d4a843) 55%,transparent);}
-.vo-ad-name{font-size:17px;font-weight:700;}
-.vo-ad-role{font-size:11px;color:var(--muted2);margin-top:2px;}
-.vo-ad-status{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border:1px solid var(--border);border-radius:999px;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);background:rgba(13,18,28,.65);}
-.vo-ad-sdot{width:6px;height:6px;border-radius:50%;}
-.vo-ad-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.vo-ad-cell{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:rgba(11,16,25,.7);}
-.vo-ad-cell-l{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);}
-.vo-ad-cell-v{margin-top:4px;font-size:13px;font-weight:600;font-family:'Space Mono',monospace;color:var(--white);}
-.vo-ad-cell-v.live{color:var(--green);}
-
-.vo-feed-card{display:flex;flex-direction:column;flex:1;}
-.vo-feed-list{flex:1;max-height:280px;overflow:auto;padding:6px 14px 10px;}
-.vo-feed-row{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px dashed var(--border);}
-.vo-feed-row:last-child{border-bottom:0;}
-.vo-feed-t{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);min-width:46px;padding-top:2px;}
-.vo-feed-ic{width:18px;height:18px;border-radius:5px;background:rgba(34,211,160,.14);color:var(--green);display:grid;place-items:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:2px;border:1px solid rgba(34,211,160,.3);}
-.vo-feed-row.warn .vo-feed-ic{background:rgba(212,168,67,.14);color:var(--gold);border-color:rgba(212,168,67,.35);}
-.vo-feed-row.info .vo-feed-ic{background:rgba(59,130,246,.14);color:var(--blue);border-color:rgba(59,130,246,.35);}
-.vo-feed-row.violet .vo-feed-ic{background:rgba(124,58,237,.14);color:#a78bfa;border-color:rgba(124,58,237,.35);}
-.vo-feed-body{font-size:12px;color:var(--white);line-height:1.5;}
-.vo-feed-who{color:var(--gold);font-family:'Space Mono',monospace;font-size:10px;}
-.vo-legend-row{display:flex;gap:14px;flex-wrap:wrap;padding:10px 16px;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:.14em;text-transform:uppercase;border-top:1px solid var(--border);}
-.vo-legend-row span{display:inline-flex;align-items:center;gap:6px;}
-.vo-legend-row i{width:7px;height:7px;border-radius:50%;display:inline-block;}
-
-.vo-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-.vo-strip-card{border:1px solid var(--border2);border-radius:14px;padding:14px;background:linear-gradient(180deg,rgba(15,20,32,.85),rgba(13,18,28,.65));}
-.vo-strip-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
-.vo-strip-v{font-family:'Space Mono',monospace;font-size:18px;font-weight:600;margin-top:6px;color:var(--white);}
-.vo-bar{height:5px;border-radius:99px;background:rgba(255,255,255,.06);margin-top:10px;overflow:hidden;}
-.vo-fill{height:100%;background:linear-gradient(90deg,var(--gold),#ff8a3d);box-shadow:0 0 12px rgba(212,168,67,.5);border-radius:99px;transition:width .8s ease;}
+.vo-tt-name{font-size:14px;font-weight:700;margin-bottom:2px;}
+.vo-tt-role{font-size:11px;color:var(--muted2);font-family:'Space Mono',monospace;margin-bottom:6px;}
+.vo-tt-act{font-size:11px;padding:4px 8px;border-radius:6px;font-family:'Space Mono',monospace;display:inline-block;}
 </style>
 </head>
 <body>
@@ -383,96 +288,8 @@ body::before {
 
   <!-- VIRTUAL OFFICE -->
   <div class="panel active" id="panel-office">
-    <!-- KPI STRIP -->
-    <div class="vo-kpis">
-      <div class="vo-kpi">
-        <div class="vo-kpi-lbl">AGENTS LIVE</div>
-        <div class="vo-kpi-v"><span id="vo-live">2</span> <span class="vo-kpi-of">/ 8</span></div>
-        <div class="vo-kpi-delta">+1 this week</div>
-        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#22d3a0" stroke-width="1.5" points="0,16 8,14 16,15 24,11 32,12 40,8 48,9 56,5 64,6"/></svg>
-      </div>
-      <div class="vo-kpi">
-        <div class="vo-kpi-lbl">TASKS / HR</div>
-        <div class="vo-kpi-v" id="vo-tph">128</div>
-        <div class="vo-kpi-delta">+12.4%</div>
-        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#d4a843" stroke-width="1.5" points="0,18 8,15 16,16 24,12 32,13 40,9 48,7 56,8 64,4"/></svg>
-      </div>
-      <div class="vo-kpi">
-        <div class="vo-kpi-lbl">RESPONSE TIME</div>
-        <div class="vo-kpi-v" id="vo-resp">1.42s</div>
-        <div class="vo-kpi-delta vo-delta-warn">avg latency</div>
-        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#7c3aed" stroke-width="1.5" points="0,12 8,11 16,13 24,10 32,12 40,9 48,11 56,8 64,10"/></svg>
-      </div>
-      <div class="vo-kpi">
-        <div class="vo-kpi-lbl">SLA</div>
-        <div class="vo-kpi-v">99.2%</div>
-        <div class="vo-kpi-delta">stable</div>
-        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#3b82f6" stroke-width="1.5" points="0,8 8,7 16,9 24,7 32,8 40,6 48,7 56,6 64,7"/></svg>
-      </div>
-      <div class="vo-kpi">
-        <div class="vo-kpi-lbl">UPTIME</div>
-        <div class="vo-kpi-v">99.98%</div>
-        <div class="vo-kpi-delta">30 days</div>
-        <svg class="vo-spark" width="64" height="22" viewBox="0 0 64 22"><polyline fill="none" stroke="#22d3a0" stroke-width="1.5" points="0,10 8,9 16,8 24,9 32,8 40,7 48,8 56,7 64,7"/></svg>
-      </div>
-    </div>
-
-    <!-- MAIN GRID -->
-    <div class="vo-grid">
-      <!-- LEFT: departments -->
-      <div class="vo-card">
-        <div class="vo-card-h">
-          <span class="vo-card-t">Departments</span>
-          <span class="vo-card-r"><span class="vo-live-dot"></span> 4 STATIONS · 2 ACTIVE</span>
-        </div>
-        <div class="vo-depts" id="vo-depts"></div>
-      </div>
-
-      <!-- RIGHT: agent detail + feed -->
-      <div class="vo-side">
-        <div class="vo-card" id="vo-detail">
-          <!-- filled by JS -->
-        </div>
-        <div class="vo-card vo-feed-card">
-          <div class="vo-card-h">
-            <span class="vo-card-t">System Feed</span>
-            <span class="vo-card-r"><span class="vo-live-dot"></span> STREAMING</span>
-          </div>
-          <div class="vo-feed-list" id="vo-feed"></div>
-          <div class="vo-legend-row">
-            <span><i style="background:#d4a843;box-shadow:0 0 8px #d4a843"></i>CEO</span>
-            <span><i style="background:#22d3a0;box-shadow:0 0 8px #22d3a0"></i>LIVE</span>
-            <span><i style="background:#7c3aed;box-shadow:0 0 8px #7c3aed"></i>C-SUITE</span>
-            <span><i style="background:#3b82f6;box-shadow:0 0 8px #3b82f6"></i>OPS</span>
-            <span><i style="background:#475569"></i>PLANNED</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOTTOM STRIP -->
-    <div class="vo-strip">
-      <div class="vo-strip-card">
-        <div class="vo-strip-lbl">CPU LOAD</div>
-        <div class="vo-strip-v" id="vo-cpu">38%</div>
-        <div class="vo-bar"><div class="vo-fill" id="vo-cpu-bar" style="width:38%"></div></div>
-      </div>
-      <div class="vo-strip-card">
-        <div class="vo-strip-lbl">MEMORY</div>
-        <div class="vo-strip-v" id="vo-mem">62%</div>
-        <div class="vo-bar"><div class="vo-fill" id="vo-mem-bar" style="width:62%;background:linear-gradient(90deg,#7c3aed,#3b82f6);box-shadow:0 0 14px rgba(124,58,237,.5)"></div></div>
-      </div>
-      <div class="vo-strip-card">
-        <div class="vo-strip-lbl">API CALLS / MIN</div>
-        <div class="vo-strip-v" id="vo-api">1,284</div>
-        <div class="vo-bar"><div class="vo-fill" id="vo-api-bar" style="width:55%;background:linear-gradient(90deg,#22d3a0,#3b82f6);box-shadow:0 0 14px rgba(34,211,160,.5)"></div></div>
-      </div>
-      <div class="vo-strip-card">
-        <div class="vo-strip-lbl">TOKEN SPEND (24H)</div>
-        <div class="vo-strip-v" id="vo-tok">$48.21</div>
-        <div class="vo-bar"><div class="vo-fill" id="vo-tok-bar" style="width:42%;background:linear-gradient(90deg,#ef4444,#d4a843);box-shadow:0 0 14px rgba(239,68,68,.5)"></div></div>
-      </div>
-    </div>
+    <canvas id="office-canvas"></canvas>
+    <div class="vo-tooltip" id="vo-tooltip" style="display:none"></div>
   </div>
 
   <!-- ORG CHART -->
@@ -663,759 +480,334 @@ function selectAgent(ag) {
 
 function initOffice() {
   if (officeRAF) { cancelAnimationFrame(officeRAF); officeRAF = null; }
+  // Clear any stale interval objects from previous Opus version
+  if (officeRAF && officeRAF._intervals) { officeRAF._intervals.forEach(clearInterval); }
 
-  // ── DEPARTMENT DATA (wired to real Thrive agents) ──
-  const VO_DEPTS = [
-    {
-      id:'ceo', name:'CEO Office', accent:'#d4a843', glyph:'C', viz:'pulse',
-      agents:[
-        {id:'alex', name:'Alex', role:'CEO · Vision & Strategy', emoji:'👑', live:true, activity:'Strategising', tasks:38, focus:'Q3 expansion plan'},
-      ]
-    },
-    {
-      id:'csuite', name:'C-Suite', accent:'#7c3aed', glyph:'X', viz:'mesh',
-      agents:[
-        {id:'rex',    name:'Rex',    role:'COO · Orchestrator',  emoji:'🧠', live:false, activity:'Planned', tasks:0, focus:'—'},
-        {id:'ledger', name:'Ledger', role:'CFO · Finance',       emoji:'💎', live:false, activity:'Planned', tasks:0, focus:'—'},
-      ]
-    },
-    {
-      id:'sales', name:'Sales & Marketing', accent:'#f59e0b', glyph:'S', viz:'pipeline',
-      agents:[
-        {id:'closer', name:'Closer', role:'Sales · Manager',           emoji:'🎯', live:false, activity:'Planned', tasks:0, focus:'—'},
-        {id:'mailer', name:'Mailer', role:'Marketing · Email Manager',  emoji:'✉️',  live:false, activity:'Planned', tasks:0, focus:'—'},
-      ]
-    },
-    {
-      id:'ops', name:'Operations', accent:'#22d3a0', glyph:'O', viz:'rack',
-      agents:[
-        {id:'thrive-bot', name:'Thrive', role:'Ops · Client Success',    emoji:'🤖', live:true,  activity:'Answering clients', tasks:71, focus:'Discord support'},
-        {id:'dash',       name:'Dash',   role:'Ops · Data & Dashboards', emoji:'📊', live:false, activity:'Planned', tasks:0, focus:'—'},
-        {id:'hunter',     name:'Hunter', role:'Ops · HR & Recruiting',   emoji:'🔍', live:false, activity:'Planned', tasks:0, focus:'—'},
-      ]
-    },
+  const canvas = document.getElementById('office-canvas');
+  if (!canvas) return;
+  const container = canvas.parentElement;
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    const W = container.clientWidth;
+    const H = Math.max(520, window.innerHeight - 160);
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    return { W, H };
+  }
+  let { W, H } = resize();
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(DPR, DPR);
+
+  // Rounded rect helper
+  function rr(x, y, w, h, r) {
+    r = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y); ctx.arcTo(x+w, y, x+w, y+r, r);
+    ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+    ctx.lineTo(x+r, y+h); ctx.arcTo(x, y+h, x, y+h-r, r);
+    ctx.lineTo(x, y+r); ctx.arcTo(x, y, x+r, y, r);
+    ctx.closePath();
+  }
+
+  // ── ROOMS ──
+  const PAD = 14, GAP = 12;
+  const TICKER_H = 32;
+
+  function buildRooms(W, H) {
+    const RW = (W - PAD*2 - GAP) / 2;
+    const RH = (H - PAD*2 - GAP - TICKER_H) / 2;
+    return [
+      { id:'ceo',   label:'CEO OFFICE',       color:'#d4a843', x:PAD,         y:PAD,         w:RW, h:RH },
+      { id:'suite', label:'C-SUITE',           color:'#7c3aed', x:PAD+RW+GAP,  y:PAD,         w:RW, h:RH },
+      { id:'sales', label:'SALES & MARKETING', color:'#f59e0b', x:PAD,         y:PAD+RH+GAP,  w:RW, h:RH },
+      { id:'ops',   label:'OPERATIONS',        color:'#22d3a0', x:PAD+RW+GAP,  y:PAD+RH+GAP,  w:RW, h:RH },
+    ];
+  }
+  let ROOMS = buildRooms(W, H);
+
+  // ── AGENTS ──
+  const AGENTS = [
+    { id:'alex',      name:'Alex',    role:'CEO · Vision & Strategy',    emoji:'👑', status:'live',    roomId:'ceo',   color:'#d4a843', activity:'Strategising'      },
+    { id:'rex',       name:'Rex',     role:'COO · Orchestrator',         emoji:'🧠', status:'planned', roomId:'suite', color:'#7c3aed', activity:'Coming soon'       },
+    { id:'ledger',    name:'Ledger',  role:'CFO · Finance',              emoji:'💎', status:'planned', roomId:'suite', color:'#a78bfa', activity:'Coming soon'       },
+    { id:'closer',    name:'Closer',  role:'Sales · Manager',            emoji:'🎯', status:'planned', roomId:'sales', color:'#f59e0b', activity:'Coming soon'       },
+    { id:'mailer',    name:'Mailer',  role:'Marketing · Email',          emoji:'✉️', status:'planned', roomId:'sales', color:'#ec4899', activity:'Coming soon'       },
+    { id:'thrive',    name:'Thrive',  role:'Ops · Client Success',       emoji:'🤖', status:'live',    roomId:'ops',   color:'#22d3a0', activity:'Answering clients' },
+    { id:'dash',      name:'Dash',    role:'Ops · Dashboards',           emoji:'📊', status:'planned', roomId:'ops',   color:'#3b82f6', activity:'Coming soon'       },
+    { id:'hunter',    name:'Hunter',  role:'Ops · HR & Recruiting',      emoji:'🔍', status:'planned', roomId:'ops',   color:'#8b5cf6', activity:'Coming soon'       },
   ];
 
-  // ── SVG VISUALISATIONS ──
-  function vizSvg(d) {
-    const W2=300, H2=155;
-    if(d.viz==='pulse'){
-      return `<svg viewBox="0 0 ${W2} ${H2}">
-        <defs><radialGradient id="vg${d.id}" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="${d.accent}" stop-opacity=".5"/>
-          <stop offset="100%" stop-color="${d.accent}" stop-opacity="0"/>
-        </radialGradient></defs>
-        <g transform="translate(${W2/2} ${H2/2-8})">
-          <circle r="52" fill="url(#vg${d.id})"/>
-          <circle r="22" fill="none" stroke="${d.accent}" stroke-opacity=".3"/>
-          <circle r="36" fill="none" stroke="${d.accent}" stroke-opacity=".15"/>
-          <circle r="50" fill="none" stroke="${d.accent}" stroke-opacity=".08"/>
-          <circle r="7" fill="${d.accent}"><animate attributeName="r" values="7;11;7" dur="2.4s" repeatCount="indefinite"/></circle>
-        </g>
-        <polyline points="10,138 50,130 90,124 130,114 170,120 210,104 250,110 290,92 300,96"
-          fill="none" stroke="${d.accent}" stroke-opacity=".7" stroke-width="1.5"/>
-        <text x="10" y="20" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2">DECISIONS / DAY</text>
-        <text x="10" y="36" fill="#e6ecf5" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">38</text>
-      </svg>`;
-    }
-    if(d.viz==='mesh'){
-      const pts=[[55,45],[150,28],[248,50],[75,112],[175,124],[248,106]];
-      let lines=''; for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++)
-        lines+=`<line x1="${pts[i][0]}" y1="${pts[i][1]}" x2="${pts[j][0]}" y2="${pts[j][1]}" stroke="${d.accent}" stroke-opacity=".15"/>`;
-      let dots=''; pts.forEach((p,i)=>{
-        const live=i<1;
-        dots+=`<circle cx="${p[0]}" cy="${p[1]}" r="${live?5:3.5}" fill="${live?d.accent:'#3a4660'}" ${live?`stroke="${d.accent}" stroke-opacity=".4"`:''}>
-          ${live?`<animate attributeName="opacity" values=".5;1;.5" dur="${1.8+i*0.2}s" repeatCount="indefinite"/>`:''}
-        </circle>`;
-      });
-      return `<svg viewBox="0 0 ${W2} ${H2}">${lines}
-        <path d="M55,45 Q150,78 248,50" fill="none" stroke="${d.accent}" stroke-width="1.3" stroke-dasharray="3 6" stroke-opacity=".65">
-          <animate attributeName="stroke-dashoffset" from="40" to="0" dur="1.8s" repeatCount="indefinite"/>
-        </path>${dots}
-        <text x="10" y="20" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2">EXEC SYNC</text>
-        <text x="10" y="36" fill="#e6ecf5" font-family="JetBrains Mono,monospace" font-size="13" font-weight="600">0 / 2</text>
-      </svg>`;
-    }
-    if(d.viz==='pipeline'){
-      const cols=[{x:20,h:85,label:'LEAD',n:24},{x:95,h:56,label:'PITCH',n:11},{x:170,h:32,label:'CLOSE',n:6},{x:245,h:16,label:'WON',n:3}];
-      let svg=''; cols.forEach(c=>{
-        svg+=`<rect x="${c.x}" y="${128-c.h}" width="46" height="${c.h}" rx="4" fill="${d.accent}" fill-opacity=".16" stroke="${d.accent}" stroke-opacity=".45"/>
-          <text x="${c.x+23}" y="143" text-anchor="middle" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="7" letter-spacing="2">${c.label}</text>
-          <text x="${c.x+23}" y="${128-c.h-5}" text-anchor="middle" fill="${d.accent}" font-family="JetBrains Mono,monospace" font-size="11" font-weight="600">${c.n}</text>`;
-      });
-      return `<svg viewBox="0 0 ${W2} ${H2}">${svg}
-        <text x="10" y="20" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2">PIPELINE · 24H</text>
-      </svg>`;
-    }
-    if(d.viz==='rack'){
-      let bars=''; for(let i=0;i<8;i++){
-        const y=34+i*13, w2=220-(i%3)*38;
-        bars+=`<rect x="38" y="${y}" width="${w2}" height="7" rx="2" fill="#0f1623" stroke="#1a2435"/>
-          <rect x="38" y="${y}" width="${w2*0.55+(i%4)*9}" height="7" rx="2" fill="${d.accent}" fill-opacity=".55"/>
-          <circle cx="30" cy="${y+3.5}" r="2.5" fill="${i%2?d.accent:'#3a4660'}">
-            ${i%2?`<animate attributeName="opacity" values=".35;1;.35" dur="${1.4+i*0.1}s" repeatCount="indefinite"/>`:''}
-          </circle>`;
+  // Assign positions within rooms
+  const ROOM_SLOTS = { ceo:[[.5,.5]], suite:[[.35,.45],[.65,.55]], sales:[[.3,.48],[.68,.52]], ops:[[.22,.5],[.5,.45],[.78,.5]] };
+  AGENTS.forEach((ag, i) => {
+    const room = ROOMS.find(r => r.id === ag.roomId);
+    ag._room = room;
+    const slots = ROOM_SLOTS[ag.roomId] || [[.5,.5]];
+    const idx = AGENTS.filter(a => a.roomId===ag.roomId).indexOf(ag);
+    const slot = slots[idx % slots.length];
+    ag._bx = room.x + slot[0] * room.w; // base x
+    ag._by = room.y + slot[1] * room.h; // base y
+    ag._x = ag._bx;
+    ag._y = ag._by;
+    ag._phase = Math.random() * Math.PI * 2;
+    ag._bobSpeed = 0.018 + Math.random() * 0.01;
+    ag._bobAmp = ag.status === 'live' ? 5 : 2;
+    ag._pulsePhase = Math.random() * Math.PI * 2;
+  });
+
+  // ── PARTICLES (live agents only) ──
+  const liveAgs = AGENTS.filter(a => a.status === 'live');
+  const particles = [];
+  liveAgs.forEach((from, i) => {
+    liveAgs.forEach((to, j) => {
+      if (j <= i) return;
+      for (let k = 0; k < 6; k++) {
+        particles.push({ from, to, prog: k/6, speed: 0.004 + Math.random()*0.003 });
       }
-      return `<svg viewBox="0 0 ${W2} ${H2}">${bars}
-        <text x="10" y="20" fill="#5d6a82" font-family="JetBrains Mono,monospace" font-size="8" letter-spacing="2">SYSTEMS · RUNNING</text>
-      </svg>`;
-    }
-    return '';
-  }
-
-  // ── RENDER DEPT CARDS ──
-  function renderDepts() {
-    const $depts = document.getElementById('vo-depts');
-    if(!$depts) return;
-    $depts.innerHTML = VO_DEPTS.map(d=>{
-      const liveCount=d.agents.filter(a=>a.live).length;
-      const agentRows=d.agents.map(a=>`
-        <div class="vo-agent" data-aid="${a.id}" data-dept="${d.id}" style="--acc:${d.accent}">
-          <div class="vo-ava ${a.live?'live':'planned'}" style="--acc:${d.accent}">${a.emoji}</div>
-          <div class="vo-agent-meta">
-            <div class="vo-agent-nm">${a.name}</div>
-            <div class="vo-agent-rl">${a.role}</div>
-          </div>
-          <div class="vo-agent-act" style="color:${a.live?d.accent:'var(--muted)'}">${a.activity}</div>
-        </div>`).join('');
-      return `<div class="vo-dept" style="--acc:${d.accent}">
-        <span class="vo-corner tl"></span><span class="vo-corner tr"></span>
-        <span class="vo-corner bl"></span><span class="vo-corner br"></span>
-        <div class="vo-dept-hdr">
-          <div class="vo-dept-name"><span class="vo-dept-glyph">${d.glyph}</span>${d.name}</div>
-          <div class="vo-dept-stat">${liveCount}/${d.agents.length} ACTIVE</div>
-        </div>
-        <div class="vo-dept-body">
-          <div class="vo-agents">${agentRows}</div>
-          <div class="vo-viz" style="--acc:${d.accent}">${vizSvg(d)}<span class="vo-viz-legend">${d.id.toUpperCase()} · TELEMETRY</span></div>
-        </div>
-      </div>`;
-    }).join('');
-    // Click handler
-    $depts.addEventListener('click', e=>{
-      const row=e.target.closest('.vo-agent'); if(!row) return;
-      voSelectAgent(row.dataset.aid);
     });
-  }
+  });
 
-  // ── AGENT DETAIL PANEL ──
-  const voAllAgents = VO_DEPTS.flatMap(d=>d.agents.map(a=>({...a,deptName:d.name,deptAccent:d.accent})));
-  function voSelectAgent(id) {
-    const a=voAllAgents.find(x=>x.id===id)||voAllAgents[0];
-    document.querySelectorAll('.vo-agent').forEach(el=>el.classList.toggle('sel',el.dataset.aid===a.id));
-    const el=document.getElementById('vo-detail'); if(!el) return;
-    el.innerHTML=`<div class="vo-detail-inner">
-      <div class="vo-ad-h">
-        <div class="vo-ad-ava" style="--acc:${a.deptAccent}">${a.emoji}</div>
-        <div><div class="vo-ad-name">${a.name}</div><div class="vo-ad-role">${a.role}</div></div>
-        <div class="vo-ad-status" style="--acc:${a.deptAccent}">
-          <span class="vo-ad-sdot" style="background:${a.live?'var(--green)':'#475569'};box-shadow:${a.live?'0 0 10px var(--green)':'none'}"></span>
-          ${a.live?'LIVE':'PLANNED'}
-        </div>
-      </div>
-      <div class="vo-ad-grid">
-        <div class="vo-ad-cell"><div class="vo-ad-cell-l">Department</div><div class="vo-ad-cell-v">${a.deptName}</div></div>
-        <div class="vo-ad-cell"><div class="vo-ad-cell-l">Activity</div><div class="vo-ad-cell-v ${a.live?'live':''}">${a.activity}</div></div>
-        <div class="vo-ad-cell"><div class="vo-ad-cell-l">Tasks (24H)</div><div class="vo-ad-cell-v">${a.tasks}</div></div>
-        <div class="vo-ad-cell"><div class="vo-ad-cell-l">Current Focus</div><div class="vo-ad-cell-v">${a.focus}</div></div>
-      </div>
-    </div>`;
-  }
-
-  // ── SYSTEM FEED ──
-  const VO_FEED_SEEDS=[
-    {who:'ALEX',    body:'updated <b>Q3 expansion plan</b> with 3 new market lanes', cls:''},
-    {who:'THRIVE',  body:'resolved <b>17 client queries</b> — avg response 1.2s', cls:'info'},
-    {who:'SYS',     body:'knowledge base synced — <b>Discord</b> connector active', cls:'violet'},
-    {who:'ALEX',    body:'set priority: <b>Closer & Mailer deployment</b> next sprint', cls:''},
-    {who:'THRIVE',  body:'flagged <b>2 unanswered threads</b> for review', cls:'warn'},
-    {who:'SYS',     body:'agent <b>Rex COO</b> queued for activation', cls:'info'},
-    {who:'THRIVE',  body:'pushed <b>thrive-bot@2.1.0</b> to Railway production', cls:'violet'},
-    {who:'ALEX',    body:'approved <b>Ledger CFO</b> architecture proposal', cls:''},
+  // ── ACTIVITY BUBBLES ──
+  const BUBBLE_MSGS = [
+    'Query resolved ✓', 'Syncing KB…', 'Task complete ✓', 'Client replied 💬',
+    'Report generated 📊', 'Signal sent 📡', 'Processing… ⚡', 'Strategy updated 🎯',
+    'Discord ping 🤖', 'New question 🧠',
   ];
-  const VO_LIVE_EVENTS=[
-    {who:'ALEX',   body:'reviewed dashboard <b>v2.0</b> visual pass', cls:''},
-    {who:'THRIVE', body:'auto-resolved <b>3 tickets</b> in <b>0.9s</b> avg', cls:'info'},
-    {who:'SYS',    body:'memory pruned · <b>1.2 GB</b> reclaimed', cls:'violet'},
-    {who:'THRIVE', body:'drafted <b>5 follow-ups</b> awaiting approval', cls:'warn'},
-    {who:'ALEX',   body:'set Q3 OKR · <b>3x outbound throughput</b>', cls:''},
-    {who:'SYS',    body:'connector <b>Supabase</b> token refreshed', cls:'info'},
-    {who:'THRIVE', body:'dispatched standup digest to <b>#leadership</b>', cls:'info'},
-  ];
-  function voTStr(d=new Date()){return d.toTimeString().slice(0,5);}
-  function voPushFeed(item, atTop=true){
-    const $feed=document.getElementById('vo-feed'); if(!$feed) return;
-    const row=document.createElement('div');
-    row.className='vo-feed-row '+(item.cls||'');
-    row.innerHTML=`<div class="vo-feed-t">${item.time||voTStr()}</div>
-      <div class="vo-feed-ic">${(item.who||'·')[0]}</div>
-      <div class="vo-feed-body"><span class="vo-feed-who">${item.who}</span> ${item.body}</div>`;
-    if(atTop) $feed.prepend(row); else $feed.appendChild(row);
-    while($feed.children.length>18) $feed.lastChild.remove();
-  }
-  // Seed feed with backdated entries
-  const _now=new Date();
-  VO_FEED_SEEDS.forEach((s,i)=>{
-    const d=new Date(_now.getTime()-(i+1)*7*60*1000);
-    voPushFeed({...s,time:voTStr(d)},false);
-  });
-
-  // ── LIVE TICKERS ──
-  let voKpi={tph:128,resp:1.42,cpu:38,mem:62,api:1284,tok:48.21};
-  let voEvIdx=0;
-  function voRand(a,b){return Math.random()*(b-a)+a;}
-  function voTick(){
-    voKpi.tph=Math.max(80,voKpi.tph+voRand(-3,4));
-    voKpi.resp=Math.max(.9,Math.min(2.4,voKpi.resp+voRand(-.04,.04)));
-    voKpi.cpu=Math.max(15,Math.min(85,voKpi.cpu+voRand(-2,2)));
-    voKpi.mem=Math.max(35,Math.min(88,voKpi.mem+voRand(-1.2,1.2)));
-    voKpi.api=Math.max(800,voKpi.api+voRand(-30,40));
-    voKpi.tok=Math.max(40,voKpi.tok+voRand(-.05,.08));
-    const s=(n,d=0)=>n.toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});
-    const $=id=>document.getElementById(id);
-    if($('vo-tph'))   $('vo-tph').textContent=s(voKpi.tph);
-    if($('vo-resp'))  $('vo-resp').textContent=voKpi.resp.toFixed(2)+'s';
-    if($('vo-cpu'))   $('vo-cpu').textContent=Math.round(voKpi.cpu)+'%';
-    if($('vo-cpu-bar')) $('vo-cpu-bar').style.width=voKpi.cpu+'%';
-    if($('vo-mem'))   $('vo-mem').textContent=Math.round(voKpi.mem)+'%';
-    if($('vo-mem-bar')) $('vo-mem-bar').style.width=voKpi.mem+'%';
-    if($('vo-api'))   $('vo-api').textContent=s(voKpi.api);
-    if($('vo-api-bar')) $('vo-api-bar').style.width=(voKpi.api/2000*100)+'%';
-    if($('vo-tok'))   $('vo-tok').textContent='$'+voKpi.tok.toFixed(2);
-    if($('vo-tok-bar')) $('vo-tok-bar').style.width=(voKpi.tok/100*100)+'%';
-  }
-  const voTickInterval=setInterval(voTick,1500);
-  const voFeedInterval=setInterval(()=>{
-    voPushFeed(VO_LIVE_EVENTS[voEvIdx%VO_LIVE_EVENTS.length]);
-    voEvIdx++;
-  },6500);
-  // Store intervals so we can clear on panel switch if needed
-  officeRAF={_intervals:[voTickInterval,voFeedInterval]};
-
-  // ── INIT ──
-  renderDepts();
-  voSelectAgent('alex');
-  voTick();
-
-  // Agent workstation positions within each room (as room-relative fractions)
-  const WS_LAYOUTS={
-    ceo:   [{rx:0.5,ry:0.52}],
-    suite: [{rx:0.32,ry:0.52},{rx:0.68,ry:0.52}],
-    sales: [{rx:0.28,ry:0.52},{rx:0.68,ry:0.52}],
-    ops:   [{rx:0.2,ry:0.52},{rx:0.5,ry:0.52},{rx:0.8,ry:0.52}],
-  };
-
-  // Assign agents to workstations
-  const ROOM_MAP={'alex':'ceo','rex':'suite','ledger':'suite','closer':'sales','mailer':'sales','thrive-bot':'ops','dash':'ops','hunter':'ops'};
-  const roomAgents={ceo:[],suite:[],sales:[],ops:[]};
-  ALL_OFFICE_AGENTS.forEach(ag=>{
-    const rid=ROOM_MAP[ag.id]||'ops';
-    roomAgents[rid].push(ag);
-    const room=ROOMS.find(r=>r.id===rid);
-    const wsList=WS_LAYOUTS[rid]||[{rx:0.5,ry:0.5}];
-    const idx=roomAgents[rid].length-1;
-    const ws=wsList[idx%wsList.length];
-    ag._x=room.x+ws.rx*room.w;
-    ag._y=room.y+ws.ry*room.h;
-    ag._room=room;
-    ag._phase=Math.random()*Math.PI*2;
-  });
-
-  // Particles: data flowing between all live agents cross-room
-  const liveAgs=ALL_OFFICE_AGENTS.filter(a=>a.status==='live');
-  const particles=[];
-  if(liveAgs.length>=2){
-    for(let i=0;i<liveAgs.length;i++)
-      for(let j=i+1;j<liveAgs.length;j++)
-        for(let k=0;k<5;k++)
-          particles.push({from:liveAgs[i],to:liveAgs[j],prog:k/5,speed:0.0025+Math.random()*0.002,trail:[]});
-  }
-
-  const NOTIFS=['✓ Query resolved','📡 Signal sent','⚡ Processing','🔄 Syncing KB','✨ Task done','💬 Client reply','📊 Report built','🎯 Lead captured'];
-  const notifications=[];
-  let notifTimer=90;
-  const TICKER='  ●  THRIVE HQ ONLINE  ·  Alex CEO active  ·  Thrive Bot live on Discord  ·  Knowledge base synced  ·  Rex COO coming soon  ·  Ledger CFO coming soon  ·  Closer & Mailer in pipeline  ·  ';
-  let tickerX=W;
-  let mouseX=-999,mouseY=-999,hoveredAgent=null;
-  let t=0;
-
-  canvas.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();mouseX=e.clientX-r.left;mouseY=e.clientY-r.top;});
-  canvas.addEventListener('mouseleave',()=>{mouseX=-999;mouseY=-999;});
-  canvas.addEventListener('click',e=>{
-    const r=canvas.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;
-    let best=null,bestD=52;
-    ALL_OFFICE_AGENTS.forEach(ag=>{const d=Math.hypot(mx-ag._x,my-ag._y);if(d<bestD){bestD=d;best=ag;}});
-    if(best)selectAgent(best);
-  });
-
-  // ─────────────────────────────────────────
-  // DRAW HELPERS
-  // ─────────────────────────────────────────
-
-  function drawFloor(room){
-    const{x,y,w,h,color}=room;
-    // Base fill
-    const bg=ctx.createLinearGradient(x,y,x+w,y+h);
-    bg.addColorStop(0,'#0d1117'); bg.addColorStop(1,'#07090f');
-    ctx.fillStyle=bg; rr(x,y,w,h,16); ctx.fill();
-    // Subtle tile grid
-    ctx.save(); rr(x+2,y+2,w-4,h-4,14); ctx.clip();
-    ctx.strokeStyle=color+'0d'; ctx.lineWidth=1;
-    const gs=40;
-    for(let gx=x;gx<x+w;gx+=gs){ctx.beginPath();ctx.moveTo(gx,y);ctx.lineTo(gx,y+h);ctx.stroke();}
-    for(let gy=y;gy<y+h;gy+=gs){ctx.beginPath();ctx.moveTo(x,gy);ctx.lineTo(x+w,gy);ctx.stroke();}
-    // Corner vignette glow
-    const vg=ctx.createRadialGradient(x+w*0.5,y+h*0.5,0,x+w*0.5,y+h*0.5,Math.max(w,h)*0.7);
-    vg.addColorStop(0,color+'0a'); vg.addColorStop(1,'transparent');
-    ctx.fillStyle=vg; ctx.fillRect(x,y,w,h);
-    ctx.restore();
-  }
-
-  function drawRoomBorder(room){
-    const{x,y,w,h,color}=room;
-    // Outer glow
-    ctx.shadowColor=color; ctx.shadowBlur=20;
-    ctx.strokeStyle=color+'bb'; ctx.lineWidth=2;
-    rr(x,y,w,h,16); ctx.stroke();
-    ctx.shadowBlur=0;
-    // Inner accent line
-    ctx.strokeStyle=color+'28'; ctx.lineWidth=1;
-    rr(x+5,y+5,w-10,h-10,12); ctx.stroke();
-    // Corner accents
-    const cs=18;
-    ctx.strokeStyle=color+'cc'; ctx.lineWidth=2;
-    [[x+4,y+4,1,1],[x+w-4,y+4,-1,1],[x+4,y+h-4,1,-1],[x+w-4,y+h-4,-1,-1]].forEach(([cx,cy,sx,sy])=>{
-      ctx.beginPath(); ctx.moveTo(cx+sx*cs,cy); ctx.lineTo(cx,cy); ctx.lineTo(cx,cy+sy*cs); ctx.stroke();
+  const bubbles = [];
+  function spawnBubble() {
+    const ag = liveAgs[Math.floor(Math.random() * liveAgs.length)];
+    if (!ag) return;
+    bubbles.push({
+      x: ag._x, y: ag._y - 28,
+      text: BUBBLE_MSGS[Math.floor(Math.random() * BUBBLE_MSGS.length)],
+      color: ag.color, life: 1.0, vx: (Math.random()-.5)*0.4, vy: -0.5,
     });
-  }
-
-  function drawRoomLabel(room){
-    const{x,y,w,color,label}=room;
-    ctx.font='700 10px "Space Mono",monospace';
-    const lw=ctx.measureText(label).width;
-    ctx.fillStyle=color+'20'; ctx.strokeStyle=color+'55'; ctx.lineWidth=1;
-    rr(x+14,y+10,lw+20,20,4); ctx.fill(); ctx.stroke();
-    ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=10;
-    ctx.fillText(label,x+24,y+24); ctx.shadowBlur=0;
-  }
-
-  // Executive desk — top-down view
-  function drawDesk(ax,ay,color,live){
-    const DW=70,DH=36;
-    // Desk top surface
-    const dg=ctx.createLinearGradient(ax-DW/2,ay-DH/2,ax+DW/2,ay+DH/2);
-    dg.addColorStop(0,'#1a2240'); dg.addColorStop(1,'#111827');
-    ctx.fillStyle=dg; ctx.strokeStyle=color+(live?'99':'33'); ctx.lineWidth=live?2:1;
-    rr(ax-DW/2,ay-DH/2,DW,DH,6); ctx.fill(); ctx.stroke();
-    // Desk edge highlight
-    ctx.fillStyle=color+(live?'55':'1a');
-    ctx.fillRect(ax-DW/2+6,ay-DH/2,DW-12,2);
-    // Monitor — top-down silhouette
-    const mw=30,mh=20;
-    ctx.fillStyle='#0a0d14'; ctx.strokeStyle=color+(live?'cc':'44'); ctx.lineWidth=live?1.5:1;
-    rr(ax-mw/2,ay-DH/2-mh-2,mw,mh,3); ctx.fill(); ctx.stroke();
-    // Screen glow
-    if(live){
-      const pulse=0.5+0.5*Math.sin(t*0.05+ax*0.03);
-      const sg=ctx.createLinearGradient(ax-12,ay-DH/2-mh,ax+12,ay-DH/2-2);
-      sg.addColorStop(0,color+'ff'); sg.addColorStop(0.5,color+'88'); sg.addColorStop(1,color+'11');
-      ctx.globalAlpha=pulse*0.9; ctx.fillStyle=sg;
-      rr(ax-12,ay-DH/2-mh+2,24,mh-4,2); ctx.fill(); ctx.globalAlpha=1;
-      // Screen data lines
-      ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='5px monospace';
-      ctx.textAlign='center';
-      ['███ ██','█ ███','██ █ █'].forEach((l,i)=>ctx.fillText(l,ax,ay-DH/2-mh+8+i*5));
-      ctx.textAlign='left';
-    } else {
-      ctx.fillStyle=color+'18';
-      rr(ax-12,ay-DH/2-mh+2,24,mh-4,2); ctx.fill();
-    }
-    // Keyboard
-    ctx.fillStyle='#1a2035'; ctx.strokeStyle=color+'33'; ctx.lineWidth=1;
-    rr(ax-18,ay-DH/2+DH*0.35,36,8,2); ctx.fill(); ctx.stroke();
-    // Mouse
-    rr(ax+24,ay-DH/2+DH*0.3,8,12,4); ctx.fill(); ctx.stroke();
-    // Coffee
-    ctx.fillStyle='#2a3042'; ctx.strokeStyle=color+'44'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.arc(ax-DW/2+10,ay-DH/2+DH*0.6,5,0,Math.PI*2); ctx.fill(); ctx.stroke();
-    if(live){
-      const sta=0.3+0.3*Math.sin(t*0.07+ax);
-      ctx.strokeStyle=`rgba(200,180,160,${sta})`; ctx.lineWidth=0.8;
-      ctx.beginPath(); ctx.moveTo(ax-DW/2+10,ay-DH/2+DH*0.6-5); ctx.quadraticCurveTo(ax-DW/2+14,ay-DH/2+DH*0.6-10,ax-DW/2+10,ay-DH/2+DH*0.6-14); ctx.stroke();
-    }
-  }
-
-  // Bookshelf — top-down
-  function drawShelf(x,y,w,h,color){
-    ctx.fillStyle='#161d2e'; ctx.strokeStyle='#232d42'; ctx.lineWidth=1.5;
-    rr(x,y,w,h,3); ctx.fill(); ctx.stroke();
-    const bcolors=['#d4a843','#7c3aed','#22d3a0','#ef4444','#3b82f6','#ec4899','#f59e0b'];
-    const bw=Math.floor((w-8)/bcolors.length);
-    bcolors.forEach((c,i)=>{
-      ctx.fillStyle=c+'cc';
-      ctx.fillRect(x+4+i*(bw+1),y+3,bw,h-6);
-    });
-    ctx.fillStyle=color+'44'; ctx.fillRect(x,y,w,2);
-  }
-
-  // Meeting table — top-down oval
-  function drawMeetingTable(x,y,w,h,color){
-    const tg=ctx.createLinearGradient(x,y,x,y+h);
-    tg.addColorStop(0,'#1a2240'); tg.addColorStop(1,'#0f1624');
-    ctx.fillStyle=tg; ctx.strokeStyle=color+'66'; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
-    // Table reflection
-    ctx.fillStyle='rgba(255,255,255,0.04)';
-    ctx.beginPath(); ctx.ellipse(x+w/2-4,y+h/2-4,w/4,h/4,0,0,Math.PI*2); ctx.fill();
-    // Chairs around table
-    const chairs=6; const cr=8;
-    for(let c=0;c<chairs;c++){
-      const ang=(c/chairs)*Math.PI*2-Math.PI/2;
-      const cx=x+w/2+Math.cos(ang)*(w/2+14);
-      const cy=y+h/2+Math.sin(ang)*(h/2+14);
-      ctx.fillStyle='#1e2a3a'; ctx.strokeStyle=color+'44'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.arc(cx,cy,cr,0,Math.PI*2); ctx.fill(); ctx.stroke();
-    }
-    // Glowing laptop on table
-    const pulse2=0.4+0.6*Math.sin(t*0.06);
-    ctx.fillStyle=color+Math.floor(pulse2*160+40).toString(16).padStart(2,'0');
-    rr(x+w/2-10,y+h/2-7,20,14,3); ctx.fill();
-  }
-
-  // Server rack — top-down
-  function drawServerRack(x,y,w,h,color){
-    ctx.fillStyle='#0d1117'; ctx.strokeStyle=color+'44'; ctx.lineWidth=1.5;
-    rr(x,y,w,h,3); ctx.fill(); ctx.stroke();
-    const slots=Math.floor(h/12);
-    for(let s=0;s<slots;s++){
-      const sl=0.4+0.6*Math.sin(t*0.08+s*1.4);
-      const sg=ctx.createLinearGradient(x+4,y+4+s*12,x+w-4,y+4+s*12+9);
-      sg.addColorStop(0,color+Math.floor(sl*180+20).toString(16).padStart(2,'0'));
-      sg.addColorStop(1,color+'11');
-      ctx.fillStyle=sg; ctx.fillRect(x+4,y+4+s*12,w-16,9);
-      const leds=['#22d3a0','#3b82f6','#22d3a0','#22d3a0','#f59e0b'];
-      const lc=leds[s%leds.length];
-      ctx.fillStyle=lc; ctx.shadowColor=lc; ctx.shadowBlur=8*sl;
-      ctx.beginPath(); ctx.arc(x+w-8,y+8+s*12,3,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
-    }
-  }
-
-  // Whiteboard — top-down (thin rectangle against wall)
-  function drawWall_Whiteboard(x,y,w,h,color,label){
-    ctx.fillStyle='#e8eef8'; ctx.strokeStyle=color+'88'; ctx.lineWidth=2;
-    rr(x,y,w,h,2); ctx.fill(); ctx.stroke();
-    // Content lines
-    ctx.strokeStyle=color+'99'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(x+6,y+h*0.35); ctx.lineTo(x+w-6,y+h*0.35); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(x+6,y+h*0.6); ctx.lineTo(x+w*0.7,y+h*0.6); ctx.stroke();
-    ctx.fillStyle=color+'cc'; ctx.font='bold 7px "Space Mono",monospace';
-    ctx.textAlign='center'; ctx.fillText(label||'',x+w/2,y+h*0.2); ctx.textAlign='left';
-    // Glow on board
-    ctx.fillStyle=color+'22'; rr(x,y,w,h,2); ctx.fill();
-  }
-
-  // Plant — top-down
-  function drawPlantTopDown(x,y,color){
-    // Pot
-    ctx.fillStyle='#3d2b1f'; ctx.strokeStyle='#5c4030'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.arc(x,y,9,0,Math.PI*2); ctx.fill(); ctx.stroke();
-    // Soil
-    ctx.fillStyle='#2d1f15'; ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2); ctx.fill();
-    // Leaves (top-down view — spread circles)
-    const leafA=0.8+0.2*Math.sin(t*0.03+x);
-    ctx.fillStyle='#16a34a'; ctx.globalAlpha=leafA;
-    [[x-7,y-4,7],[x+6,y-5,6],[x-4,y+7,6],[x+5,y+6,5],[x,y,8]].forEach(([lx,ly,lr])=>{
-      ctx.beginPath(); ctx.arc(lx,ly,lr,0,Math.PI*2); ctx.fill();
-    });
-    ctx.fillStyle='#22c55e'; ctx.globalAlpha=leafA*0.8;
-    ctx.beginPath(); ctx.arc(x,y,5,0,Math.PI*2); ctx.fill();
-    ctx.globalAlpha=1;
-  }
-
-  // Pipeline kanban board
-  function drawPipeline(x,y,w,h,color){
-    ctx.fillStyle='#0d1117'; ctx.strokeStyle=color+'44'; ctx.lineWidth=1;
-    rr(x,y,w,h,4); ctx.fill(); ctx.stroke();
-    const cols=3,cw=(w-8)/cols;
-    const stages=['LEAD','PITCH','CLOSE'];
-    const stageColors=['#3b82f6','#f59e0b','#22d3a0'];
-    stages.forEach((s,i)=>{
-      ctx.fillStyle=stageColors[i]+'22';
-      ctx.fillRect(x+4+i*cw,y+4,cw-2,h-8);
-      ctx.font='600 7px "Space Mono",monospace';
-      ctx.fillStyle=stageColors[i]+'cc';
-      ctx.textAlign='center'; ctx.fillText(s,x+4+i*cw+cw/2,y+12); ctx.textAlign='left';
-      // Cards
-      const cards=i===0?3:i===1?2:1;
-      for(let c=0;c<cards;c++){
-        ctx.fillStyle=stageColors[i]+'55'; ctx.strokeStyle=stageColors[i]+'88'; ctx.lineWidth=0.5;
-        rr(x+6+i*cw,y+16+c*10,cw-6,8,2); ctx.fill(); ctx.stroke();
-      }
-    });
-  }
-
-  // ── ROOM DRAW ──
-  function drawRoom(room){
-    const{id,x,y,w,h,color}=room;
-    drawFloor(room);
-    // Room-specific furniture
-    ctx.save(); rr(x+2,y+2,w-4,h-4,14); ctx.clip();
-
-    if(id==='ceo'){
-      // Bookshelf along left wall
-      drawShelf(x+14,y+16,w*0.12,h*0.5,color);
-      // Plant corner
-      drawPlantTopDown(x+w-24,y+22,color);
-      drawPlantTopDown(x+22,y+h-24,color);
-      // Centered executive desk (drawn by agent system)
-    }
-    if(id==='suite'){
-      // Whiteboard on left wall
-      drawWall_Whiteboard(x+12,y+14,8,h*0.45,color,'Q1');
-      // Big meeting table centred
-      drawMeetingTable(x+w*0.25,y+h*0.25,w*0.55,h*0.5,color);
-      drawPlantTopDown(x+w-22,y+20,color);
-      drawPlantTopDown(x+w-22,y+h-22,color);
-    }
-    if(id==='sales'){
-      // Pipeline board on top wall
-      drawPipeline(x+14,y+14,w*0.38,h*0.28,color);
-      // Whiteboard right wall
-      drawWall_Whiteboard(x+w-20,y+14,8,h*0.4,color,'ROI');
-      drawPlantTopDown(x+20,y+h-24,color);
-      drawPlantTopDown(x+w-22,y+h-24,color);
-    }
-    if(id==='ops'){
-      // Server rack left wall
-      drawServerRack(x+10,y+16,22,h*0.55,color);
-      // Monitoring dashboard panel
-      const pw=w*0.3,ph=h*0.28;
-      ctx.fillStyle='#0a0d14'; ctx.strokeStyle=color+'55'; ctx.lineWidth=1;
-      rr(x+w-pw-14,y+14,pw,ph,4); ctx.fill(); ctx.stroke();
-      // Mini charts inside
-      for(let b=0;b<5;b++){
-        const bh=(0.3+0.7*Math.sin(t*0.04+b*1.3))*(ph-14);
-        const bc=['#22d3a0','#3b82f6','#7c3aed','#f59e0b','#22d3a0'][b];
-        ctx.fillStyle=bc+'cc';
-        ctx.fillRect(x+w-pw-14+8+b*((pw-16)/5),y+14+ph-6-bh,(pw-16)/5-2,bh);
-      }
-      ctx.fillStyle=color+'99'; ctx.font='600 6px "Space Mono",monospace';
-      ctx.fillText('SYS STATUS',x+w-pw-14+6,y+22);
-      drawPlantTopDown(x+w-20,y+h-22,color);
-    }
-
-    ctx.restore();
-    drawRoomBorder(room);
-    drawRoomLabel(room);
-  }
-
-  // ── AGENT NODE ──
-  function drawAgentNode(ag){
-    const live=ag.status==='live';
-    const isSel=selectedAgent&&selectedAgent.id===ag.id;
-    const isHov=hoveredAgent&&hoveredAgent.id===ag.id;
-    const ax=ag._x, ay=ag._y;
-    const pulse=0.55+0.45*Math.sin(t*0.07+ag._phase);
-
-    // Draw desk beneath
-    drawDesk(ax,ay,ag.color,live);
-
-    // Agent glow halo
-    if(live){
-      const glow=ctx.createRadialGradient(ax,ay,0,ax,ay,48);
-      glow.addColorStop(0,ag.color+'30'); glow.addColorStop(0.5,ag.color+'10'); glow.addColorStop(1,'transparent');
-      ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(ax,ay,48,0,Math.PI*2); ctx.fill();
-    }
-
-    // Selection/hover ring
-    if(isSel){
-      ctx.strokeStyle=ag.color; ctx.lineWidth=2.5;
-      ctx.shadowColor=ag.color; ctx.shadowBlur=20;
-      ctx.beginPath(); ctx.arc(ax,ay,22,0,Math.PI*2); ctx.stroke(); ctx.shadowBlur=0;
-    } else if(isHov){
-      ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=2;
-      ctx.beginPath(); ctx.arc(ax,ay,20,0,Math.PI*2); ctx.stroke();
-    }
-
-    // Outer ring (planned agents: dashed)
-    ctx.strokeStyle=ag.color+(live?'dd':'55'); ctx.lineWidth=live?2:1.5;
-    if(!live){ ctx.setLineDash([4,4]); }
-    ctx.shadowColor=live?ag.color:'transparent'; ctx.shadowBlur=live?16*pulse:0;
-    ctx.beginPath(); ctx.arc(ax,ay,16,0,Math.PI*2); ctx.stroke();
-    ctx.setLineDash([]); ctx.shadowBlur=0;
-
-    // Inner fill circle
-    const ig=ctx.createRadialGradient(ax-3,ay-3,0,ax,ay,14);
-    ig.addColorStop(0,live?ag.color+'ff':ag.color+'44');
-    ig.addColorStop(0.5,live?ag.color+'cc':ag.color+'22');
-    ig.addColorStop(1,live?ag.color+'66':'transparent');
-    ctx.fillStyle=ig;
-    ctx.beginPath(); ctx.arc(ax,ay,14,0,Math.PI*2); ctx.fill();
-
-    // Avatar emoji (small, centered)
-    ctx.font=`${live?13:11}px serif`;
-    ctx.textAlign='center';
-    ctx.globalAlpha=live?1:0.5;
-    ctx.fillText(ag.avatar,ax,ay+5);
-    ctx.globalAlpha=1;
-    ctx.textAlign='left';
-
-    // Live pulse ring animation
-    if(live){
-      const ringR=18+pulse*8;
-      ctx.strokeStyle=ag.color+Math.floor((1-pulse)*140).toString(16).padStart(2,'0');
-      ctx.lineWidth=1;
-      ctx.beginPath(); ctx.arc(ax,ay,ringR,0,Math.PI*2); ctx.stroke();
-    }
-
-    // Status dot top-right
-    const dotColor=live?'#22d3a0':'#475569';
-    ctx.fillStyle=dotColor; ctx.shadowColor=live?dotColor:'transparent'; ctx.shadowBlur=live?10*pulse:0;
-    ctx.beginPath(); ctx.arc(ax+13,ay-13,4.5,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
-
-    // Name label
-    ctx.font=`${live?'700':'400'} 10px "Space Mono",monospace`;
-    const nw=ctx.measureText(ag.name).width;
-    ctx.globalAlpha=live?1:isHov||isSel?0.8:0.45;
-    ctx.fillStyle='rgba(5,8,18,0.9)';
-    ctx.strokeStyle=ag.color+(live?'88':'33'); ctx.lineWidth=1;
-    rr(ax-nw/2-8,ay+20,nw+16,16,8); ctx.fill(); ctx.stroke();
-    ctx.fillStyle=live?ag.color:'#64748b';
-    ctx.textAlign='center'; ctx.fillText(ag.name,ax,ay+31); ctx.textAlign='left';
-    ctx.globalAlpha=1;
-
-    // Activity text (live only, subtle)
-    if(live){
-      ctx.font='9px "Space Grotesk",sans-serif';
-      ctx.fillStyle='rgba(255,255,255,0.35)';
-      const act=ag.activity||'';
-      ctx.textAlign='center'; ctx.fillText(act,ax,ay+43); ctx.textAlign='left';
-    }
-  }
-
-  // ── DATA PARTICLES ──
-  function drawParticles(){
-    particles.forEach(p=>{
-      p.prog+=p.speed; if(p.prog>=1)p.prog=0;
-      const cpx=(p.from._x+p.to._x)/2+Math.sin(p.from._phase+t*0.005)*60;
-      const cpy=(p.from._y+p.to._y)/2+Math.cos(p.to._phase+t*0.005)*40;
-      const tt=p.prog;
-      const bx=(1-tt)*(1-tt)*p.from._x+2*(1-tt)*tt*cpx+tt*tt*p.to._x;
-      const by=(1-tt)*(1-tt)*p.from._y+2*(1-tt)*tt*cpy+tt*tt*p.to._y;
-      p.trail.push({x:bx,y:by});
-      if(p.trail.length>18)p.trail.shift();
-      p.trail.forEach((pt,i)=>{
-        const a=i/p.trail.length;
-        ctx.beginPath(); ctx.arc(pt.x,pt.y,2*a,0,Math.PI*2);
-        ctx.fillStyle=p.from.color+Math.floor(a*170).toString(16).padStart(2,'0');
-        ctx.fill();
-      });
-      // Head glow
-      ctx.fillStyle=p.from.color;
-      ctx.shadowColor=p.from.color; ctx.shadowBlur=14;
-      ctx.beginPath(); ctx.arc(bx,by,4,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
-    });
-  }
-
-  // ── CONNECTION LINES between live agents ──
-  function drawConnections(){
-    if(liveAgs.length<2)return;
-    for(let i=0;i<liveAgs.length;i++){
-      for(let j=i+1;j<liveAgs.length;j++){
-        const a=liveAgs[i],b=liveAgs[j];
-        const pulse=0.3+0.2*Math.sin(t*0.03+i+j);
-        ctx.strokeStyle=a.color+Math.floor(pulse*80).toString(16).padStart(2,'0');
-        ctx.lineWidth=1;
-        ctx.setLineDash([6,10]);
-        ctx.beginPath(); ctx.moveTo(a._x,a._y); ctx.lineTo(b._x,b._y); ctx.stroke();
-        ctx.setLineDash([]);
-      }
-    }
-  }
-
-  // ── NOTIFICATIONS ──
-  function updateNotifications(){
-    notifTimer--;
-    if(notifTimer<=0){
-      notifTimer=100+Math.random()*180;
-      if(liveAgs.length){
-        const ag=liveAgs[Math.floor(Math.random()*liveAgs.length)];
-        notifications.push({x:ag._x,y:ag._y-30,msg:NOTIFS[Math.floor(Math.random()*NOTIFS.length)],color:ag.color,life:1,vy:-0.4});
-      }
-    }
-    for(let i=notifications.length-1;i>=0;i--){
-      const n=notifications[i];
-      n.y+=n.vy; n.life-=0.012;
-      if(n.life<=0){notifications.splice(i,1);continue;}
-      ctx.globalAlpha=Math.min(1,n.life*3);
-      ctx.font='700 9px "Space Mono",monospace';
-      const nw=ctx.measureText(n.msg).width;
-      ctx.fillStyle='rgba(5,8,18,0.94)';
-      ctx.strokeStyle=n.color+'88'; ctx.lineWidth=1;
-      rr(n.x-nw/2-8,n.y-12,nw+16,16,8); ctx.fill(); ctx.stroke();
-      ctx.fillStyle=n.color; ctx.shadowColor=n.color; ctx.shadowBlur=6;
-      ctx.textAlign='center'; ctx.fillText(n.msg,n.x,n.y); ctx.textAlign='left';
-      ctx.shadowBlur=0; ctx.globalAlpha=1;
-    }
   }
 
   // ── TICKER ──
-  function drawTicker(){
-    const TY=H-TICKER_H;
-    ctx.fillStyle='rgba(5,8,18,0.98)'; ctx.fillRect(0,TY,W,TICKER_H);
-    ctx.strokeStyle='rgba(212,168,67,0.35)'; ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(0,TY); ctx.lineTo(W,TY); ctx.stroke();
-    ctx.font='700 9px "Space Mono",monospace';
-    const tw=ctx.measureText(TICKER).width;
-    tickerX-=1.4; if(tickerX<-tw)tickerX=W;
-    ctx.fillStyle='#d4a843'; ctx.fillText(TICKER+TICKER,tickerX,TY+19);
-    // Live pulse
-    const lp=0.5+0.5*Math.sin(t*0.12);
-    ctx.fillStyle='#22d3a0'; ctx.shadowColor='#22d3a0'; ctx.shadowBlur=10*lp;
-    ctx.beginPath(); ctx.arc(W-52,TY+15,4,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
-    ctx.fillStyle='#22d3a0'; ctx.font='700 8px "Space Mono",monospace';
-    ctx.fillText('LIVE',W-44,TY+19);
+  const TICKER = '  ●  THRIVE HQ ONLINE  ·  Alex CEO active  ·  Thrive Bot live on Discord  ·  Knowledge base synced  ·  Rex COO coming soon  ·  Ledger CFO coming soon  ·  Closer & Mailer in pipeline  ·  ';
+  let tickerX = W;
+
+  // ── TOOLTIP ──
+  const tooltip = document.getElementById('vo-tooltip');
+  let hoveredAgent = null;
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    let best = null, bestD = 36;
+    AGENTS.forEach(ag => {
+      const d = Math.hypot(mx - ag._x, my - ag._y);
+      if (d < bestD) { bestD = d; best = ag; }
+    });
+    hoveredAgent = best;
+    if (best) {
+      const liveCol = best.status === 'live' ? best.color : '#475569';
+      tooltip.style.display = 'block';
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+      tooltip.innerHTML = `
+        <div class="vo-tt-name" style="color:${best.color}">${best.emoji} ${best.name}</div>
+        <div class="vo-tt-role">${best.role}</div>
+        <div class="vo-tt-act" style="background:${liveCol}22;color:${liveCol};border:1px solid ${liveCol}44">${best.activity}</div>`;
+    } else {
+      tooltip.style.display = 'none';
+    }
+  });
+  canvas.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; hoveredAgent = null; });
+
+  // ── DRAW HELPERS ──
+  function drawRoom(room) {
+    const { x, y, w, h, color, label } = room;
+
+    // Floor fill
+    const bg = ctx.createLinearGradient(x, y, x+w, y+h);
+    bg.addColorStop(0, '#0d1117'); bg.addColorStop(1, '#07090f');
+    ctx.fillStyle = bg;
+    rr(x, y, w, h, 16); ctx.fill();
+
+    // Tile grid
+    ctx.save();
+    rr(x+2, y+2, w-4, h-4, 14); ctx.clip();
+    ctx.strokeStyle = color + '14'; ctx.lineWidth = 1;
+    for (let gx = x; gx < x+w; gx += 44) { ctx.beginPath(); ctx.moveTo(gx, y); ctx.lineTo(gx, y+h); ctx.stroke(); }
+    for (let gy = y; gy < y+h; gy += 44) { ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x+w, gy); ctx.stroke(); }
+
+    // Room glow
+    const vg = ctx.createRadialGradient(x+w*.5, y+h*.5, 0, x+w*.5, y+h*.5, Math.max(w,h)*.65);
+    vg.addColorStop(0, color + '0e'); vg.addColorStop(1, 'transparent');
+    ctx.fillStyle = vg; ctx.fillRect(x, y, w, h);
+    ctx.restore();
+
+    // Border glow
+    ctx.shadowColor = color; ctx.shadowBlur = 18;
+    ctx.strokeStyle = color + 'aa'; ctx.lineWidth = 1.5;
+    rr(x, y, w, h, 16); ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Corner brackets
+    const cs = 16;
+    ctx.strokeStyle = color + 'cc'; ctx.lineWidth = 2;
+    [[x+4,y+4,1,1],[x+w-4,y+4,-1,1],[x+4,y+h-4,1,-1],[x+w-4,y+h-4,-1,-1]].forEach(([cx,cy,sx,sy]) => {
+      ctx.beginPath(); ctx.moveTo(cx+sx*cs, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy+sy*cs); ctx.stroke();
+    });
+
+    // Label badge
+    ctx.font = '700 9px "Space Mono",monospace';
+    const lw = ctx.measureText(label).width;
+    ctx.fillStyle = color + '1a'; ctx.strokeStyle = color + '55'; ctx.lineWidth = 1;
+    rr(x+12, y+10, lw+20, 20, 5); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 8;
+    ctx.fillText(label, x+22, y+23); ctx.shadowBlur = 0;
   }
+
+  function drawAgent(ag, t) {
+    const live = ag.status === 'live';
+    const bob = Math.sin(t * ag._bobSpeed + ag._phase) * ag._bobAmp;
+    const x = ag._x, y = ag._y + bob;
+    const pulse = 0.5 + 0.5 * Math.sin(t * 0.05 + ag._pulsePhase);
+    const r = live ? 20 : 14;
+    const color = ag.color;
+
+    if (live) {
+      // Outer glow ring
+      ctx.beginPath(); ctx.arc(x, y, r + 10 + pulse*6, 0, Math.PI*2);
+      const grd = ctx.createRadialGradient(x, y, r, x, y, r+16+pulse*6);
+      grd.addColorStop(0, color + '55'); grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd; ctx.fill();
+
+      // Pulse ring
+      ctx.beginPath(); ctx.arc(x, y, r + 4 + pulse*8, 0, Math.PI*2);
+      ctx.strokeStyle = color + Math.floor((1-pulse)*140+40).toString(16).padStart(2,'0');
+      ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    // Main circle
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    const cg = ctx.createRadialGradient(x-r*.3, y-r*.3, 0, x, y, r);
+    cg.addColorStop(0, live ? color + 'ff' : color + '55');
+    cg.addColorStop(1, live ? color + 'aa' : color + '22');
+    ctx.fillStyle = cg;
+    if (live) { ctx.shadowColor = color; ctx.shadowBlur = 22; }
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Border
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.strokeStyle = live ? color : color + '66';
+    ctx.lineWidth = live ? 2 : 1;
+    ctx.stroke();
+
+    // Emoji
+    ctx.font = `${live ? 16 : 11}px serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.globalAlpha = live ? 1 : 0.5;
+    ctx.fillText(ag.emoji, x, y);
+    ctx.globalAlpha = 1;
+
+    // Name label
+    ctx.font = live ? '600 10px "Space Grotesk",sans-serif' : '500 9px "Space Grotesk",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillStyle = live ? '#f0f4ff' : '#4a5568';
+    ctx.fillText(ag.name, x, y + r + 5);
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  function drawParticles(t) {
+    particles.forEach(p => {
+      p.prog += p.speed;
+      if (p.prog > 1) p.prog -= 1;
+      const fx = p.from._x, fy = p.from._y;
+      const tx = p.to._x, ty = p.to._y;
+      const px = fx + (tx-fx)*p.prog, py = fy + (ty-fy)*p.prog;
+      const alpha = Math.sin(p.prog * Math.PI);
+      ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI*2);
+      ctx.fillStyle = p.from.color + Math.floor(alpha*220).toString(16).padStart(2,'0');
+      ctx.shadowColor = p.from.color; ctx.shadowBlur = 8*alpha;
+      ctx.fill(); ctx.shadowBlur = 0;
+    });
+  }
+
+  function drawConnectionLines() {
+    liveAgs.forEach((a, i) => {
+      liveAgs.forEach((b, j) => {
+        if (j <= i) return;
+        ctx.beginPath(); ctx.moveTo(a._x, a._y); ctx.lineTo(b._x, b._y);
+        ctx.strokeStyle = a.color + '18'; ctx.lineWidth = 1;
+        ctx.setLineDash([4, 10]); ctx.stroke(); ctx.setLineDash([]);
+      });
+    });
+  }
+
+  function drawBubbles() {
+    for (let i = bubbles.length-1; i >= 0; i--) {
+      const b = bubbles[i];
+      b.x += b.vx; b.y += b.vy; b.life -= 0.012;
+      if (b.life <= 0) { bubbles.splice(i, 1); continue; }
+      const alpha = Math.min(1, b.life * 3);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.font = '500 10px "Space Grotesk",sans-serif';
+      const tw = ctx.measureText(b.text).width;
+      rr(b.x - tw/2 - 8, b.y - 12, tw + 16, 22, 8);
+      ctx.fillStyle = '#0d1117'; ctx.strokeStyle = b.color + '88'; ctx.lineWidth = 1;
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#f0f4ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(b.text, b.x, b.y);
+      ctx.restore();
+    }
+  }
+
+  function drawTicker() {
+    const ty = H - TICKER_H;
+    ctx.fillStyle = '#07090f'; ctx.fillRect(0, ty, W, TICKER_H);
+    ctx.strokeStyle = 'rgba(212,168,67,0.2)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, ty); ctx.lineTo(W, ty); ctx.stroke();
+    ctx.font = '500 10px "Space Mono",monospace';
+    ctx.fillStyle = '#d4a843';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(TICKER + TICKER, tickerX, ty + TICKER_H/2);
+    const tw = ctx.measureText(TICKER).width;
+    tickerX -= 1.2;
+    if (tickerX < -tw) tickerX = W;
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  // ── BUBBLE SPAWN TIMER ──
+  let bubbleTimer = 0;
+  let t = 0;
 
   // ── MAIN LOOP ──
-  function loop(){
-    try{
+  function loop() {
+    try {
       t++;
-      ctx.clearRect(0,0,W,H);
-      ctx.fillStyle='#07090f'; ctx.fillRect(0,0,W,H);
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#07090f'; ctx.fillRect(0, 0, W, H);
 
-      // Draw rooms
-      ROOMS.forEach(r=>drawRoom(r));
-
-      // Dividers (subtle)
-      ctx.strokeStyle='rgba(212,168,67,0.08)'; ctx.lineWidth=1;
-      ctx.setLineDash([4,12]);
-      ctx.beginPath(); ctx.moveTo(PAD+RW+GAP/2,PAD); ctx.lineTo(PAD+RW+GAP/2,H-TICKER_H); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(PAD,PAD+RH+GAP/2); ctx.lineTo(W-PAD,PAD+RH+GAP/2); ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Connection lines (under particles)
-      drawConnections();
-
-      // Particles
-      drawParticles();
-
-      // Agent nodes
-      hoveredAgent=null;
-      ALL_OFFICE_AGENTS.forEach(ag=>{if(Math.hypot(mouseX-ag._x,mouseY-ag._y)<28)hoveredAgent=ag;});
-      ALL_OFFICE_AGENTS.forEach(ag=>drawAgentNode(ag));
-
-      // Notifications
-      updateNotifications();
-
-      // Ticker
+      ROOMS.forEach(r => drawRoom(r));
+      drawConnectionLines();
+      drawParticles(t);
+      AGENTS.forEach(ag => drawAgent(ag, t));
+      drawBubbles();
       drawTicker();
 
-    }catch(err){console.error('Office render error:',err);}
-    officeRAF=requestAnimationFrame(loop);
+      // Spawn activity bubble every ~5s
+      bubbleTimer++;
+      if (bubbleTimer > 300) { spawnBubble(); bubbleTimer = 0; }
+
+    } catch(err) { console.error('Office render error:', err); }
+    officeRAF = requestAnimationFrame(loop);
   }
   loop();
-}
+</ENDOFJS
+
+echo "Written $(wc -l < /tmp/new_office.js) lines"
+
+
 
 // ── ORG CHART ──
 function agentCardHTML(agent) {
