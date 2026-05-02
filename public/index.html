@@ -585,8 +585,8 @@ async function loadKPIs() {
     const escsCount = Array.isArray(escRes) ? escRes.length : 0;
 
     if (snap) snap.innerHTML = `
-      <div class="stat-card"><div class="stat-label">Revenue (${month})</div><div class="stat-value" style="color:var(--green);">${revenue!=null?'£'+Number(revenue).toLocaleString('en-GB',{minimumFractionDigits:0}):'—'}</div><div class="stat-sub">Stripe · this month</div></div>
-      <div class="stat-card"><div class="stat-label">Stripe Balance</div><div class="stat-value">${balance!=null?'£'+Number(balance).toLocaleString('en-GB',{minimumFractionDigits:0}):'—'}</div><div class="stat-sub">Available now</div></div>
+      <div class="stat-card"><div class="stat-label">Revenue (${month})</div><div class="stat-value" style="color:var(--green);">${revenue!=null?'$'+Number(revenue).toLocaleString('en-US',{minimumFractionDigits:0}):'—'}</div><div class="stat-sub">Stripe · this month</div></div>
+      <div class="stat-card"><div class="stat-label">Stripe Balance</div><div class="stat-value">${balance!=null?'$'+Number(balance).toLocaleString('en-US',{minimumFractionDigits:0}):'—'}</div><div class="stat-sub">Available now</div></div>
       <div class="stat-card"><div class="stat-label">Calls Booked (${month})</div><div class="stat-value">${booked!=null?booked:'—'}</div><div class="stat-sub">Calendly · this month</div></div>
       <div class="stat-card"><div class="stat-label">Show-Up Rate</div><div class="stat-value" style="color:${showUp>=80?'var(--green)':showUp>=65?'var(--gold)':'#ef4444'};">${showUp!=null?showUp+'%':'—'}</div><div class="stat-sub">${showUp!=null&&kpis.find(k=>k.metric==='calendly_show_up_rate')?.notes?.includes('verified')?'Fathom verified':'Estimated'}</div></div>
       <div class="stat-card"><div class="stat-label">Pending Escalations</div><div class="stat-value" style="color:${escsCount>0?'#ef4444':'var(--green)'};">${escsCount}</div><div class="stat-sub">${escsCount===0?'All clear':'Needs attention'}</div></div>
@@ -614,7 +614,7 @@ async function loadKPIs() {
           <tbody>${sortedMonths.map(d=>{
             const m=months[d];
             const mLabel=new Date(d+'T12:00:00').toLocaleString('en-GB',{month:'short',year:'numeric'});
-            const rev=m.stripe_revenue!=null?'£'+Number(m.stripe_revenue).toLocaleString('en-GB',{minimumFractionDigits:0}):'—';
+            const rev=m.stripe_revenue!=null?'$'+Number(m.stripe_revenue).toLocaleString('en-US',{minimumFractionDigits:0}):'—';
             const pmts=m.stripe_payment_count!=null?m.stripe_payment_count:'—';
             const calls=m.calendly_calls_booked!=null?m.calendly_calls_booked:'—';
             const su=m.calendly_show_up_rate!=null?m.calendly_show_up_rate+'%':'—';
