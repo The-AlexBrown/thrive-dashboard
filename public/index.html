@@ -303,6 +303,8 @@ body::before {
     <div class="topbar-divider"></div>
     <div class="topbar-stat"><span class="lbl">Q&A</span><span class="val" id="hdr-qa">—</span></div>
     <div class="topbar-divider"></div>
+    <div class="topbar-stat"><span class="lbl">ESCALATIONS</span><span class="val" id="hdr-escalations">0</span></div>
+    <div class="topbar-divider"></div>
     <div class="status-pill"><div class="pulse-dot"></div>SYSTEM ONLINE</div>
   </div>
 </div>
@@ -310,6 +312,7 @@ body::before {
 <!-- NAV -->
 <nav class="nav">
   <button class="nav-tab active" onclick="showPanel('office',this)">🏢 Virtual Office</button>
+  <button class="nav-tab" onclick="showPanel('kpis',this)">📊 KPI Dashboard</button>
   <button class="nav-tab" onclick="showPanel('org',this)">🔗 Org Chart</button>
   <button class="nav-tab" onclick="showPanel('agents',this)">🤖 Agents</button>
   <button class="nav-tab" onclick="showPanel('pdfs',this)">📄 PDF Manager</button>
@@ -348,6 +351,34 @@ body::before {
           <div class="vo-feed-list" id="vo-feed"></div>
         </div>
       </section>
+    </div>
+  </div>
+
+  <!-- KPI DASHBOARD -->
+  <div class="panel" id="panel-kpis">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title">KPI <span>Dashboard</span></div>
+        <div class="panel-subtitle">Live data synced from Stripe + Calendly · powered by Axel</div>
+      </div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);" id="kpi-last-sync">Loading...</div>
+    </div>
+    <!-- Snapshot row -->
+    <div class="stats-grid" id="kpi-snapshot" style="margin-bottom:28px;"></div>
+    <!-- Monthly table -->
+    <div class="priority-section">
+      <div class="priority-label">Monthly Breakdown</div>
+      <div id="kpi-monthly"></div>
+    </div>
+    <!-- Escalations -->
+    <div class="priority-section" style="margin-top:28px;">
+      <div class="priority-label">Pending Escalations <span id="esc-badge" style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(239,68,68,0.15);color:#ef4444;margin-left:8px;display:none;"></span></div>
+      <div id="kpi-escalations" style="margin-top:12px;"></div>
+    </div>
+    <!-- Latest briefing -->
+    <div class="priority-section" style="margin-top:28px;">
+      <div class="priority-label">Latest Morning Briefing</div>
+      <div id="kpi-briefing" style="margin-top:12px;"></div>
     </div>
   </div>
 
@@ -463,7 +494,7 @@ const AGENT_META = {
 const CEO = { id:'alex', name:'Alex', role:'CEO / Vision & Strategy', avatar:'👑', tier:'ceo', status:'live', color:'#d4a843', room:'CEO Office', activity:'Setting strategy', platform:'—' };
 
 const FUTURE_AGENTS = [
-  { id:'rex',    name:'Rex',    role:'COO / Strategic Orchestrator', avatar:'🧠', tier:'coo',    status:'planned', color:'#7c3aed', room:'C-Suite',           activity:'Orchestrating agents',  platform:'Coming soon' },
+  { id:'axel',   name:'Axel',   role:'COO / Strategic Orchestrator', avatar:'🧠', tier:'coo',    status:'live',    color:'#7c3aed', room:'C-Suite',           activity:'Monitoring operations', platform:'Telegram / Node.js' },
   { id:'closer', name:'Closer', role:'Sales Manager',                avatar:'🎯', tier:'worker', status:'planned', color:'#f59e0b', room:'Sales & Marketing',  activity:'Working the pipeline',  platform:'Coming soon' },
   { id:'mailer', name:'Mailer', role:'Email Marketing Manager',      avatar:'✉️',  tier:'worker', status:'planned', color:'#ec4899', room:'Sales & Marketing',  activity:'Crafting campaigns',    platform:'Coming soon' },
   { id:'dash',   name:'Dash',   role:'Data & Dashboard Manager',     avatar:'📊', tier:'worker', status:'planned', color:'#3b82f6', room:'Operations',         activity:'Building dashboards',   platform:'Coming soon' },
@@ -481,6 +512,7 @@ function showPanel(name, tabEl) {
   document.getElementById('panel-' + name).classList.add('active');
   if (tabEl) tabEl.classList.add('active');
   if (name === 'office') initOffice();
+  if (name === 'kpis') loadKPIs();
   if (name === 'org') renderOrgPanel();
   if (name === 'agents') renderAgentsPanel();
   if (name === 'pdfs') loadPDFs();
@@ -504,15 +536,150 @@ async function loadData() {
   }));
   try { const r = await fetch('/api/bots/'+BOT_ID+'/questions'); const q=await r.json(); qCount=Array.isArray(q)?q.length:0; } catch(e){}
   const totalChunks = botsData.reduce((s,b)=>s+(b.chunkCount||0),0);
-  document.getElementById('hdr-agents').textContent = liveAgents.length;
+  // +1 for Axel (live COO agent, not in bots table)
+  document.getElementById('hdr-agents').textContent = liveAgents.length + 1;
   document.getElementById('hdr-chunks').textContent = totalChunks;
   document.getElementById('hdr-qa').textContent = qCount;
+  // Load escalation count for header
+  try {
+    const er = await fetch('/api/axel/escalations');
+    const escs = await er.json();
+    if (Array.isArray(escs) && escs.length > 0) {
+      const pill = document.getElementById('hdr-escalations');
+      if (pill) { pill.textContent = escs.length; pill.style.color = '#ef4444'; }
+    }
+  } catch(e) {}
+}
+
+// ── KPI DASHBOARD ──
+async function loadKPIs() {
+  const snap = document.getElementById('kpi-snapshot');
+  const monthly = document.getElementById('kpi-monthly');
+  const escEl = document.getElementById('kpi-escalations');
+  const briefEl = document.getElementById('kpi-briefing');
+  const syncEl = document.getElementById('kpi-last-sync');
+  if (snap) snap.innerHTML = '<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading KPIs...</div>';
+
+  try {
+    const [kpiRes, escRes, briefRes] = await Promise.all([
+      fetch('/api/axel/kpis').then(r=>r.json()),
+      fetch('/api/axel/escalations').then(r=>r.json()),
+      fetch('/api/axel/briefing').then(r=>r.json()).catch(()=>null),
+    ]);
+
+    const kpis = Array.isArray(kpiRes) ? kpiRes : [];
+
+    // Helper: get latest value for a metric+period
+    const get = (metric, period='monthly') => {
+      const row = kpis.find(k=>k.metric===metric && k.period===period);
+      return row ? row.value : null;
+    };
+    const latestDate = kpis.filter(k=>k.period==='monthly').map(k=>k.period_date).sort().reverse()[0] || '';
+    const month = latestDate ? new Date(latestDate+'T12:00:00').toLocaleString('en-GB',{month:'long',year:'numeric'}) : '—';
+
+    // Snapshot cards
+    const revenue = get('stripe_revenue','monthly');
+    const balance = get('stripe_balance_available','snapshot');
+    const booked = get('calendly_calls_booked','monthly');
+    const showUp = get('calendly_show_up_rate','monthly');
+    const escsCount = Array.isArray(escRes) ? escRes.length : 0;
+
+    if (snap) snap.innerHTML = `
+      <div class="stat-card"><div class="stat-label">Revenue (${month})</div><div class="stat-value" style="color:var(--green);">${revenue!=null?'£'+Number(revenue).toLocaleString('en-GB',{minimumFractionDigits:0}):'—'}</div><div class="stat-sub">Stripe · this month</div></div>
+      <div class="stat-card"><div class="stat-label">Stripe Balance</div><div class="stat-value">${balance!=null?'£'+Number(balance).toLocaleString('en-GB',{minimumFractionDigits:0}):'—'}</div><div class="stat-sub">Available now</div></div>
+      <div class="stat-card"><div class="stat-label">Calls Booked (${month})</div><div class="stat-value">${booked!=null?booked:'—'}</div><div class="stat-sub">Calendly · this month</div></div>
+      <div class="stat-card"><div class="stat-label">Show-Up Rate</div><div class="stat-value" style="color:${showUp>=80?'var(--green)':showUp>=65?'var(--gold)':'#ef4444'};">${showUp!=null?showUp+'%':'—'}</div><div class="stat-sub">${showUp!=null&&kpis.find(k=>k.metric==='calendly_show_up_rate')?.notes?.includes('verified')?'Fathom verified':'Estimated'}</div></div>
+      <div class="stat-card"><div class="stat-label">Pending Escalations</div><div class="stat-value" style="color:${escsCount>0?'#ef4444':'var(--green)'};">${escsCount}</div><div class="stat-sub">${escsCount===0?'All clear':'Needs attention'}</div></div>
+    `;
+
+    // Monthly breakdown table
+    const months = {};
+    kpis.filter(k=>k.period==='monthly').forEach(k=>{
+      if(!months[k.period_date]) months[k.period_date]={};
+      months[k.period_date][k.metric]=k.value;
+    });
+    const sortedMonths = Object.keys(months).sort().reverse().slice(0,4);
+    if (monthly) {
+      if (!sortedMonths.length) {
+        monthly.innerHTML = '<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:16px 0;">No monthly data synced yet. Run /sync in Telegram.</div>';
+      } else {
+        monthly.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-family:Space Mono,monospace;font-size:12px;">
+          <thead><tr style="border-bottom:1px solid var(--border2);">
+            <th style="text-align:left;padding:8px 12px;color:var(--muted2);font-weight:400;">MONTH</th>
+            <th style="text-align:right;padding:8px 12px;color:var(--muted2);font-weight:400;">REVENUE</th>
+            <th style="text-align:right;padding:8px 12px;color:var(--muted2);font-weight:400;">PAYMENTS</th>
+            <th style="text-align:right;padding:8px 12px;color:var(--muted2);font-weight:400;">CALLS BOOKED</th>
+            <th style="text-align:right;padding:8px 12px;color:var(--muted2);font-weight:400;">SHOW-UP</th>
+          </tr></thead>
+          <tbody>${sortedMonths.map(d=>{
+            const m=months[d];
+            const mLabel=new Date(d+'T12:00:00').toLocaleString('en-GB',{month:'short',year:'numeric'});
+            const rev=m.stripe_revenue!=null?'£'+Number(m.stripe_revenue).toLocaleString('en-GB',{minimumFractionDigits:0}):'—';
+            const pmts=m.stripe_payment_count!=null?m.stripe_payment_count:'—';
+            const calls=m.calendly_calls_booked!=null?m.calendly_calls_booked:'—';
+            const su=m.calendly_show_up_rate!=null?m.calendly_show_up_rate+'%':'—';
+            const suCol=m.calendly_show_up_rate>=80?'var(--green)':m.calendly_show_up_rate>=65?'var(--gold)':'#ef4444';
+            return `<tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:10px 12px;color:var(--gold);">${mLabel}</td>
+              <td style="text-align:right;padding:10px 12px;color:var(--green);">${rev}</td>
+              <td style="text-align:right;padding:10px 12px;">${pmts}</td>
+              <td style="text-align:right;padding:10px 12px;">${calls}</td>
+              <td style="text-align:right;padding:10px 12px;color:${suCol};">${su}</td>
+            </tr>`;
+          }).join('')}</tbody></table></div>`;
+      }
+    }
+
+    // Escalations
+    if (escEl) {
+      const badge = document.getElementById('esc-badge');
+      if (escsCount > 0) {
+        if (badge) { badge.textContent = escsCount + ' pending'; badge.style.display = 'inline'; }
+        escEl.innerHTML = (Array.isArray(escRes)?escRes:[]).map(e=>`
+          <div style="background:var(--card2);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:14px 18px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <span style="font-family:Space Mono,monospace;font-size:10px;background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:6px;text-transform:uppercase;">${e.urgency||'normal'}</span>
+              <span style="font-size:13px;font-weight:600;">${e.title}</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted2);line-height:1.5;">${e.context||''}</div>
+            <div style="font-size:10px;color:var(--muted);font-family:Space Mono,monospace;margin-top:8px;">${new Date(e.created_at).toLocaleString('en-GB')}</div>
+          </div>`).join('');
+      } else {
+        if (badge) badge.style.display='none';
+        escEl.innerHTML = '<div style="color:var(--green);font-family:Space Mono,monospace;font-size:12px;padding:12px 0;">✓ Nothing pending. All clear.</div>';
+      }
+    }
+
+    // Briefing
+    if (briefEl) {
+      if (briefRes && briefRes.briefing) {
+        briefEl.innerHTML = `
+          <div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <span style="font-family:Space Mono,monospace;font-size:11px;color:var(--gold);">${briefRes.brief_date}</span>
+              <span style="font-family:Space Mono,monospace;font-size:10px;color:${briefRes.delivered?'var(--green)':'var(--muted2)'};">${briefRes.delivered?'● DELIVERED':'○ NOT YET DELIVERED'}</span>
+            </div>
+            <pre style="font-family:Space Grotesk,sans-serif;font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--white);max-height:400px;overflow-y:auto;">${briefRes.briefing}</pre>
+          </div>`;
+      } else {
+        briefEl.innerHTML = '<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:12px;padding:12px 0;">No briefing generated yet.</div>';
+      }
+    }
+
+    if (syncEl) {
+      const latest = kpis[0];
+      syncEl.textContent = latest ? 'Last sync: ' + new Date(latest.period_date+'T12:00:00').toLocaleString('en-GB',{month:'short',year:'numeric'}) : 'No data yet';
+    }
+
+  } catch(err) {
+    if (snap) snap.innerHTML = `<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Error loading KPIs: ${err.message}</div>`;
+  }
 }
 
 // ── VIRTUAL OFFICE (Canvas) ──
 const ALL_OFFICE_AGENTS = [
   { id:'alex',      name:'Alex',   role:'CEO / Vision & Strategy',      avatar:'👑', color:'#d4a843', status:'live',    room:'CEO Office',       activity:'Strategising',         platform:'—' },
-  { id:'rex',       name:'Rex',    role:'COO / Strategic Orchestrator', avatar:'🧠', color:'#7c3aed', status:'planned', room:'C-Suite',          activity:'Orchestrating',        platform:'Coming soon' },
+  { id:'axel',      name:'Axel',   role:'COO / Strategic Orchestrator', avatar:'🧠', color:'#7c3aed', status:'live',    room:'C-Suite',          activity:'Monitoring operations',platform:'Telegram / Node.js' },
   { id:'ledger',    name:'Ledger', role:'Finance & CFO Agent',          avatar:'💎', color:'#10b981', status:'planned', room:'C-Suite',          activity:'P&L analysis',         platform:'Coming soon' },
   { id:'closer',    name:'Closer', role:'Sales Manager',                avatar:'🎯', color:'#f59e0b', status:'planned', room:'Sales & Marketing',activity:'Pipeline',             platform:'Coming soon' },
   { id:'mailer',    name:'Mailer', role:'Email Marketing Manager',      avatar:'✉️',  color:'#ec4899', status:'planned', room:'Sales & Marketing',activity:'Campaigns',            platform:'Coming soon' },
@@ -582,14 +749,14 @@ function initOffice() {
       stats:{ activity:'Fleet architecture', focus:'Zero-overhead AI agency', tasks:'38 decisions today', status:'Online' },
       alert:null
     },
-    // C-SUITE — Rex & Ledger planned
+    // C-SUITE — Axel live, Ledger planned
     {
-      id:'rex', name:'Rex', role:'COO · Strategic Orchestrator', room:'csuite',
+      id:'axel', name:'Axel', role:'COO · Strategic Orchestrator', room:'csuite',
       hue:'#a98bff', skin:'#f3c8a8', hair:'#1c2230', shirt:'#7a5cff', pants:'#1b2536',
-      live:false, tasks:0,
-      task:'Deployment pending',
-      focus:'Will orchestrate all agents end-to-end — automating ops so humans only touch strategy',
-      stats:{ activity:'Deployment pending', focus:'Full-stack agent orchestration', tasks:'—', status:'Standby' },
+      live:true, tasks:0,
+      task:'Running nightly analysis · morning briefing delivered',
+      focus:'Monitoring all Thrive operations — KPIs, calls, setter performance, escalations',
+      stats:{ activity:'Telegram · Node.js', focus:'Autonomous COO operations', tasks:'—', status:'Online' },
       alert:null
     },
     {
@@ -954,16 +1121,16 @@ function initOffice() {
     {who:'ALEX',   body:'deployed <b>Thrive Bot v1.0</b> to Discord · Railway hosting confirmed', cls:'info'},
     {who:'THRIVE', body:'KB lookup returned <b>4 matching chunks</b> · Supabase query 12ms', cls:'green'},
     {who:'SYSTEM', body:'Supabase connected · knowledge base <b>fully indexed</b>', cls:'info'},
-    {who:'ALEX',   body:'roadmap updated · <b>Rex (COO)</b> is next agent to deploy', cls:''},
+    {who:'ALEX',   body:'Axel (COO) deployed · <b>nightly analysis + briefings now live</b>', cls:'violet'},
     {who:'THRIVE', body:'71 client queries handled today · <b>zero escalations</b>', cls:'green'},
     {who:'SYSTEM', body:'Closer + Mailer in pipeline · <b>sales automation coming Q3</b>', cls:'violet'},
-    {who:'ALEX',   body:'Ledger (CFO) scoped · will own <b>P&L + cashflow reporting</b>', cls:''},
+    {who:'AXEL',   body:'Ledger (CFO) scoped · will own <b>P&L + cashflow reporting</b>', cls:''},
   ];
-  // Live events rotate every 7s — tied to what the real active agents would actually be doing
+  // Live events rotate every 7s — wired to real Axel activity
   const VO_LIVE_EVENTS=[
     {who:'THRIVE', body:'Discord query resolved · <b>&ldquo;what\'s included in the programme?&rdquo;</b>', cls:'green'},
     {who:'THRIVE', body:'KB search · <b>3 chunks retrieved</b> · answered in 1.1s', cls:'green'},
-    {who:'ALEX',   body:'reviewing agent deployment order · <b>Rex COO next</b>', cls:''},
+    {who:'AXEL',   body:'nightly Fathom analysis complete · <b>briefing queued for 7am</b>', cls:'violet'},
     {who:'THRIVE', body:'client session active · <b>response time 0.8s</b>', cls:'green'},
     {who:'SYSTEM', body:'Railway uptime <b>99.9%</b> · all webhooks firing', cls:'info'},
     {who:'ALEX',   body:'scoping <b>Closer agent</b> · target: 7-fig pipeline in Y1', cls:''},
@@ -980,8 +1147,18 @@ function initOffice() {
     if(atTop)$vofeed.prepend(row);else $vofeed.appendChild(row);
     while($vofeed.children.length>20)$vofeed.lastChild.remove();
   }
+  // Seed with static fallback, then replace with real Axel data
   const _n=new Date();
   VO_FEED_SEEDS.forEach((s,i)=>{ const d=new Date(_n.getTime()-(i+1)*6*60*1000); voPushFeed({...s,time:voTStr(d)},false); });
+  fetch('/api/axel/feed').then(r=>r.json()).then(items=>{
+    if(!Array.isArray(items)||!items.length) return;
+    if($vofeed) $vofeed.innerHTML='';
+    items.forEach(item=>{
+      const ts=item.ts?new Date(item.ts).toTimeString().slice(0,5):voTStr();
+      voPushFeed({...item, time:ts}, false);
+    });
+  }).catch(()=>{});
+  // Also update Axel's task/stats when clicked if we have live data
   let voEvIdx=0;
   const voFeedInterval=setInterval(()=>{ voPushFeed(VO_LIVE_EVENTS[voEvIdx%VO_LIVE_EVENTS.length]); voEvIdx++; },7000);
 
@@ -1033,7 +1210,7 @@ function renderOrgPanel() {
     document.getElementById('stat-docs').textContent=totalDocs;
   }
   const chart=document.getElementById('org-chart');
-  const coo=FUTURE_AGENTS.find(a=>a.id==='rex');
+  const coo=FUTURE_AGENTS.find(a=>a.id==='axel');
   const workers=[...liveAgents,...FUTURE_AGENTS.filter(a=>a.tier==='worker')];
   chart.innerHTML=`
     <div style="display:flex;justify-content:center;">${agentCardHTML(CEO)}</div>

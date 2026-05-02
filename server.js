@@ -1,9 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-const { exec } = require('child_process');
 const { createClient } = require('@supabase/supabase-js');
 const Anthropic = require('@anthropic-ai/sdk');
 
@@ -12,47 +9,34 @@ const PORT = process.env.PORT || 3000;
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
+// Determine if we're running on Vercel (no local filesystem access)
+const IS_VERCEL = !!process.env.VERCEL;
+
 // Middleware
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// PDF storage — always local in ~/thrive-bot/pdfs (per bot would need its own folder; using bot id as subfolder)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const botId = req.params.botId;
-    const pdfDir = path.join(process.env.HOME || '/root', 'thrive-bot', 'pdfs');
-    if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir, { recursive: true });
-    cb(null, pdfDir);
-  },
-  filename: (req, file, cb) => cb(null, file.originalname),
-});
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    cb(null, file.mimetype === 'application/pdf');
-  },
-});
-
 // ─── BOTS ───────────────────────────────────────────────────────────────────
 
-// GET all bots (from Supabase bots table, with live chunk counts)
 app.get('/api/bots', async (req, res) => {
   try {
     const { data: bots, error } = await supabase.from('bots').select('*').order('created_at', { ascending: true });
     if (error) return res.status(500).json({ error: error.message });
 
-    // For each bot, get chunk count from knowledge_chunks
     const botsWithCounts = await Promise.all(bots.map(async (bot) => {
       const { count } = await supabase
         .from('knowledge_chunks')
         .select('id', { count: 'exact', head: true })
         .eq('bot_id', bot.id);
 
-      // PDF count from local folder
-      const pdfDir = path.join(process.env.HOME || '/root', 'thrive-bot', 'pdfs');
-      const pdfCount = fs.existsSync(pdfDir)
-        ? fs.readdirSync(pdfDir).filter(f => f.toLowerCase().endsWith('.pdf')).length
-        : 0;
+      let pdfCount = 0;
+      if (!IS_VERCEL) {
+        const fs = require('fs');
+        const pdfDir = path.join(process.env.HOME || '/root', 'thrive-bot', 'pdfs');
+        pdfCount = fs.existsSync(pdfDir)
+          ? fs.readdirSync(pdfDir).filter(f => f.toLowerCase().endsWith('.pdf')).length
+          : 0;
+      }
 
       return { ...bot, chunkCount: count || 0, pdfCount };
     }));
@@ -63,17 +47,11 @@ app.get('/api/bots', async (req, res) => {
   }
 });
 
-// POST create new bot
 app.post('/api/bots', async (req, res) => {
   try {
     const { name, description } = req.body;
     const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-    const { error } = await supabase.from('bots').insert({
-      id,
-      name,
-      description,
-      status: 'active',
-    });
+    const { error } = await supabase.from('bots').insert({ id, name, description, status: 'active' });
     if (error) return res.status(500).json({ error: error.message });
     res.json({ success: true, id });
   } catch (err) {
@@ -81,10 +59,11 @@ app.post('/api/bots', async (req, res) => {
   }
 });
 
-// ─── PDFs (stays local) ──────────────────────────────────────────────────────
+// ─── PDFs (local only — not available on Vercel) ─────────────────────────────
 
-// GET PDFs for a bot
 app.get('/api/bots/:botId/pdfs', (req, res) => {
+  if (IS_VERCEL) return res.json([]);
+  const fs = require('fs');
   const pdfDir = path.join(process.env.HOME || '/root', 'thrive-bot', 'pdfs');
   if (!fs.existsSync(pdfDir)) return res.json([]);
   const files = fs.readdirSync(pdfDir)
@@ -96,30 +75,43 @@ app.get('/api/bots/:botId/pdfs', (req, res) => {
   res.json(files);
 });
 
-// POST upload PDFs
-app.post('/api/bots/:botId/pdfs', upload.array('pdfs'), (req, res) => {
-  res.json({ success: true, uploaded: req.files.length });
+app.post('/api/bots/:botId/pdfs', (req, res) => {
+  if (IS_VERCEL) return res.status(400).json({ error: 'PDF upload must be done from your local dashboard.' });
+  const multer = require('multer');
+  const fs = require('fs');
+  const pdfDir = path.join(process.env.HOME || '/root', 'thrive-bot', 'pdfs');
+  if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir, { recursive: true });
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, pdfDir),
+    filename: (req, file, cb) => cb(null, file.originalname),
+  });
+  const upload = multer({ storage, fileFilter: (req, file, cb) => cb(null, file.mimetype === 'application/pdf') });
+  upload.array('pdfs')(req, res, (err) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ success: true, uploaded: req.files.length });
+  });
 });
 
-// DELETE a PDF
 app.delete('/api/bots/:botId/pdfs/:filename', (req, res) => {
+  if (IS_VERCEL) return res.status(400).json({ error: 'File deletion must be done from your local dashboard.' });
+  const fs = require('fs');
   const pdfPath = path.join(process.env.HOME || '/root', 'thrive-bot', 'pdfs', req.params.filename);
   if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
   res.json({ success: true });
 });
 
-// ─── KNOWLEDGE BASE ──────────────────────────────────────────────────────────
-
-// POST rebuild knowledge base (runs build-kb.js which writes to Supabase)
 app.post('/api/bots/:botId/rebuild', (req, res) => {
-  res.json({ success: true, message: 'Rebuilding started — this may take a minute.' });
-  exec('cd ' + (process.env.HOME || '/root') + '/thrive-bot && node build-kb.js', (err, stdout, stderr) => {
-    console.log('Rebuild complete:', stdout);
+  if (IS_VERCEL) return res.status(400).json({ error: 'Knowledge base rebuild must be run locally: node ~/thrive-bot/build-kb.js' });
+  const { exec } = require('child_process');
+  res.json({ success: true, message: 'Rebuilding started...' });
+  exec((process.env.HOME || '/root') + '/thrive-bot && node build-kb.js', (err, stdout, stderr) => {
+    console.log('Rebuild:', stdout);
     if (err) console.error('Rebuild error:', stderr);
   });
 });
 
-// GET knowledge base status (chunk count from Supabase)
+// ─── STATUS ──────────────────────────────────────────────────────────────────
+
 app.get('/api/bots/:botId/status', async (req, res) => {
   try {
     const { count, error } = await supabase
@@ -135,24 +127,17 @@ app.get('/api/bots/:botId/status', async (req, res) => {
 
 // ─── TEST ────────────────────────────────────────────────────────────────────
 
-// POST test a question against a bot's knowledge base
 app.post('/api/bots/:botId/test', async (req, res) => {
   try {
     const { question } = req.body;
-    const botId = req.params.botId;
-
-    // Load chunks from Supabase
     const { data: knowledge, error } = await supabase
       .from('knowledge_chunks')
       .select('source, text, chunk_index')
-      .eq('bot_id', botId);
+      .eq('bot_id', req.params.botId);
 
     if (error) return res.status(500).json({ error: error.message });
-    if (!knowledge || knowledge.length === 0) {
-      return res.json({ error: 'No knowledge base built yet for this bot.' });
-    }
+    if (!knowledge || knowledge.length === 0) return res.json({ error: 'No knowledge base built yet.' });
 
-    // Keyword search in memory
     const words = question.toLowerCase().split(/\s+/).filter(w => w.length > 2);
     const scored = knowledge.map(chunk => {
       const text = chunk.text.toLowerCase();
@@ -169,7 +154,7 @@ app.post('/api/bots/:botId/test', async (req, res) => {
       ? scored.map((c, i) => `--- EXCERPT ${i+1} FROM: ${c.source} ---\n${c.text}`).join('\n\n')
       : null;
     const system = context
-      ? `You are the Thrive Acquisition assistant. Answer using ONLY the programme content below. Be specific and direct.\n\n=== PROGRAMME CONTENT ===\n\n${context}\n\n=== END ===`
+      ? `You are the Thrive Acquisition assistant. Answer using ONLY the programme content below.\n\n=== PROGRAMME CONTENT ===\n\n${context}\n\n=== END ===`
       : 'No specific content found. Tell the user this topic is not in the materials.';
 
     const response = await anthropic.messages.create({
@@ -178,7 +163,6 @@ app.post('/api/bots/:botId/test', async (req, res) => {
       system,
       messages: [{ role: 'user', content: question }],
     });
-
     res.json({ answer: response.content[0].text, chunks: scored, question });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -187,7 +171,6 @@ app.post('/api/bots/:botId/test', async (req, res) => {
 
 // ─── QUESTIONS LOG ───────────────────────────────────────────────────────────
 
-// GET recent questions for a bot (from Supabase questions_log)
 app.get('/api/bots/:botId/questions', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -203,4 +186,71 @@ app.get('/api/bots/:botId/questions', async (req, res) => {
   }
 });
 
+// ─── AXEL INTEGRATION ────────────────────────────────────────────────────────
+
+app.get('/api/axel/kpis', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('kpis')
+      .select('metric, value, period, period_date, notes')
+      .order('period_date', { ascending: false })
+      .limit(80);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/axel/escalations', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('escalations')
+      .select('id, title, context, urgency, created_at')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/axel/briefing', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('daily_briefings')
+      .select('briefing, brief_date, delivered')
+      .order('brief_date', { ascending: false })
+      .limit(1)
+      .single();
+    if (error) return res.status(404).json({ error: error.message });
+    res.json(data);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/axel/feed', async (req, res) => {
+  try {
+    const [escResult, callResult, briefResult, convResult] = await Promise.all([
+      supabase.from('escalations').select('title, urgency, created_at').order('created_at', { ascending: false }).limit(5),
+      supabase.from('call_analyses').select('call_title, sentiment, call_date').order('call_date', { ascending: false }).limit(5),
+      supabase.from('daily_briefings').select('brief_date, delivered, created_at').order('created_at', { ascending: false }).limit(3),
+      supabase.from('kpis').select('metric, value, period_date, updated_at').order('updated_at', { ascending: false }).limit(3),
+    ]);
+    const feed = [];
+    for (const e of (escResult.data || [])) {
+      feed.push({ who: 'AXEL', body: `escalation raised · <b>${e.title}</b> · ${e.urgency}`, cls: e.urgency === 'critical' ? 'red' : '', ts: e.created_at });
+    }
+    for (const c of (callResult.data || [])) {
+      feed.push({ who: 'AXEL', body: `call analysed · <b>${c.call_title || 'Discovery call'}</b> · ${c.sentiment || 'reviewed'}`, cls: 'green', ts: c.call_date });
+    }
+    for (const b of (briefResult.data || [])) {
+      feed.push({ who: 'AXEL', body: `morning briefing ${b.delivered ? 'delivered' : 'generated'} · <b>${b.brief_date}</b>`, cls: 'info', ts: b.created_at });
+    }
+    for (const k of (convResult.data || [])) {
+      feed.push({ who: 'SYSTEM', body: `KPI synced · <b>${k.metric.replace(/_/g,' ')}</b> → ${k.value}`, cls: '', ts: k.updated_at });
+    }
+    feed.sort((a, b) => new Date(b.ts) - new Date(a.ts));
+    res.json(feed.slice(0, 12));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.listen(PORT, () => console.log(`Dashboard running at http://localhost:${PORT}`));
+
+module.exports = app;
