@@ -82,9 +82,41 @@ body::before {
 /* NAV */
 .nav {
   background:var(--surface);border-bottom:1px solid var(--border);
-  padding:0 28px;display:flex;
+  padding:0 28px;display:flex;overflow-x:auto;scrollbar-width:thin;
   position:sticky;top:56px;z-index:190;
 }
+.nav::-webkit-scrollbar{height:3px}
+.nav::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.nav::-webkit-scrollbar-track{background:transparent}
+
+/* PILL FILTER BUTTONS */
+.btn-pill{
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.5px;text-transform:uppercase;
+  background:var(--card2);border:1px solid var(--border2);color:var(--muted2);
+  padding:7px 14px;border-radius:20px;cursor:pointer;transition:all 0.15s;
+}
+.btn-pill:hover{border-color:var(--gold);color:var(--white);}
+.btn-pill.active{background:var(--gold-dim);border-color:rgba(212,168,67,0.4);color:var(--gold);}
+
+/* DATA CARD - reusable list item */
+.data-card{
+  background:var(--card2);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;cursor:pointer;transition:all 0.15s;
+}
+.data-card:hover{border-color:var(--gold);background:var(--card);transform:translateX(2px);}
+.data-card.no-hover{cursor:default;}
+.data-card.no-hover:hover{border-color:var(--border);background:var(--card2);transform:none;}
+
+.tag-pill{
+  display:inline-block;font-family:'Space Mono',monospace;font-size:9px;
+  padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:0.5px;
+  background:rgba(255,255,255,0.05);color:var(--muted2);margin-right:6px;
+}
+.tag-pill.green{background:rgba(34,211,160,0.15);color:var(--green);}
+.tag-pill.gold{background:rgba(212,168,67,0.15);color:var(--gold);}
+.tag-pill.red{background:rgba(239,68,68,0.15);color:#ef4444;}
+.tag-pill.blue{background:rgba(59,130,246,0.15);color:#3b82f6;}
+.tag-pill.violet{background:rgba(124,58,237,0.18);color:#a98bff;}
 .nav-tab {
   font-family:'Space Mono',monospace;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;
   padding:13px 18px;background:none;border:none;color:var(--muted2);cursor:pointer;
@@ -312,13 +344,20 @@ body::before {
 <!-- NAV -->
 <nav class="nav">
   <button class="nav-tab active" onclick="showPanel('office',this)">🏢 Virtual Office</button>
-  <button class="nav-tab" onclick="showPanel('kpis',this)">📊 KPI Dashboard</button>
+  <button class="nav-tab" onclick="showPanel('kpis',this)">📊 KPIs</button>
+  <button class="nav-tab" onclick="showPanel('activity',this)">⚡ Activity</button>
+  <button class="nav-tab" onclick="showPanel('calls',this)">📞 Calls</button>
+  <button class="nav-tab" onclick="showPanel('briefings',this)">📰 Briefings</button>
+  <button class="nav-tab" onclick="showPanel('escalations',this)">🚨 Escalations</button>
+  <button class="nav-tab" onclick="showPanel('knowledge',this)">🧠 Knowledge Base</button>
+  <button class="nav-tab" onclick="showPanel('conversations',this)">💬 Conversations</button>
+  <button class="nav-tab" onclick="showPanel('memory',this)">🗂️ Memory</button>
+  <button class="nav-tab" onclick="showPanel('setters',this)">🎯 Setters</button>
   <button class="nav-tab" onclick="showPanel('org',this)">🔗 Org Chart</button>
   <button class="nav-tab" onclick="showPanel('agents',this)">🤖 Agents</button>
-  <button class="nav-tab" onclick="showPanel('pdfs',this)">📄 PDF Manager</button>
-  <button class="nav-tab" onclick="showPanel('knowledge',this)">🧠 Knowledge Base</button>
-  <button class="nav-tab" onclick="showPanel('test',this)">⚡ Test Bot</button>
-  <button class="nav-tab" onclick="showPanel('questions',this)">💬 Questions Log</button>
+  <button class="nav-tab" onclick="showPanel('pdfs',this)">📄 PDFs</button>
+  <button class="nav-tab" onclick="showPanel('test',this)">🧪 Test Bot</button>
+  <button class="nav-tab" onclick="showPanel('questions',this)">📋 Questions Log</button>
 </nav>
 
 <div class="container">
@@ -382,6 +421,95 @@ body::before {
     </div>
   </div>
 
+  <!-- ACTIVITY -->
+  <div class="panel" id="panel-activity">
+    <div class="panel-header">
+      <div><div class="panel-title">Activity <span>Stream</span></div><div class="panel-subtitle">Everything happening across the agency in real time</div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);" id="activity-status">Loading...</div>
+    </div>
+    <div class="stats-grid" id="activity-summary" style="margin-bottom:24px;"></div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;" id="activity-filters">
+      <button class="btn-pill active" data-filter="all" onclick="filterActivity('all',this)">All</button>
+      <button class="btn-pill" data-filter="escalation" onclick="filterActivity('escalation',this)">🚨 Escalations</button>
+      <button class="btn-pill" data-filter="call" onclick="filterActivity('call',this)">📞 Calls</button>
+      <button class="btn-pill" data-filter="briefing" onclick="filterActivity('briefing',this)">📰 Briefings</button>
+      <button class="btn-pill" data-filter="kpi" onclick="filterActivity('kpi',this)">📊 KPIs</button>
+      <button class="btn-pill" data-filter="conversation" onclick="filterActivity('conversation',this)">💬 Conversations</button>
+    </div>
+    <div id="activity-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+
+  <!-- CALLS -->
+  <div class="panel" id="panel-calls">
+    <div class="panel-header">
+      <div><div class="panel-title">Sales <span>Calls</span></div><div class="panel-subtitle">Every Fathom call analysed against the 4-pillar framework</div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);" id="calls-status"></div>
+    </div>
+    <div class="stats-grid" id="calls-summary" style="margin-bottom:24px;"></div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;" id="calls-filters">
+      <button class="btn-pill active" data-outcome="all" onclick="filterCalls('all',this)">All</button>
+      <button class="btn-pill" data-outcome="closed" onclick="filterCalls('closed',this)">✅ Closed</button>
+      <button class="btn-pill" data-outcome="follow_up" onclick="filterCalls('follow_up',this)">⏳ Follow-up</button>
+      <button class="btn-pill" data-outcome="lost" onclick="filterCalls('lost',this)">❌ Lost</button>
+      <button class="btn-pill" data-outcome="no_show" onclick="filterCalls('no_show',this)">⚠️ No-show</button>
+    </div>
+    <div id="calls-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+
+  <!-- BRIEFINGS -->
+  <div class="panel" id="panel-briefings">
+    <div class="panel-header">
+      <div><div class="panel-title">Morning <span>Briefings</span></div><div class="panel-subtitle">Every briefing Axel has generated · click to read</div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);" id="briefings-status"></div>
+    </div>
+    <div id="briefings-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+
+  <!-- ESCALATIONS -->
+  <div class="panel" id="panel-escalations">
+    <div class="panel-header">
+      <div><div class="panel-title">Escalation <span>History</span></div><div class="panel-subtitle">Every decision Alex was asked to make · pending, approved, dismissed</div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);" id="esc-status"></div>
+    </div>
+    <div class="stats-grid" id="esc-summary" style="margin-bottom:24px;"></div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;" id="esc-filters">
+      <button class="btn-pill active" data-status="all" onclick="filterEsc('all',this)">All</button>
+      <button class="btn-pill" data-status="pending" onclick="filterEsc('pending',this)">⏱ Pending</button>
+      <button class="btn-pill" data-status="resolved" onclick="filterEsc('resolved',this)">✅ Approved</button>
+      <button class="btn-pill" data-status="dismissed" onclick="filterEsc('dismissed',this)">❌ Dismissed</button>
+    </div>
+    <div id="esc-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+
+  <!-- CONVERSATIONS -->
+  <div class="panel" id="panel-conversations">
+    <div class="panel-header">
+      <div><div class="panel-title">Telegram <span>Conversations</span></div><div class="panel-subtitle">Alex ↔ Axel · everything you've discussed</div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);" id="conv-status"></div>
+    </div>
+    <input class="input-field" id="conv-search" placeholder="🔍 Search conversation history..." style="margin-bottom:18px;" oninput="filterConv()">
+    <div id="conv-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+
+  <!-- MEMORY -->
+  <div class="panel" id="panel-memory">
+    <div class="panel-header">
+      <div><div class="panel-title">Axel <span>Memory</span></div><div class="panel-subtitle">Persistent key/value store · what Axel remembers between sessions</div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);" id="mem-status"></div>
+    </div>
+    <div id="memory-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+  </div>
+
+  <!-- SETTERS -->
+  <div class="panel" id="panel-setters">
+    <div class="panel-header">
+      <div><div class="panel-title">Setter <span>Performance</span></div><div class="panel-subtitle">Daily EOD reports and scoring trends</div></div>
+      <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted2);" id="setters-status"></div>
+    </div>
+    <div id="setters-summary" class="stats-grid" style="margin-bottom:24px;"></div>
+    <div id="setters-list"></div>
+  </div>
+
   <!-- ORG CHART -->
   <div class="panel" id="panel-org">
     <div class="panel-header">
@@ -426,22 +554,44 @@ body::before {
 
   <!-- KNOWLEDGE BASE -->
   <div class="panel" id="panel-knowledge">
-    <div class="panel-header"><div><div class="panel-title">Knowledge <span>Base</span></div><div class="panel-subtitle">Rebuild to update the bot with new documents</div></div></div>
-    <div class="kb-status">
-      <div class="kb-stat"><div class="kb-stat-value" id="kb-chunks">—</div><div class="kb-stat-label">Total Chunks</div></div>
-      <div class="kb-stat"><div class="kb-stat-value" id="kb-pdfs">—</div><div class="kb-stat-label">PDFs Indexed</div></div>
-      <div class="kb-stat"><div class="kb-stat-value" id="kb-built">—</div><div class="kb-stat-label">Last Built</div></div>
+    <div class="panel-header">
+      <div><div class="panel-title">Knowledge <span>Base</span></div><div class="panel-subtitle">Axel's full library — everything the COO knows about Thrive</div></div>
     </div>
-    <div class="card">
-      <div style="font-size:20px;font-weight:700;margin-bottom:8px;">Rebuild Knowledge Base</div>
-      <div style="font-size:13px;color:var(--muted2);margin-bottom:20px;line-height:1.6;">Processes all PDFs and spreadsheets in your library and creates a searchable knowledge base.</div>
-      <div style="display:flex;align-items:center;gap:16px;">
-        <button class="btn btn-primary" onclick="rebuildKB()">🔄 Rebuild Now</button>
-        <div class="spinner" id="rebuild-spinner"></div>
-        <div id="rebuild-status" style="font-size:13px;color:var(--muted2);"></div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+      <input class="input-field" id="kb-search" placeholder="🔍 Search across all knowledge..." style="flex:1;min-width:240px;" oninput="filterKB()">
+      <div id="kb-cat-filters" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <div class="stats-grid" id="kb-cat-stats" style="margin-bottom:24px;"></div>
+    <div id="kb-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+
+    <div style="margin-top:48px;padding-top:24px;border-top:1px solid var(--border);">
+      <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Thrive Bot · Discord KB</div>
+      <div class="kb-status">
+        <div class="kb-stat"><div class="kb-stat-value" id="kb-chunks">—</div><div class="kb-stat-label">Total Chunks</div></div>
+        <div class="kb-stat"><div class="kb-stat-value" id="kb-pdfs">—</div><div class="kb-stat-label">PDFs Indexed</div></div>
+        <div class="kb-stat"><div class="kb-stat-value" id="kb-built">—</div><div class="kb-stat-label">Last Built</div></div>
       </div>
-      <div class="rebuild-progress" id="rebuild-progress"><div class="rebuild-bar" id="rebuild-bar"></div></div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:8px;">Rebuild Thrive Bot KB</div>
+        <div style="font-size:12px;color:var(--muted2);margin-bottom:14px;line-height:1.6;">Run from your local machine. Re-indexes every PDF/XLSX in ~/thrive-bot/pdfs/.</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button class="btn btn-primary" onclick="rebuildKB()" style="font-size:11px;padding:8px 14px;">🔄 Rebuild Now</button>
+          <div class="spinner" id="rebuild-spinner"></div>
+          <div id="rebuild-status" style="font-size:11px;color:var(--muted2);"></div>
+        </div>
+        <div class="rebuild-progress" id="rebuild-progress"><div class="rebuild-bar" id="rebuild-bar"></div></div>
+      </div>
     </div>
+  </div>
+
+  <!-- DRAWER for KB entry detail / call detail / briefing detail -->
+  <div id="drawer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;backdrop-filter:blur(4px);" onclick="closeDrawer()"></div>
+  <div id="drawer" style="display:none;position:fixed;top:0;right:0;width:min(680px,100vw);height:100vh;background:var(--surface);border-left:1px solid var(--border2);z-index:301;overflow-y:auto;">
+    <div style="position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
+      <div id="drawer-title" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;"></div>
+      <button onclick="closeDrawer()" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:20px;">×</button>
+    </div>
+    <div id="drawer-body" style="padding:24px 28px;"></div>
   </div>
 
   <!-- TEST BOT -->
@@ -513,10 +663,17 @@ function showPanel(name, tabEl) {
   if (tabEl) tabEl.classList.add('active');
   if (name === 'office') initOffice();
   if (name === 'kpis') loadKPIs();
+  if (name === 'activity') loadActivity();
+  if (name === 'calls') loadCalls();
+  if (name === 'briefings') loadBriefings();
+  if (name === 'escalations') loadEscalationsAll();
+  if (name === 'knowledge') { loadKBStatus(); loadAxelKB(); }
+  if (name === 'conversations') loadConversations();
+  if (name === 'memory') loadMemory();
+  if (name === 'setters') loadSetters();
   if (name === 'org') renderOrgPanel();
   if (name === 'agents') renderAgentsPanel();
   if (name === 'pdfs') loadPDFs();
-  if (name === 'knowledge') loadKBStatus();
   if (name === 'questions') loadQuestions();
 }
 
@@ -681,6 +838,450 @@ async function loadKPIs() {
     if (snap) snap.innerHTML = `<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Error loading KPIs: ${err.message}</div>`;
   }
 }
+
+// ── DRAWER ──
+function openDrawer(title, html){
+  document.getElementById('drawer-title').textContent=title;
+  document.getElementById('drawer-body').innerHTML=html;
+  document.getElementById('drawer').style.display='block';
+  document.getElementById('drawer-overlay').style.display='block';
+}
+function closeDrawer(){
+  document.getElementById('drawer').style.display='none';
+  document.getElementById('drawer-overlay').style.display='none';
+}
+function fmtDate(s){ if(!s) return '—'; return new Date(s).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function fmtDateOnly(s){ if(!s) return '—'; return new Date(s+(s.length===10?'T12:00:00':'')).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+function fmtAgo(s){
+  if(!s) return '—'; const diff=Date.now()-new Date(s).getTime(); const m=Math.floor(diff/60000);
+  if(m<1) return 'just now'; if(m<60) return m+'m ago'; const h=Math.floor(m/60);
+  if(h<24) return h+'h ago'; return Math.floor(h/24)+'d ago';
+}
+
+// ── KNOWLEDGE BASE (AXEL) ──
+let _kbAll=[], _kbCatFilter='all', _kbSearch='';
+async function loadAxelKB() {
+  const list=document.getElementById('kb-list');
+  if(!list) return;
+  list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading knowledge base...</div>';
+  try {
+    const [entries, cats] = await Promise.all([
+      fetch('/api/axel/kb').then(r=>r.json()),
+      fetch('/api/axel/kb/categories').then(r=>r.json()),
+    ]);
+    _kbAll = Array.isArray(entries) ? entries : [];
+    // Category stats
+    const stats = document.getElementById('kb-cat-stats');
+    if (stats) {
+      const total = _kbAll.length;
+      const sortedCats = Object.entries(cats||{}).sort((a,b)=>b[1]-a[1]);
+      stats.innerHTML = `
+        <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value">${total}</div><div class="stat-sub">in Axel's KB</div></div>
+        ${sortedCats.slice(0,4).map(([cat,n])=>`<div class="stat-card"><div class="stat-label">${cat.toUpperCase()}</div><div class="stat-value" style="color:var(--gold);">${n}</div><div class="stat-sub">documents</div></div>`).join('')}
+      `;
+    }
+    // Filters
+    const filtersEl = document.getElementById('kb-cat-filters');
+    if (filtersEl) {
+      const allCats = Object.keys(cats||{});
+      filtersEl.innerHTML = `<button class="btn-pill ${_kbCatFilter==='all'?'active':''}" onclick="setKBFilter('all')">All</button>` +
+        allCats.map(c=>`<button class="btn-pill ${_kbCatFilter===c?'active':''}" onclick="setKBFilter('${c}')">${c}</button>`).join('');
+    }
+    renderKBList();
+  } catch(err) {
+    list.innerHTML = `<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Failed to load: ${err.message}</div>`;
+  }
+}
+function setKBFilter(cat){ _kbCatFilter=cat; loadAxelKB(); }
+function filterKB(){ _kbSearch=document.getElementById('kb-search').value.toLowerCase(); renderKBList(); }
+function renderKBList(){
+  const list=document.getElementById('kb-list'); if(!list) return;
+  let rows = _kbAll.slice();
+  if (_kbCatFilter!=='all') rows = rows.filter(r=>r.category===_kbCatFilter);
+  if (_kbSearch) rows = rows.filter(r=>(r.title||'').toLowerCase().includes(_kbSearch)||(r.content||'').toLowerCase().includes(_kbSearch));
+  if (!rows.length) {
+    list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:14px 0;">No entries match.</div>';
+    return;
+  }
+  list.innerHTML = rows.map(r=>`
+    <div class="data-card" onclick='showKB(${JSON.stringify(r.id)})'>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="tag-pill gold">${r.category}</span>
+          <span style="font-weight:600;font-size:14px;">${escapeHtml(r.title)}</span>
+        </div>
+        <span style="font-family:Space Mono,monospace;font-size:10px;color:var(--muted);">${fmtAgo(r.updated_at)}</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted2);line-height:1.5;">${escapeHtml((r.content||'').slice(0,180))}${(r.content||'').length>180?'...':''}</div>
+    </div>
+  `).join('');
+}
+async function showKB(id){
+  try {
+    const r = await fetch('/api/axel/kb/'+id).then(r=>r.json());
+    openDrawer(`${r.category} · ${r.title}`, `
+      <h2 style="font-size:22px;margin-bottom:8px;">${escapeHtml(r.title)}</h2>
+      <div style="display:flex;gap:8px;margin-bottom:18px;">
+        <span class="tag-pill gold">${r.category}</span>
+        ${(r.tags||[]).map(t=>`<span class="tag-pill">${escapeHtml(t)}</span>`).join('')}
+        <span class="tag-pill">Updated ${fmtAgo(r.updated_at)}</span>
+      </div>
+      <div style="font-size:13px;line-height:1.7;color:var(--white);white-space:pre-wrap;">${escapeHtml(r.content)}</div>
+    `);
+  } catch(e){}
+}
+
+// ── ACTIVITY ──
+let _activityAll=[], _activityFilter='all';
+async function loadActivity(){
+  const list=document.getElementById('activity-list');
+  if(!list) return;
+  list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading activity...</div>';
+  try {
+    const [escs, calls, briefs, conv, kpis, health] = await Promise.all([
+      fetch('/api/axel/escalations/all').then(r=>r.json()),
+      fetch('/api/axel/calls').then(r=>r.json()),
+      fetch('/api/axel/briefings').then(r=>r.json()),
+      fetch('/api/axel/conversations').then(r=>r.json()),
+      fetch('/api/axel/kpis').then(r=>r.json()),
+      fetch('/api/axel/health').then(r=>r.json()),
+    ]);
+    const items=[];
+    (escs||[]).forEach(e=>items.push({type:'escalation',ts:e.created_at,title:e.title,detail:e.context,meta:`${e.urgency} · ${e.status}`,cls:e.status==='pending'?'red':e.status==='resolved'?'green':''}));
+    (calls||[]).forEach(c=>items.push({type:'call',ts:c.created_at||c.call_date,title:c.prospect_name||c.call_id||'Discovery call',detail:c.coaching_note||c.what_worked||'',meta:c.outcome||'reviewed',cls:c.outcome==='closed'?'green':c.outcome==='lost'?'red':''}));
+    (briefs||[]).forEach(b=>items.push({type:'briefing',ts:b.created_at,title:`Morning briefing · ${b.brief_date}`,detail:(b.briefing||'').slice(0,140)+'...',meta:b.delivered?'delivered':'pending',cls:'violet'}));
+    (conv||[]).slice(0,15).forEach(c=>items.push({type:'conversation',ts:c.created_at,title:`${c.role==='user'?'Alex':'Axel'} via Telegram`,detail:(c.content||'').slice(0,120),meta:c.role,cls:''}));
+    (kpis||[]).filter(k=>k.updated_at).slice(0,5).forEach(k=>items.push({type:'kpi',ts:k.updated_at,title:`KPI synced · ${k.metric.replace(/_/g,' ')}`,detail:k.notes||'',meta:String(k.value),cls:'gold'}));
+    items.sort((a,b)=>new Date(b.ts)-new Date(a.ts));
+    _activityAll = items;
+    // Summary cards
+    const summary=document.getElementById('activity-summary');
+    if (summary) {
+      summary.innerHTML=`
+        <div class="stat-card"><div class="stat-label">Conversations Today</div><div class="stat-value" style="color:var(--green);">${health.conversationsToday||0}</div><div class="stat-sub">Telegram messages</div></div>
+        <div class="stat-card"><div class="stat-label">Pending Escalations</div><div class="stat-value" style="color:${(health.pendingEscalations||0)>0?'#ef4444':'var(--green)'};">${health.pendingEscalations||0}</div><div class="stat-sub">awaiting decision</div></div>
+        <div class="stat-card"><div class="stat-label">Last Briefing</div><div class="stat-value" style="font-size:18px;">${health.lastBriefing?fmtAgo(health.lastBriefing.created_at):'—'}</div><div class="stat-sub">${health.lastBriefing?(health.lastBriefing.delivered?'delivered':'queued'):'—'}</div></div>
+        <div class="stat-card"><div class="stat-label">Last Call Analysis</div><div class="stat-value" style="font-size:18px;">${fmtAgo(health.lastCallAnalysis)}</div><div class="stat-sub">Fathom</div></div>
+        <div class="stat-card"><div class="stat-label">Last KPI Sync</div><div class="stat-value" style="font-size:18px;">${fmtAgo(health.lastKpiSync)}</div><div class="stat-sub">Stripe + Calendly</div></div>
+      `;
+    }
+    document.getElementById('activity-status').textContent = `${items.length} events`;
+    renderActivity();
+  } catch(err) {
+    list.innerHTML = `<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Failed to load: ${err.message}</div>`;
+  }
+}
+function filterActivity(f, btn){
+  _activityFilter=f;
+  document.querySelectorAll('#activity-filters .btn-pill').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderActivity();
+}
+function renderActivity(){
+  const list=document.getElementById('activity-list'); if(!list) return;
+  const rows = _activityFilter==='all' ? _activityAll : _activityAll.filter(i=>i.type===_activityFilter);
+  if (!rows.length) { list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:14px 0;">No events.</div>'; return; }
+  list.innerHTML = rows.slice(0,50).map(i=>{
+    const icon = {escalation:'🚨',call:'📞',briefing:'📰',conversation:'💬',kpi:'📊'}[i.type]||'•';
+    return `<div class="data-card no-hover">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <span style="font-size:14px;">${icon}</span>
+            <span style="font-weight:600;font-size:13px;">${escapeHtml(i.title)}</span>
+            <span class="tag-pill ${i.cls||''}">${i.meta}</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted2);line-height:1.5;">${escapeHtml(i.detail||'')}</div>
+        </div>
+        <div style="font-family:Space Mono,monospace;font-size:10px;color:var(--muted);white-space:nowrap;">${fmtAgo(i.ts)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── CALLS ──
+let _callsAll=[], _callsFilter='all';
+async function loadCalls(){
+  const list=document.getElementById('calls-list'); if(!list) return;
+  list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading calls...</div>';
+  try {
+    const calls = await fetch('/api/axel/calls').then(r=>r.json());
+    _callsAll = Array.isArray(calls)?calls:[];
+    // Summary
+    const summary=document.getElementById('calls-summary');
+    if (summary) {
+      const total=_callsAll.length;
+      const closed=_callsAll.filter(c=>c.outcome==='closed').length;
+      const lost=_callsAll.filter(c=>c.outcome==='lost').length;
+      const avgPillars={};
+      ['awareness','pain','solution','close'].forEach(p=>{
+        const vals=_callsAll.map(c=>c.pillar_scores?.[p]).filter(v=>typeof v==='number');
+        avgPillars[p] = vals.length ? (vals.reduce((s,v)=>s+v,0)/vals.length).toFixed(1) : '—';
+      });
+      summary.innerHTML=`
+        <div class="stat-card"><div class="stat-label">Total Analysed</div><div class="stat-value">${total}</div><div class="stat-sub">calls</div></div>
+        <div class="stat-card"><div class="stat-label">Closed</div><div class="stat-value" style="color:var(--green);">${closed}</div><div class="stat-sub">${total?Math.round(closed/total*100):0}% close rate</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Awareness</div><div class="stat-value" style="color:var(--gold);">${avgPillars.awareness}</div><div class="stat-sub">/10</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Pain</div><div class="stat-value" style="color:var(--gold);">${avgPillars.pain}</div><div class="stat-sub">/10</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Solution</div><div class="stat-value" style="color:var(--gold);">${avgPillars.solution}</div><div class="stat-sub">/10</div></div>
+        <div class="stat-card"><div class="stat-label">Avg Close</div><div class="stat-value" style="color:var(--gold);">${avgPillars.close}</div><div class="stat-sub">/10</div></div>
+      `;
+    }
+    document.getElementById('calls-status').textContent = `${_callsAll.length} calls`;
+    renderCalls();
+  } catch(err) { list.innerHTML=`<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Failed: ${err.message}</div>`; }
+}
+function filterCalls(f, btn){
+  _callsFilter=f;
+  document.querySelectorAll('#calls-filters .btn-pill').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCalls();
+}
+function renderCalls(){
+  const list=document.getElementById('calls-list'); if(!list) return;
+  const rows = _callsFilter==='all' ? _callsAll : _callsAll.filter(c=>c.outcome===_callsFilter);
+  if (!rows.length) { list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:14px 0;">No calls match.</div>'; return; }
+  list.innerHTML = rows.map(c=>{
+    const ps=c.pillar_scores||{};
+    const pillarBars=['awareness','pain','solution','close'].map(p=>{
+      const v=ps[p];const pct=v?v*10:0;
+      return `<div style="flex:1;"><div style="font-family:Space Mono,monospace;font-size:9px;color:var(--muted2);text-transform:uppercase;margin-bottom:3px;">${p} ${v||'—'}</div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${pct>=70?'var(--green)':pct>=50?'var(--gold)':'#ef4444'};"></div></div></div>`;
+    }).join('');
+    const oc = {closed:'green',lost:'red',no_show:'red',follow_up:'gold',booked:'blue'}[c.outcome]||'';
+    return `<div class="data-card" onclick='showCall(${JSON.stringify(c.id)})'>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-weight:600;font-size:14px;">${escapeHtml(c.prospect_name||'Discovery call')}</span>
+          ${c.outcome?`<span class="tag-pill ${oc}">${c.outcome.replace('_',' ')}</span>`:''}
+          ${c.duration_mins?`<span class="tag-pill">${c.duration_mins}min</span>`:''}
+        </div>
+        <span style="font-family:Space Mono,monospace;font-size:10px;color:var(--muted);">${fmtDateOnly(c.call_date)}</span>
+      </div>
+      <div style="display:flex;gap:14px;">${pillarBars}</div>
+      ${c.coaching_note?`<div style="font-size:12px;color:var(--muted2);line-height:1.5;margin-top:10px;border-left:2px solid var(--gold);padding-left:10px;">${escapeHtml(c.coaching_note.slice(0,200))}${c.coaching_note.length>200?'...':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+async function showCall(id){
+  try {
+    const c=await fetch('/api/axel/calls/'+id).then(r=>r.json());
+    const ps=c.pillar_scores||{};
+    openDrawer(c.prospect_name||'Call analysis', `
+      <h2 style="font-size:22px;margin-bottom:8px;">${escapeHtml(c.prospect_name||'Discovery call')}</h2>
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+        <span class="tag-pill gold">${fmtDateOnly(c.call_date)}</span>
+        ${c.outcome?`<span class="tag-pill ${c.outcome==='closed'?'green':c.outcome==='lost'?'red':''}">${c.outcome.replace('_',' ')}</span>`:''}
+        ${c.duration_mins?`<span class="tag-pill">${c.duration_mins} min</span>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px;">
+        ${['awareness','pain','solution','close'].map(p=>{
+          const v=ps[p]||0;const pct=v*10;
+          return `<div style="background:var(--card);padding:12px;border-radius:8px;border:1px solid var(--border);">
+            <div style="font-family:Space Mono,monospace;font-size:9px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;">${p}</div>
+            <div style="font-size:24px;font-weight:700;color:${pct>=70?'var(--green)':pct>=50?'var(--gold)':'#ef4444'};margin-top:4px;">${v||'—'}<span style="font-size:12px;color:var(--muted2);font-weight:400;">/10</span></div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${c.what_worked?`<div style="margin-bottom:18px;"><div style="font-family:Space Mono,monospace;font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✓ What Worked</div><div style="font-size:13px;line-height:1.6;">${escapeHtml(c.what_worked)}</div></div>`:''}
+      ${c.what_stalled?`<div style="margin-bottom:18px;"><div style="font-family:Space Mono,monospace;font-size:10px;color:#ef4444;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">✗ What Stalled</div><div style="font-size:13px;line-height:1.6;">${escapeHtml(c.what_stalled)}</div></div>`:''}
+      ${c.key_objections&&c.key_objections.length?`<div style="margin-bottom:18px;"><div style="font-family:Space Mono,monospace;font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Objections Raised</div><div style="display:flex;gap:6px;flex-wrap:wrap;">${c.key_objections.map(o=>`<span class="tag-pill">${escapeHtml(o)}</span>`).join('')}</div></div>`:''}
+      ${c.coaching_note?`<div style="margin-bottom:18px;background:var(--gold-dim);border-left:3px solid var(--gold);padding:14px;border-radius:6px;"><div style="font-family:Space Mono,monospace;font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Coaching Note</div><div style="font-size:13px;line-height:1.6;">${escapeHtml(c.coaching_note)}</div></div>`:''}
+      ${c.transcript?`<details><summary style="cursor:pointer;font-family:Space Mono,monospace;font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">View transcript</summary><div style="font-size:12px;line-height:1.6;color:var(--muted2);white-space:pre-wrap;background:var(--card);padding:14px;border-radius:8px;max-height:400px;overflow-y:auto;">${escapeHtml(c.transcript)}</div></details>`:''}
+    `);
+  } catch(e){}
+}
+
+// ── BRIEFINGS ──
+async function loadBriefings(){
+  const list=document.getElementById('briefings-list'); if(!list) return;
+  list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading briefings...</div>';
+  try {
+    const briefs = await fetch('/api/axel/briefings').then(r=>r.json());
+    document.getElementById('briefings-status').textContent = `${briefs.length} briefings`;
+    if (!briefs.length) { list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:14px 0;">No briefings generated yet.</div>'; return; }
+    list.innerHTML = briefs.map(b=>{
+      const preview=(b.briefing||'').slice(0,200).replace(/\n+/g,' ');
+      return `<div class="data-card" onclick='showBriefing(${JSON.stringify(b.id)})'>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="tag-pill gold">${b.brief_date}</span>
+            <span class="tag-pill ${b.delivered?'green':''}">${b.delivered?'● delivered':'○ pending'}</span>
+          </div>
+          <span style="font-family:Space Mono,monospace;font-size:10px;color:var(--muted);">${fmtAgo(b.created_at)}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted2);line-height:1.5;">${escapeHtml(preview)}...</div>
+      </div>`;
+    }).join('');
+    // Stash for drawer
+    window._briefMap = Object.fromEntries(briefs.map(b=>[b.id,b]));
+  } catch(err) { list.innerHTML=`<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Failed: ${err.message}</div>`; }
+}
+function showBriefing(id){
+  const b = (window._briefMap||{})[id]; if (!b) return;
+  openDrawer(`Morning briefing · ${b.brief_date}`,`
+    <h2 style="font-size:22px;margin-bottom:8px;">${b.brief_date}</h2>
+    <div style="display:flex;gap:8px;margin-bottom:18px;">
+      <span class="tag-pill ${b.delivered?'green':'gold'}">${b.delivered?'delivered':'not yet delivered'}</span>
+      <span class="tag-pill">Generated ${fmtAgo(b.created_at)}</span>
+    </div>
+    <pre style="font-family:Space Grotesk,sans-serif;font-size:13px;line-height:1.7;white-space:pre-wrap;color:var(--white);">${escapeHtml(b.briefing)}</pre>
+  `);
+}
+
+// ── ESCALATIONS HISTORY ──
+let _escAll=[], _escFilter='all';
+async function loadEscalationsAll(){
+  const list=document.getElementById('esc-list'); if(!list) return;
+  list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading...</div>';
+  try {
+    const escs=await fetch('/api/axel/escalations/all').then(r=>r.json());
+    _escAll=Array.isArray(escs)?escs:[];
+    document.getElementById('esc-status').textContent = `${_escAll.length} total`;
+    const summary=document.getElementById('esc-summary');
+    if(summary){
+      const pending=_escAll.filter(e=>e.status==='pending').length;
+      const resolved=_escAll.filter(e=>e.status==='resolved').length;
+      const dismissed=_escAll.filter(e=>e.status==='dismissed').length;
+      const critical=_escAll.filter(e=>e.urgency==='critical').length;
+      summary.innerHTML=`
+        <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" style="color:${pending>0?'#ef4444':'var(--green)'};">${pending}</div><div class="stat-sub">awaiting decision</div></div>
+        <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value" style="color:var(--green);">${resolved}</div><div class="stat-sub">historical</div></div>
+        <div class="stat-card"><div class="stat-label">Dismissed</div><div class="stat-value">${dismissed}</div><div class="stat-sub">historical</div></div>
+        <div class="stat-card"><div class="stat-label">Critical (all time)</div><div class="stat-value" style="color:#ef4444;">${critical}</div><div class="stat-sub">urgent decisions</div></div>
+      `;
+    }
+    renderEsc();
+  } catch(err){ list.innerHTML=`<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Failed: ${err.message}</div>`; }
+}
+function filterEsc(f,btn){
+  _escFilter=f;
+  document.querySelectorAll('#esc-filters .btn-pill').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderEsc();
+}
+function renderEsc(){
+  const list=document.getElementById('esc-list'); if(!list) return;
+  const rows=_escFilter==='all'?_escAll:_escAll.filter(e=>e.status===_escFilter);
+  if(!rows.length){ list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:14px 0;">No escalations match.</div>'; return; }
+  list.innerHTML = rows.map(e=>{
+    const sCls={pending:'red',resolved:'green',dismissed:''}[e.status]||'';
+    const uCls={critical:'red',high:'gold',normal:'',low:''}[e.urgency]||'';
+    return `<div class="data-card no-hover">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="tag-pill ${uCls}">${e.urgency}</span>
+          <span class="tag-pill ${sCls}">${e.status}</span>
+          <span style="font-weight:600;font-size:13px;">${escapeHtml(e.title)}</span>
+        </div>
+        <span style="font-family:Space Mono,monospace;font-size:10px;color:var(--muted);">${fmtAgo(e.created_at)}</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted2);line-height:1.5;">${escapeHtml(e.context||'')}</div>
+      ${e.resolution_note?`<div style="margin-top:8px;font-size:11px;color:var(--green);font-style:italic;border-left:2px solid var(--green);padding-left:10px;">"${escapeHtml(e.resolution_note)}"</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── CONVERSATIONS ──
+let _convAll=[], _convSearch='';
+async function loadConversations(){
+  const list=document.getElementById('conv-list'); if(!list) return;
+  list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading...</div>';
+  try {
+    const conv=await fetch('/api/axel/conversations').then(r=>r.json());
+    _convAll=Array.isArray(conv)?conv:[];
+    document.getElementById('conv-status').textContent = `${_convAll.length} messages`;
+    renderConv();
+  } catch(err){ list.innerHTML=`<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Failed: ${err.message}</div>`; }
+}
+function filterConv(){ _convSearch=document.getElementById('conv-search').value.toLowerCase(); renderConv(); }
+function renderConv(){
+  const list=document.getElementById('conv-list'); if(!list) return;
+  let rows=_convAll.slice();
+  if(_convSearch) rows=rows.filter(c=>(c.content||'').toLowerCase().includes(_convSearch));
+  if(!rows.length){ list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:14px 0;">No messages match.</div>'; return; }
+  list.innerHTML = rows.slice(0,80).map(c=>{
+    const isUser=c.role==='user';
+    return `<div class="data-card no-hover" style="border-left:3px solid ${isUser?'var(--gold)':'#a98bff'};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-family:Space Mono,monospace;font-size:11px;font-weight:700;color:${isUser?'var(--gold)':'#a98bff'};text-transform:uppercase;letter-spacing:1px;">${isUser?'Alex':'Axel'}</span>
+        <span style="font-family:Space Mono,monospace;font-size:10px;color:var(--muted);">${fmtDate(c.created_at)}</span>
+      </div>
+      <div style="font-size:13px;color:var(--white);line-height:1.6;white-space:pre-wrap;">${escapeHtml((c.content||'').slice(0,500))}${(c.content||'').length>500?'...':''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── MEMORY ──
+async function loadMemory(){
+  const list=document.getElementById('memory-list'); if(!list) return;
+  list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading...</div>';
+  try {
+    const rows=await fetch('/api/axel/memory').then(r=>r.json());
+    document.getElementById('mem-status').textContent = `${rows.length} entries`;
+    if(!rows.length){ list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:14px 0;">No memory stored yet. Axel will populate this as it learns.</div>'; return; }
+    // Group by category
+    const groups={};
+    rows.forEach(r=>{ const c=r.category||'general'; if(!groups[c])groups[c]=[]; groups[c].push(r); });
+    list.innerHTML = Object.entries(groups).map(([cat,items])=>`
+      <div style="margin-bottom:18px;">
+        <div style="font-family:Space Mono,monospace;font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">${cat} · ${items.length}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${items.map(i=>`<div class="data-card no-hover">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <span style="font-family:Space Mono,monospace;font-size:11px;color:var(--white);font-weight:600;">${escapeHtml(i.key)}</span>
+              <span style="font-family:Space Mono,monospace;font-size:10px;color:var(--muted);">${fmtAgo(i.updated_at)}</span>
+            </div>
+            <div style="font-size:12px;color:var(--muted2);line-height:1.5;">${escapeHtml(i.value)}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  } catch(err){ list.innerHTML=`<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Failed: ${err.message}</div>`; }
+}
+
+// ── SETTERS ──
+async function loadSetters(){
+  const list=document.getElementById('setters-list'); if(!list) return;
+  list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;">Loading...</div>';
+  try {
+    const rows=await fetch('/api/axel/setters').then(r=>r.json());
+    document.getElementById('setters-status').textContent = `${rows.length} reports`;
+    const summary=document.getElementById('setters-summary');
+    if(summary){
+      const setters=[...new Set(rows.map(r=>r.setter_name))];
+      const totalBooked=rows.reduce((s,r)=>s+(r.calls_booked||0),0);
+      const totalShowed=rows.reduce((s,r)=>s+(r.calls_showed||0),0);
+      const flagged=rows.filter(r=>r.flagged).length;
+      summary.innerHTML=`
+        <div class="stat-card"><div class="stat-label">Active Setters</div><div class="stat-value">${setters.length}</div><div class="stat-sub">on the team</div></div>
+        <div class="stat-card"><div class="stat-label">Total Booked</div><div class="stat-value" style="color:var(--green);">${totalBooked}</div><div class="stat-sub">all time</div></div>
+        <div class="stat-card"><div class="stat-label">Total Showed</div><div class="stat-value">${totalShowed}</div><div class="stat-sub">all time</div></div>
+        <div class="stat-card"><div class="stat-label">Flagged Reports</div><div class="stat-value" style="color:${flagged>0?'#ef4444':'var(--green)'};">${flagged}</div><div class="stat-sub">needs review</div></div>
+      `;
+    }
+    if(!rows.length){ list.innerHTML='<div style="color:var(--muted2);font-family:Space Mono,monospace;font-size:11px;padding:14px 0;">No setter reports yet. Once setters submit EOD reports they will appear here.</div>'; return; }
+    list.innerHTML = `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-family:Space Mono,monospace;font-size:12px;">
+      <thead><tr style="border-bottom:1px solid var(--border2);">
+        <th style="text-align:left;padding:10px 12px;color:var(--muted2);font-weight:400;">DATE</th>
+        <th style="text-align:left;padding:10px 12px;color:var(--muted2);font-weight:400;">SETTER</th>
+        <th style="text-align:right;padding:10px 12px;color:var(--muted2);font-weight:400;">SCORE</th>
+        <th style="text-align:right;padding:10px 12px;color:var(--muted2);font-weight:400;">BOOKED</th>
+        <th style="text-align:right;padding:10px 12px;color:var(--muted2);font-weight:400;">SHOWED</th>
+        <th style="text-align:left;padding:10px 12px;color:var(--muted2);font-weight:400;">NOTES</th>
+      </tr></thead>
+      <tbody>${rows.map(r=>`<tr style="border-bottom:1px solid var(--border);${r.flagged?'background:rgba(239,68,68,0.05);':''}">
+        <td style="padding:10px 12px;color:var(--gold);">${fmtDateOnly(r.report_date)}</td>
+        <td style="padding:10px 12px;">${escapeHtml(r.setter_name)}</td>
+        <td style="text-align:right;padding:10px 12px;color:${r.score>=7?'var(--green)':r.score>=5?'var(--gold)':'#ef4444'};">${r.score||'—'}/10</td>
+        <td style="text-align:right;padding:10px 12px;">${r.calls_booked||0}</td>
+        <td style="text-align:right;padding:10px 12px;">${r.calls_showed||0}</td>
+        <td style="padding:10px 12px;color:var(--muted2);font-family:Space Grotesk,sans-serif;">${r.flagged?'🚩 ':''}${escapeHtml(r.notes||'—')}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  } catch(err){ list.innerHTML=`<div style="color:#ef4444;font-family:Space Mono,monospace;font-size:11px;">Failed: ${err.message}</div>`; }
+}
+
+function escapeHtml(s){ return (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 // ── VIRTUAL OFFICE (Canvas) ──
 const ALL_OFFICE_AGENTS = [

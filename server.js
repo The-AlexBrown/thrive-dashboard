@@ -188,6 +188,147 @@ app.get('/api/bots/:botId/questions', async (req, res) => {
 
 // ─── AXEL INTEGRATION ────────────────────────────────────────────────────────
 
+// ---- KNOWLEDGE BASE ----
+app.get('/api/axel/kb', async (req, res) => {
+  try {
+    const { category, search } = req.query;
+    let q = supabase.from('knowledge_base').select('id, title, category, content, tags, updated_at').order('updated_at', { ascending: false });
+    if (category && category !== 'all') q = q.eq('category', category);
+    const { data, error } = await q;
+    if (error) return res.status(500).json({ error: error.message });
+    let rows = data || [];
+    if (search) {
+      const s = search.toLowerCase();
+      rows = rows.filter(r => (r.title||'').toLowerCase().includes(s) || (r.content||'').toLowerCase().includes(s));
+    }
+    res.json(rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/axel/kb/categories', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('knowledge_base').select('category');
+    if (error) return res.status(500).json({ error: error.message });
+    const counts = {};
+    (data || []).forEach(r => { counts[r.category] = (counts[r.category] || 0) + 1; });
+    res.json(counts);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/axel/kb/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('knowledge_base').select('*').eq('id', req.params.id).single();
+    if (error) return res.status(404).json({ error: error.message });
+    res.json(data);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- CALLS ----
+app.get('/api/axel/calls', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('call_analyses')
+      .select('id, call_id, call_date, prospect_name, duration_mins, pillar_scores, what_worked, what_stalled, key_objections, coaching_note, outcome, created_at')
+      .order('call_date', { ascending: false })
+      .limit(100);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/axel/calls/:id', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('call_analyses').select('*').eq('id', req.params.id).single();
+    if (error) return res.status(404).json({ error: error.message });
+    res.json(data);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- BRIEFINGS ----
+app.get('/api/axel/briefings', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('daily_briefings')
+      .select('id, briefing, brief_date, delivered, created_at')
+      .order('brief_date', { ascending: false })
+      .limit(60);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- ESCALATIONS HISTORY ----
+app.get('/api/axel/escalations/all', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('escalations')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(80);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- CONVERSATIONS (Alex ↔ Axel) ----
+app.get('/api/axel/conversations', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('id, role, content, created_at')
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- SETTERS ----
+app.get('/api/axel/setters', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('setter_performance')
+      .select('*')
+      .order('report_date', { ascending: false })
+      .limit(60);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- AXEL MEMORY (KV) ----
+app.get('/api/axel/memory', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('axel_kv')
+      .select('key, value, category, updated_at')
+      .order('updated_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data || []);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ---- SYSTEM HEALTH ----
+app.get('/api/axel/health', async (req, res) => {
+  try {
+    const [briefRes, callRes, kpiRes, escRes, convRes] = await Promise.all([
+      supabase.from('daily_briefings').select('brief_date, delivered, created_at').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+      supabase.from('call_analyses').select('created_at').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+      supabase.from('kpis').select('updated_at').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
+      supabase.from('escalations').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase.from('conversations').select('id', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 24*60*60*1000).toISOString()),
+    ]);
+    res.json({
+      lastBriefing: briefRes?.data || null,
+      lastCallAnalysis: callRes?.data?.created_at || null,
+      lastKpiSync: kpiRes?.data?.updated_at || null,
+      pendingEscalations: escRes?.count || 0,
+      conversationsToday: convRes?.count || 0,
+      checkedAt: new Date().toISOString(),
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 app.get('/api/axel/kpis', async (req, res) => {
   try {
     const { data, error } = await supabase
